@@ -1,0 +1,24 @@
+version: "3.8"
+
+services:
+  scylladb:
+    image: scylladb/scylla:latest
+    container_name: scylladb
+    ports:
+      - "9042:9042" # Default port for CQL
+      - "9180:9180" # Default port for the REST API
+    environment:
+      # SCYLLA_CLUSTER_NAME=my-clus-ig
+      - SCYLLA_LISTEN_ADDRESS=scylladb
+      - SCYLLA_RPC_ADDRESS=0.0.0.0
+    volumes:
+      - scylladb_data:/var/lib/scylla
+    networks:
+      - db-network
+
+volumes:
+  scylladb_data:
+
+networks:
+  db-network:
+    driver: bridge
