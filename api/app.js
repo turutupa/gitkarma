@@ -81,9 +81,7 @@ const path = "/api/webhook";
 const localWebhookUrl = `http://${host}:${port}${path}`;
 
 // This sets up a middleware function to handle incoming webhook events.
-//
 // Octokit's `createNodeMiddleware` function takes care of generating this middleware function for you. The resulting middleware function will:
-//
 //    - Check the signature of the incoming webhook event to make sure that it matches your webhook secret. This verifies that the incoming webhook event is a valid GitHub event.
 //    - Parse the webhook event payload and identify the type of event.
 //    - Trigger the corresponding webhook event handler.
