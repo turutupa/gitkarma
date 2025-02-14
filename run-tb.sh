@@ -52,4 +52,4 @@ fi
 
 # Start the TigerBeetle server
 echo "Starting TigerBeetle server..."
-"$TIGERBEETLE_DIR/tigerbeetle" start --addresses=3001 "$TIGERBEETLE_DIR/0_0.tigerbeetle"
+"$TIGERBEETLE_DIR/tigerbeetle" start --addresses=3001 "$TIGERBEETLE_DIR/0_0.tigerbeetle" 
