@@ -5,6 +5,7 @@ import log from "log.ts";
 import tb from "../db/tigerbeetle.ts";
 import {
   ADMIN_TRIGGER_RECHECK_EMOJI,
+  BALANCE_CHECK_EMOJI,
   EGithubEndpoints,
   EPullRequestState,
   githubHeaders,
@@ -19,30 +20,10 @@ import { getOrDefaultGithubUser } from "./utils.ts";
  * This handler processes an issue comment event and, if the comment is on a pull request,
  * it triggers a re-check of the GitKarma check based on the content of the comment.
  *
- * - Verifies that the comment is on a pull request (checks for the existence of payload.issue.pull_request).
  * - Determines if the comment triggers a re-check:
  *   - Uses a specific emoji (e.g., "✨") for a standard re-check.
+ *   - Uses a specific emoji (e.g., "💰") to check user balance.
  *   - Uses a designated admin emoji (e.g., "🚀") to indicate an admin override.
- * - Retrieves the repository record and pull request record from the local database.
- * - If the pull request is closed, it exits early.
- * - If the pull request's GitKarma check has already passed, it posts a comment and exits.
- * - Sets the GitKarma check to "in_progress" using the stored head_sha.
- * - If the admin override emoji is used:
- *   - Checks if the sender is a repository admin (via payload permissions or an API call).
- *   - If the sender is an admin, updates the PR record to mark the check as passed,
- *     posts an override comment, and creates a completed check run with a "success" conclusion.
- *   - If the sender is not an admin, logs the unauthorized attempt and continues.
- * - For a standard re-check:
- *   - Retrieves the GitHub user and their account details.
- *   - Checks if the user has sufficient tokens (balance) to meet the merge deduction requirement.
- *   - Updates the pull request record's check status based on the token balance.
- *   - If sufficient tokens exist:
- *     - Deducts the required tokens from the user's account.
- *     - Posts a comment with the updated balance.
- *     - Creates a check run with a "success" conclusion.
- *   - If not enough tokens are available:
- *     - Posts a comment indicating the insufficient token balance.
- *     - Creates a check run with a "failure" conclusion.
  *
  * @param {Octokit} octokit - An authenticated Octokit instance for GitHub API interactions.
  * @param {IssueCommentEvent} payload - The webhook payload for an issue comment event from GitHub.
@@ -71,6 +52,24 @@ export const handleIssueComment = async ({
     return;
   }
 
+  const repo = await db.getRepoByGitServiceRepoId(repoId);
+
+  const isUserBalanceCheck = commentBody === BALANCE_CHECK_EMOJI;
+  if (payload.action === "created" && isUserBalanceCheck) {
+    const user = await db.getUserByGithubId(payload.sender.id);
+    const account = await tb.getUserAccount(BigInt(user.id), BigInt(repo.id));
+    const balance = tb.getBalance(account);
+
+    await octokit.request(EGithubEndpoints.Comments, {
+      owner,
+      repo: payload.repository.name,
+      issue_number: prNumber,
+      body: `Balance for user ${payload.sender.login} is ${balance}💰`,
+      headers: githubHeaders,
+    });
+    return;
+  }
+
   // check if a user has triggered a re-check on PR owner funds,
   // otherwise just exit
   const isTriggeringRecheck = commentBody === TRIGGER_RECHECK_EMOJI;
@@ -91,7 +90,6 @@ export const handleIssueComment = async ({
     return;
   }
 
-  const repo = await db.getRepoByGitServiceRepoId(repoId);
   const pr = await db.getPullRequest(prNumber, repo.id);
 
   if (!pr) {

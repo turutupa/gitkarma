@@ -15,17 +15,12 @@ import { getOrDefaultGithubRepo, getOrDefaultGithubUser } from "./utils.ts";
  *
  * This handler is invoked when a pull request creator pushes a new commit (i.e. a "synchronize" event).
  *
- * - **Triggered on synchronize events:** Runs when new commits are pushed to an open pull request.
- * - **Sets check status:** Marks the GitKarma check as "in_progress" for the new commit (using the new head SHA).
- * - **Retrieves details:** Fetches repository and user details from the local database, along with the PR record.
- * - **Checks existing status:** If the PR is already marked as having passed the GitKarma check, it immediately marks the new commit as successful and exits.
- * - **Token balance verification:** Compares the user's token balance to the required tokens for merging.
- * - **Updates PR record:** Updates the local database record for the pull request with the new check status.
- * - **If sufficient tokens are available:**
+ * - Checks existing status: If the PR is already marked as having passed the GitKarma check, it immediately marks the new commit as successful and exits.
+ * - If sufficient tokens are available:
  *   - Charges the user's account by transferring the necessary tokens.
  *   - Posts a comment to the PR with the updated balance.
  *   - Marks the GitKarma check as "completed" with a "success" conclusion.
- * - **If tokens are insufficient:**
+ * - If tokens are insufficient:
  *   - Posts an error comment indicating the shortfall.
  *   - Marks the GitKarma check as "completed" with a "failure" conclusion.
  *

@@ -15,8 +15,7 @@ import { getOrDefaultGithubRepo, getOrDefaultGithubUser } from "./utils.ts";
  * handlePullRequestReopened:
  *
  * This handler is invoked when a pull request is reopened on GitHub.
- * - Sets the GitKarma check status to "in_progress" for the reopened PR.
- * - Retrieves the repository and user details using the PR's GitHub data.
+ *
  * - Checks the user's token balance against the required tokens for merging the PR.
  * - Updates the pull request record in the local database:
  *   - Sets the PR state to "open".

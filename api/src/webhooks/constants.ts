@@ -9,6 +9,7 @@ export const DEFAULT_REPO_CONFIG = {
 export const GITKARMA_CHECK_NAME: string = "Gitkarma Tokens Check";
 export const TRIGGER_RECHECK_EMOJI: string = "✨";
 export const ADMIN_TRIGGER_RECHECK_EMOJI: string = "🚀";
+export const BALANCE_CHECK_EMOJI = "💰";
 
 export enum EGithubEndpoints {
   Comments = "POST /repos/{owner}/{repo}/issues/{issue_number}/comments",

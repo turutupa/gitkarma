@@ -16,8 +16,6 @@ import { getOrDefaultGithubRepo, getOrDefaultGithubUser } from "./utils.ts";
  *
  * This handler is invoked when a pull request is opened on GitHub.
  *
- * - Sets the remote GitKarma check to "in_progress".
- * - Retrieves the repository and user details based on the PR data.
  * - Checks the user's token balance against the required tokens for merging the PR.
  * - Creates a new pull request entry in the local database with:
  *   - The PR number and repository ID.
