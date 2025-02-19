@@ -1,0 +1,17 @@
+TigerBeetle is already installed.
+Starting TigerBeetle server...
+2025-02-19 20:32:47.178Z info(io): opening "0_0.tigerbeetle"...
+2025-02-19 20:32:47.223Z info(main): release=0.16.27
+2025-02-19 20:32:47.223Z info(main): release_client_min=0.15.3
+2025-02-19 20:32:47.223Z info(main): releases_bundled={ 0.16.21, 0.16.23, 0.16.25, 0.16.26, 0.16.27 }
+2025-02-19 20:32:47.223Z info(main): git_commit=1c7db9310d65ef9b8dcef61431cd4d8b6da95459
+2025-02-19 20:32:47.524Z info(replica): superblock release=0.16.27
+2025-02-19 20:32:47.935Z info(main): 0: Allocated 3105MiB during replica init
+2025-02-19 20:32:47.935Z info(main): 0: Grid cache: 1024MiB, LSM-tree manifests: 128MiB
+2025-02-19 20:32:47.935Z info(main): 0: cluster=0: listening on 127.0.0.1:3001
+2025-02-19 20:32:47.935Z info(main): 0: started with extra verification checks
+2025-02-19 20:32:47.935Z warning(main): a cluster id of 0 is reserved for testing and benchmarking, do not use in production
+2025-02-19 20:32:48.117Z info(replica): 0: transition_to_normal_from_recovering_status: view=15 primary
+2025-02-19 20:32:50.252Z info(message_bus): connection from client 124360542396068855384311606143091855356
+2025-02-19 20:32:57.021Z info(message_bus): peer performed an orderly shutdown: message_bus.MessageBusType(.replica).Connection.Peer{ .client = 124360542396068855384311606143091855356 }
+./scripts/run_tb.sh: line 57: 86975 Terminated: 15          "$TIGERBEETLE_DIR/tigerbeetle" start --addresses=3001 "$TIGERBEETLE_DIR/0_0.tigerbeetle"

@@ -24,7 +24,7 @@ class TigerBeetle {
 
   private constructor() {}
 
-  public static connect(): TigerBeetle {
+  public static async connect(): Promise<TigerBeetle> {
     const tbHost = process.env.TB_HOST || "";
     const tbPort = Number(process.env.TB_PORT) || 3001;
     const tigerbeetle = new TigerBeetle();
@@ -32,7 +32,12 @@ class TigerBeetle {
       cluster_id: 0n,
       replica_addresses: [`${tbHost}:${tbPort}` || "127.0.0.1:3001"],
     });
-    log.info("Connection established to tigerbeetle");
+    const isConnected = await tigerbeetle.tb.lookupAccounts([BigInt(1)]);
+    if (isConnected) {
+      log.info("Connection established to tigerbeetle");
+    } else {
+      log.error("Connection tigerbeetle failed");
+    }
     return tigerbeetle;
   }
 

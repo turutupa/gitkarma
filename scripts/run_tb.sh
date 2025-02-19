@@ -1,7 +1,9 @@
 #!/bin/bash
 
-# Define the TigerBeetle directory
-TIGERBEETLE_DIR="tigerbeetle"
+
+# Define dirs
+PROJECT_ROOT=$(pwd)
+TIGERBEETLE_DIR="$PROJECT_ROOT/tigerbeetle"
 
 # Create the TigerBeetle directory if it doesn't exist
 mkdir -p "$TIGERBEETLE_DIR"

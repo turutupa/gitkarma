@@ -1,11 +1,6 @@
-.PHONY: all build run stop start-databases
+.PHONY: all build dev stop tb
 
-# Variables
-DOCKER_COMPOSE = docker-compose
-NGROK_PORT = 4000
-GO_PORT = 4000
-GO_BINARY = main
-PID_FILE = .pid
+DOCKER_COMPOSE = docker compose
 
 all: build run
 
@@ -14,21 +9,15 @@ build:
 	@echo "Building Go backend..."
 	cd api && go build -o $(GO_BINARY)
 
-# WORKING FOR TMUX USERS 
-dev: 
-	@echo "Starting Go server and ngrok..."
-	@./start.sh 
-
-# MIGHT NEED SOME TWEAKING (stop tiger beetle hasn't been tested yet)
-stop:
-	@echo "Stopping Go server and ngrok..."
-	@pkill -f ./main || true
-	@pkill -f ngrok || true
-	@pkill -f tigerbeetle || true 
-	@$(DOCKER_COMPOSE) down || true
-
-# NOT FINISHED
-start-databases:
-	@echo "Starting databases..."
+dev:
+	@echo "Starting tigerbeetle and PostgreSQL..."
+	@./scripts/run_tb.sh > logs/tigerbeetle.log 2>&1 &
 	$(DOCKER_COMPOSE) up -d
 
+stop:
+	@pkill -f tigerbeetle || true 
+	@$(DOCKER_COMPOSE) stop || true 
+	@echo "tigerbeetle and PostreSQL exited"
+
+tb: 
+	@./tigerbeetle/tigerbeetle repl --addresses=3001 --cluster=0
