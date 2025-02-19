@@ -161,7 +161,7 @@ export const handleIssueComment = async ({
   if (isAdmin && isTriggeringAdminRecheck) {
     // hard-code true to checks passing
     await db.updatePullRequest(prNumber, repo.id, { checkPassed: true });
-    const message = `**Admin override.** ${payload.sender.login} has manually approved the GitKarma Check, bypassing the funds verification.`;
+    const message = `**Admin override.** **${payload.sender.login}** has manually approved the GitKarma Check, bypassing the funds verification.`;
     await octokit.request(EGithubEndpoints.Comments, {
       owner,
       repo: repoName,
