@@ -21,8 +21,8 @@ import { getOrDefaultGithubUser } from "./utils.ts";
  * it triggers a re-check of the GitKarma check based on the content of the comment.
  *
  * - Determines if the comment triggers a re-check:
- *   - Uses a specific emoji (e.g., "✨") for a standard re-check.
  *   - Uses a specific emoji (e.g., "💰") to check user balance.
+ *   - Uses a specific emoji (e.g., "✨") for a standard re-check.
  *   - Uses a designated admin emoji (e.g., "🚀") to indicate an admin override.
  *
  * @param {Octokit} octokit - An authenticated Octokit instance for GitHub API interactions.
