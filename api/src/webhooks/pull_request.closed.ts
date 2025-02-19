@@ -39,7 +39,9 @@ export const handlePullRequestClosed = async ({
 
   const repo = await db.getRepoByGitServiceRepoId(repoId);
 
-  // Set pull request to merged / closed
+  // Fetch first PR to know current state before closing it. To know if it was passing or not.
+  const pr = await db.getPullRequest(prNumber, repo.id);
+  // Then set pull request to merged / closed
   const prState = merged ? EPullRequestState.Merged : EPullRequestState.Closed;
   await db.updatePullRequest(prNumber, repo.id, {
     state: prState,
@@ -88,9 +90,12 @@ export const handlePullRequestClosed = async ({
   }
 
   // Handle pull request was closed but not merged
-  // Case where pull request was NOT passing gitkarma check
-  const pr = await db.getPullRequest(prNumber, repo.id);
+  // Case where pull request was NOT passing gitkarma check -> no refund
   if (!pr?.check_passed) {
+    log.info(
+      { pr },
+      "Pull request closed > Not issueing as it was not passing check"
+    );
     return;
   }
   // Case where pull request was passing gitkarma check -> refund-user
@@ -98,7 +103,7 @@ export const handlePullRequestClosed = async ({
   const userRepo = await db.getUserRepo(user.id, repo.id);
   log.info(
     { repo, user: userRepo },
-    "Pull Request closed but not merged. Transfering funds to PR Owner."
+    "Pull Request closed but not merged. Transfering funds back to PR Owner."
   );
   await tb.repoTransfersFundsToUser(
     BigInt(repo.tigerbeetle_account_id),
