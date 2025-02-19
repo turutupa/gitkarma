@@ -1,7 +1,7 @@
 export type TUser = {
   id: number;
   github_id: number;
-  username: string;
+  github_username: string;
   created_at: Date;
 };
 
@@ -34,4 +34,17 @@ export type TRepo = {
   comment_debits: number;
   max_complexity_bonus_debits: number;
   pr_merge_deduction_debits: number;
+};
+
+export type TPullRequest = {
+  id: number;
+  pr_number: number;
+  repo_id: number;
+  user_id: number;
+  head_sha: string;
+  state: string;
+  check_passed: boolean;
+  created_at: Date;
+  updated_at: Date;
+  // Add additional fields here if needed.
 };

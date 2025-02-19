@@ -25,10 +25,12 @@ class TigerBeetle {
   private constructor() {}
 
   public static connect(): TigerBeetle {
+    const tbHost = process.env.TB_HOST || "";
+    const tbPort = Number(process.env.TB_PORT) || 3001;
     const tigerbeetle = new TigerBeetle();
     tigerbeetle.tb = createClient({
       cluster_id: 0n,
-      replica_addresses: [process.env.TB_ADDRESS || "127.0.0.1:3001"],
+      replica_addresses: [`${tbHost}:${tbPort}` || "127.0.0.1:3001"],
     });
     log.info("Connection established to tigerbeetle");
     return tigerbeetle;

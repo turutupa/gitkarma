@@ -3,7 +3,9 @@ import dotenv from "dotenv";
 import fs from "fs";
 import http from "http";
 import { App } from "octokit";
+import { handleIssueComment } from "webhooks/issue_comment.ts";
 import { handlePullRequestClosed } from "webhooks/pull_request.closed.ts";
+import { handlePullRequestSynchronize } from "webhooks/pull_request.synchronize.ts";
 import log from "./log.ts";
 import { handlePullRequestOpened } from "./webhooks/pull_request.opened.ts";
 
@@ -37,6 +39,10 @@ const app = async () => {
   app.webhooks.on("pull_request.opened", handlePullRequestOpened);
   // @ts-ignore
   app.webhooks.on("pull_request.closed", handlePullRequestClosed);
+  // @ts-ignore
+  app.webhooks.on("pull_request.synchronize", handlePullRequestSynchronize);
+  // @ts-ignore
+  app.webhooks.on("issue_comment", handleIssueComment);
 
   // This logs any errors that occur.
   app.webhooks.onError((error) => {

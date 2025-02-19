@@ -6,8 +6,18 @@ export const DEFAULT_REPO_CONFIG = {
   prMergeDeductionDebits: 100, // debits deducted from the PR creator when merged
 };
 
-export enum GithubEndpoints {
+export const GITKARMA_CHECK_NAME: string = "Gitkarma Tokens Check";
+export const TRIGGER_RECHECK_EMOJI: string = "✨";
+export const ADMIN_TRIGGER_RECHECK_EMOJI: string = "🚀";
+
+export enum EGithubEndpoints {
   Comments = "POST /repos/{owner}/{repo}/issues/{issue_number}/comments",
+}
+
+export enum EPullRequestStatus {
+  Open = "open",
+  Closed = "closed",
+  Merged = "merged",
 }
 
 export const githubHeaders = {

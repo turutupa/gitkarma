@@ -5,7 +5,7 @@
   "main": "app.js",
   "scripts": {
     "server": "node app.js",
-    "dev": "npx tsx watch src/app.ts",
+    "dev": "clear && bash ../scripts/gitkarma.sh && npx tsx watch src/app.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],

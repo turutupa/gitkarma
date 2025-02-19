@@ -4,7 +4,8 @@ import log from "log.ts";
 import { dirname, join } from "path";
 import pgk from "pg";
 import { fileURLToPath } from "url";
-import type { TRepo, TUser, TUserRepo } from "./models.ts";
+import type { EPullRequestStatus } from "webhooks/constants.ts";
+import type { TPullRequest, TRepo, TUser, TUserRepo } from "./models.ts";
 const { Pool } = pgk;
 
 dotenv.config();
@@ -67,10 +68,10 @@ class DB {
    */
   public async getUserByGithubId(githubId: number): Promise<TUser> {
     const query = `
-    SELECT id, github_id, username, created_at 
-    FROM users 
-    WHERE github_id = $1
-  `;
+      SELECT id, github_id, github_username, created_at 
+      FROM users 
+      WHERE github_id = $1
+    `;
     const { rows } = await this.pg.query<TUser>(query, [githubId]);
     return rows[0];
   }
@@ -80,25 +81,31 @@ class DB {
    * Inserts a new user into the `users` table with the provided GitHub ID and username.
    *
    * @param githubId - The GitHub user ID.
-   * @param username - The GitHub username.
+   * @param githubUsername - The GitHub username.
    * @returns A Promise that resolves to the newly created user.
    */
-  public async createUser(githubId: number, username: string): Promise<TUser> {
+  public async createUser(
+    githubId: number,
+    githubUsername: string
+  ): Promise<TUser> {
     const query = `
-    INSERT INTO users (github_id, username) 
-    VALUES ($1, $2) 
-    RETURNING *
-  `;
-    const { rows } = await this.pg.query<TUser>(query, [githubId, username]);
+      INSERT INTO users (github_id, github_username) 
+      VALUES ($1, $2) 
+      RETURNING *
+    `;
+    const { rows } = await this.pg.query<TUser>(query, [
+      githubId,
+      githubUsername,
+    ]);
     return rows[0];
   }
 
   /**
-   * getUserById:
-   * Checks if a user exists in the `users` table by their GitHub ID.
+   * getUserRepo:
+   * Get the user-repo entry given a user's and repo's id
    *
-   * @param userId - The user ID to look up.
-   * @param repoId - The repo ID to look up.
+   * @param userId - The user ID (from repos table - not the github service user id)
+   * @param repoId - The repo ID (from repos table - not the github service repo id)
    * @returns A Promise that resolves to the user if found, or null if not.
    */
   public async getUserRepo(userId: number, repoId: number): Promise<TUserRepo> {
@@ -121,13 +128,13 @@ class DB {
     comments_count = 0
   ): Promise<TUserRepo> {
     const query = `
-    INSERT INTO 
-      user_repo (user_id, repo_id, tigerbeetle_account_id, prs_opened, prs_approved, comments_count)
-    VALUES 
-      ($1, $2, $3, $4, $5, $6)
-    RETURNING 
-      *
-  `;
+      INSERT INTO 
+        user_repo (user_id, repo_id, tigerbeetle_account_id, prs_opened, prs_approved, comments_count)
+      VALUES 
+        ($1, $2, $3, $4, $5, $6)
+      RETURNING 
+        *
+    `;
     const { rows } = await this.pg.query<TUserRepo>(query, [
       userId,
       repoId,
@@ -149,10 +156,10 @@ class DB {
    */
   public async createRepo(repoId: number, repoName: string): Promise<TRepo> {
     const query = `
-    INSERT INTO repos (repo_id, repo_name)
-    VALUES ($1, $2)
-    RETURNING *
-  `;
+      INSERT INTO repos (repo_id, repo_name)
+      VALUES ($1, $2)
+      RETURNING *
+    `;
     const { rows } = await this.pg.query<TRepo>(query, [repoId, repoName]);
     return rows[0];
   }
@@ -170,11 +177,11 @@ class DB {
     tigerbeetleAccountId: bigint
   ): Promise<TRepo> {
     const query = `
-    UPDATE repos
-    SET tigerbeetle_account_id = $1
-    WHERE repos.id = $2
-    RETURNING *
-  `;
+      UPDATE repos
+      SET tigerbeetle_account_id = $1
+      WHERE repos.id = $2
+      RETURNING *
+    `;
     log.info(`Updating repo with tiger beetle account ${tigerbeetleAccountId}`);
     const { rows } = await this.pg.query<TRepo>(query, [
       tigerbeetleAccountId,
@@ -192,12 +199,166 @@ class DB {
    */
   public async getRepoByGitServiceRepoId(githubRepoId: number): Promise<TRepo> {
     const query = `
-    SELECT * 
-    FROM repos 
-    WHERE repo_id = $1
-  `;
+      SELECT * 
+      FROM repos 
+      WHERE repo_id = $1
+    `;
     const { rows } = await this.pg.query<TRepo>(query, [githubRepoId]);
     return rows[0];
+  }
+
+  /**
+   * createPullRequest:
+   * Inserts a new pull request record into the pull_requests table.
+   *
+   * @param prNumber - The Git Service PR number (unique per repo).
+   * @param repoId - The internal repository id.
+   * @param userId - The internal user id for the PR creator.
+   * @param headSha - The commit SHA of the PR's head.
+   * @param state - The state of the pull request (e.g., 'open', 'closed', 'merged').
+   * @param checkPassed - Optional flag indicating if the GitKarma check has passed (defaults to false).
+   * @returns A Promise that resolves to the newly created pull request record.
+   */
+  public async createPullRequest(
+    prNumber: number,
+    repoId: number,
+    userId: number,
+    headSha: string,
+    state: string,
+    checkPassed: boolean = false
+  ): Promise<TPullRequest> {
+    const query = `
+      INSERT INTO 
+        pull_requests (pr_number, repo_id, user_id, head_sha, state, check_passed)
+      VALUES 
+        ($1, $2, $3, $4, $5, $6)
+      RETURNING *;
+    `;
+    const { rows } = await this.pg.query<TPullRequest>(query, [
+      prNumber,
+      repoId,
+      userId,
+      headSha,
+      state,
+      checkPassed,
+    ]);
+    return rows[0];
+  }
+
+  /**
+   * getPullRequest:
+   * Fetches a pull request record by its Git Service PR number and repository id.
+   *
+   * @param prNumber - The pull request number from the git service.
+   * @param repoId - The internal repository id (from your repos table).
+   * @returns - A Promise that resolves to the pull request record if found, or null.
+   */
+  public async getPullRequest(
+    prNumber: number,
+    repoId: number
+  ): Promise<TPullRequest | null> {
+    const query = `
+      SELECT *
+      FROM pull_requests
+      WHERE pr_number = $1 AND repo_id = $2
+      LIMIT 1;
+    `;
+    const { rows } = await this.pg.query<TPullRequest>(query, [
+      prNumber,
+      repoId,
+    ]);
+    return rows.length > 0 ? rows[0] : null;
+  }
+
+  /**
+   * updatePullRequest:
+   * Updates the head_sha and check_passed fields for a pull request identified by its Git Service PR number and repository id.
+   *
+   * @param prNumber - The pull request number from the git service.
+   * @param repoId - The internal repository id (from your repos table).
+   * @param headSha - The new commit SHA to update.
+   * @param checkPassed - The new value for check_passed.
+   * @returns - A Promise that resolves to the updated pull request record if found, or null.
+   */
+  public async updatePullRequest(
+    prNumber: number,
+    repoId: number,
+    headSha: string,
+    checkPassed: boolean
+  ): Promise<TPullRequest | null> {
+    const query = `
+      UPDATE pull_requests
+      SET head_sha = $1,
+          check_passed = $2,
+          updated_at = CURRENT_TIMESTAMP
+      WHERE pr_number = $3 AND repo_id = $4
+      RETURNING *;
+    `;
+    const { rows } = await this.pg.query<TPullRequest>(query, [
+      headSha,
+      checkPassed,
+      prNumber,
+      repoId,
+    ]);
+    return rows.length > 0 ? rows[0] : null;
+  }
+
+  /**
+   * setPullRequestStatus:
+   * Changes the status of a given pull request status
+   *
+   * @param prNumber - The pull request number from the git service.
+   * @param repoId - The internal repository id (from your repos table).
+   * @param status - The new status of Pull Request
+   * @returns - A Promise that resolves to the updated pull request record if found, or null.
+   */
+  public async setPullRequestStatus(
+    prNumber: number,
+    repoId: number,
+    status: EPullRequestStatus
+  ): Promise<TPullRequest | null> {
+    const query = `
+      UPDATE pull_requests
+      SET status = $1,
+          updated_at = CURRENT_TIMESTAMP
+      WHERE pr_number = $2 AND repo_id = $3
+      RETURNING *;
+    `;
+    const { rows } = await this.pg.query<TPullRequest>(query, [
+      status,
+      prNumber,
+      repoId,
+    ]);
+    return rows.length > 0 ? rows[0] : null;
+  }
+
+  /**
+   * setPullRequestCheck:
+   * Changes the status of a given pull request check_passed
+   *
+   * @param prNumber - The pull request number from the git service.
+   * @param repoId - The internal repository id (from your repos table).
+   * @param status - The new status of Pull Request
+   * @returns - A Promise that resolves to the updated pull request record if found, or null.
+   */
+  public async setPullRequestCheck(
+    prNumber: number,
+    repoId: number,
+    checkPassed: boolean
+  ): Promise<TPullRequest | null> {
+    const query = `
+      UPDATE pull_requests
+      SET check_passed = $1,
+          updated_at = CURRENT_TIMESTAMP
+      WHERE pr_number = $2 AND repo_id = $3
+      RETURNING *;
+    `;
+    const { rows } = await this.pg.query<TPullRequest>(query, [
+      checkPassed,
+      prNumber,
+      repoId,
+    ]);
+    return rows.length > 0 ? rows[0] : null;
   }
 }
 

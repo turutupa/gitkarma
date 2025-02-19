@@ -3,7 +3,7 @@ BEGIN;
 CREATE TABLE IF NOT EXISTS users (
   id SERIAL PRIMARY KEY,
   github_id INTEGER NOT NULL UNIQUE,
-  username VARCHAR(255) NOT NULL,
+  github_username VARCHAR(255) NOT NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS repos (
   review_approval_debits INTEGER DEFAULT 50,       -- Credits granted for approving a PR review 
   comment_debits INTEGER DEFAULT 5,                -- Credits per comment 
   max_complexity_bonus_debits INTEGER DEFAULT 20,  -- Maximum bonus credits for complex reviews 
-  pr_merge_deduction_debits INTEGER DEFAULT 100            -- Credits deducted from the PR creator when merged 
+  pr_merge_deduction_debits INTEGER DEFAULT 100    -- Credits deducted from the PR creator when merged 
 );
 
 CREATE TABLE IF NOT EXISTS user_repo (
@@ -36,12 +36,17 @@ CREATE TABLE IF NOT EXISTS user_repo (
   UNIQUE(user_id, repo_id)
 );
 
-CREATE TABLE IF NOT EXISTS transactions (
+CREATE TABLE IF NOT EXISTS pull_requests (
   id SERIAL PRIMARY KEY,
-  user_repo_id INTEGER NOT NULL REFERENCES user_repo(id),
-  amount NUMERIC NOT NULL,
-  transaction_type VARCHAR(50) NOT NULL,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  pr_number INTEGER NOT NULL,                     -- Git Service PR number (unique per repo)
+  repo_id INTEGER NOT NULL REFERENCES repos(id),  -- Reference to the repo table
+  user_id INTEGER NOT NULL REFERENCES users(id),  -- The PR creator's internal user id
+  head_sha VARCHAR(255) NOT NULL,                 -- Latest commit SHA of the PR
+  state VARCHAR(50) NOT NULL,                     -- e.g. 'open', 'closed', 'merged'
+  check_passed BOOLEAN DEFAULT false,             -- Whether the GitKarma check passed for this PR
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  -- can create more entries here for analytics, such as # comments, # reviews, code quality etc
 );
 
 COMMIT;
