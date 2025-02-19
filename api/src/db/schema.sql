@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS repos (
   total_prs_approved INTEGER DEFAULT 0,
   total_comments INTEGER DEFAULT 0,
   -- Configuration fields:
-  default_debits INTEGER DEFAULT 200,              -- Starting credits for a new user 
+  default_debits INTEGER DEFAULT 400,              -- Starting credits for a new user 
   review_approval_debits INTEGER DEFAULT 50,       -- Credits granted for approving a PR review 
   comment_debits INTEGER DEFAULT 5,                -- Credits per comment 
   max_complexity_bonus_debits INTEGER DEFAULT 20,  -- Maximum bonus credits for complex reviews 

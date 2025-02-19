@@ -1,5 +1,5 @@
 export const DEFAULT_REPO_CONFIG = {
-  defaultDebits: 200, // starting debits for a new user
+  defaultDebits: 400, // starting debits for a new user
   reviewApprovalDebits: 50, // debits granted for approving a PR review
   commentDebits: 5, // debits per comment
   maxComplexityBonusDebits: 20, // Maximum bonus debits for complex reviews
@@ -14,7 +14,7 @@ export enum EGithubEndpoints {
   Comments = "POST /repos/{owner}/{repo}/issues/{issue_number}/comments",
 }
 
-export enum EPullRequestStatus {
+export enum EPullRequestState {
   Open = "open",
   Closed = "closed",
   Merged = "merged",

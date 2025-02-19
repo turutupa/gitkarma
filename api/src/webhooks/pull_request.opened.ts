@@ -5,7 +5,7 @@ import tb from "db/tigerbeetle.ts";
 import log from "log.ts";
 import {
   EGithubEndpoints,
-  EPullRequestStatus,
+  EPullRequestState,
   githubHeaders,
   GITKARMA_CHECK_NAME,
 } from "webhooks/constants.ts";
@@ -14,7 +14,28 @@ import { getOrDefaultGithubRepo, getOrDefaultGithubUser } from "./utils.ts";
 /**
  * handlePullRequestOpened:
  *
- * @param { Octokit, payload }
+ * This handler is invoked when a pull request is opened on GitHub.
+ *
+ * - Sets the remote GitKarma check to "in_progress".
+ * - Retrieves the repository and user details based on the PR data.
+ * - Checks the user's token balance against the required tokens for merging the PR.
+ * - Creates a new pull request entry in the local database with:
+ *   - The PR number and repository ID.
+ *   - The head SHA of the PR.
+ *   - The PR state set to "open".
+ *   - The check status flag set based on whether the user has enough tokens.
+ * - If the user has sufficient tokens:
+ *   - Charges the user's account by transferring the PR merge deduction tokens.
+ *   - Posts a comment to the PR with the updated balance.
+ *   - Updates the GitKarma check to "completed" with a "success" conclusion.
+ * - If the user does not have enough tokens:
+ *   - Posts a comment to the PR indicating insufficient tokens.
+ *   - Updates the GitKarma check to "completed" with a "failure" conclusion.
+ *
+ * @param {Object} params - The parameters for the handler.
+ * @param {Octokit} params.octokit - An authenticated Octokit instance for GitHub API interactions.
+ * @param {PullRequestOpenedEvent} params.payload - The webhook payload for the pull request opened event.
+ * @returns {Promise<void>} A promise that resolves when processing is complete.
  */
 export const handlePullRequestOpened = async ({
   octokit,
@@ -52,7 +73,7 @@ export const handlePullRequestOpened = async ({
   );
 
   log.debug({ user }, "pull_request.opened > user");
-  log.info({ account }, "pull_request.opened > user account");
+  log.debug({ account }, "pull_request.opened > user account");
 
   const balance = Number(tb.getBalance(account));
   const hasEnoughDebits = balance >= repo.pr_merge_deduction_debits;
@@ -63,54 +84,20 @@ export const handlePullRequestOpened = async ({
     repo.id,
     user.id,
     headSha,
-    EPullRequestStatus.Open,
+    EPullRequestState.Open,
     hasEnoughDebits // set PR to passed check
   );
 
+  // handle pr payment and notify github
   if (hasEnoughDebits) {
-    try {
-      await tb.repoChargesFundsToUser(
-        BigInt(repo.tigerbeetle_account_id),
-        BigInt(account.id),
-        BigInt(repo.pr_merge_deduction_debits),
-        repo.id
-      );
-      const newBalance = balance - repo.pr_merge_deduction_debits;
-      const message = `Balance for ${githubUsername} is ${newBalance}💰. You're good!`;
-      await octokit.request(EGithubEndpoints.Comments, {
-        owner,
-        repo: repoName,
-        issue_number: prNumber,
-        body: message,
-        headers: githubHeaders,
-      });
-
-      await octokit.rest.checks.create({
-        owner,
-        repo: repoName,
-        name: "Gitkarma Tokens Check",
-        head_sha: headSha,
-        status: "completed",
-        conclusion: "success",
-        output: {
-          title: "Tokens Check",
-          summary: `User has enough tokens to merge!`,
-        },
-      });
-    } catch (error: any) {
-      if (error.response) {
-        log.error(
-          `Error! Status: ${error.response.status}. Message: ${error.response.data.message}`
-        );
-      }
-      log.error(error);
-    }
-    return;
-  }
-
-  // send error because not enough debits
-  try {
-    const message = `Balance for ${githubUsername} is ${balance}💰.\n\nA minimum of ${repo.pr_merge_deduction_debits} tokens are required! Review PRs to get more tokens! 🪙`;
+    await tb.repoChargesFundsToUser(
+      BigInt(repo.tigerbeetle_account_id),
+      BigInt(account.id),
+      BigInt(repo.pr_merge_deduction_debits),
+      repo.id
+    );
+    const newBalance = balance - repo.pr_merge_deduction_debits;
+    const message = `Pull Request funded. Current balance for ${githubUsername} is ${newBalance}💰.`;
     await octokit.request(EGithubEndpoints.Comments, {
       owner,
       repo: repoName,
@@ -125,18 +112,35 @@ export const handlePullRequestOpened = async ({
       name: "Gitkarma Tokens Check",
       head_sha: headSha,
       status: "completed",
-      conclusion: "failure",
+      conclusion: "success",
       output: {
-        title: "Insufficient Tokens",
-        summary: `This PR cannot pass because user ${githubUsername} does not have enough tokens.`,
+        title: "Tokens Check",
+        summary: `User has enough tokens to merge!`,
       },
     });
-  } catch (error: any) {
-    if (error.response) {
-      log.error(
-        `Error! Status: ${error.response.status}. Message: ${error.response.data.message}`
-      );
-    }
-    log.error(error);
+    return;
   }
+
+  // send error because not enough debits
+  const message = `Not enough tokens! Balance for ${githubUsername} is ${balance}💰. A minimum of ${repo.pr_merge_deduction_debits} tokens are required! Review PRs to get more tokens! 🪙`;
+  await octokit.request(EGithubEndpoints.Comments, {
+    owner,
+    repo: repoName,
+    issue_number: prNumber,
+    body: message,
+    headers: githubHeaders,
+  });
+
+  await octokit.rest.checks.create({
+    owner,
+    repo: repoName,
+    name: "Gitkarma Tokens Check",
+    head_sha: headSha,
+    status: "completed",
+    conclusion: "failure",
+    output: {
+      title: "Insufficient Tokens",
+      summary: `This PR cannot pass because user ${githubUsername} does not have enough tokens.`,
+    },
+  });
 };

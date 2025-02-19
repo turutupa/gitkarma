@@ -5,6 +5,7 @@ import http from "http";
 import { App } from "octokit";
 import { handleIssueComment } from "webhooks/issue_comment.ts";
 import { handlePullRequestClosed } from "webhooks/pull_request.closed.ts";
+import { handlePullRequestReopened } from "webhooks/pull_request.reopened.ts";
 import { handlePullRequestSynchronize } from "webhooks/pull_request.synchronize.ts";
 import log from "./log.ts";
 import { handlePullRequestOpened } from "./webhooks/pull_request.opened.ts";
@@ -41,6 +42,8 @@ const app = async () => {
   app.webhooks.on("pull_request.closed", handlePullRequestClosed);
   // @ts-ignore
   app.webhooks.on("pull_request.synchronize", handlePullRequestSynchronize);
+  // @ts-ignore
+  app.webhooks.on("pull_request.reopened", handlePullRequestReopened);
   // @ts-ignore
   app.webhooks.on("issue_comment", handleIssueComment);
 

@@ -4,7 +4,7 @@ import log from "log.ts";
 import { dirname, join } from "path";
 import pgk from "pg";
 import { fileURLToPath } from "url";
-import type { EPullRequestStatus } from "webhooks/constants.ts";
+import type { EPullRequestState } from "webhooks/constants.ts";
 import type { TPullRequest, TRepo, TUser, TUserRepo } from "./models.ts";
 const { Pool } = pgk;
 
@@ -110,11 +110,11 @@ class DB {
    */
   public async getUserRepo(userId: number, repoId: number): Promise<TUserRepo> {
     const query = `
-    SELECT *
-    FROM user_repo
-    WHERE user_id = $1
-    AND repo_id = $2
-  `;
+      SELECT *
+      FROM user_repo
+      WHERE user_id = $1
+      AND repo_id = $2
+    `;
     const { rows } = await this.pg.query<TUserRepo>(query, [userId, repoId]);
     return rows[0];
   }
@@ -272,92 +272,51 @@ class DB {
 
   /**
    * updatePullRequest:
-   * Updates the head_sha and check_passed fields for a pull request identified by its Git Service PR number and repository id.
+   * Updates one or more fields of a pull request record.
    *
-   * @param prNumber - The pull request number from the git service.
-   * @param repoId - The internal repository id (from your repos table).
-   * @param headSha - The new commit SHA to update.
-   * @param checkPassed - The new value for check_passed.
-   * @returns - A Promise that resolves to the updated pull request record if found, or null.
+   * @param prNumber - The Git Service PR number.
+   * @param repoId - The internal repository id.
+   * @param updates - An object that can include the new state and/or check_passed flag.
+   * @returns A Promise that resolves to the updated pull request record if found, or null.
    */
   public async updatePullRequest(
     prNumber: number,
     repoId: number,
-    headSha: string,
-    checkPassed: boolean
+    updates: { state?: EPullRequestState; checkPassed?: boolean }
   ): Promise<TPullRequest | null> {
-    const query = `
-      UPDATE pull_requests
-      SET head_sha = $1,
-          check_passed = $2,
-          updated_at = CURRENT_TIMESTAMP
-      WHERE pr_number = $3 AND repo_id = $4
-      RETURNING *;
-    `;
-    const { rows } = await this.pg.query<TPullRequest>(query, [
-      headSha,
-      checkPassed,
-      prNumber,
-      repoId,
-    ]);
-    return rows.length > 0 ? rows[0] : null;
-  }
+    const setClauses: string[] = [];
+    const params: any[] = [];
 
-  /**
-   * setPullRequestStatus:
-   * Changes the status of a given pull request status
-   *
-   * @param prNumber - The pull request number from the git service.
-   * @param repoId - The internal repository id (from your repos table).
-   * @param status - The new status of Pull Request
-   * @returns - A Promise that resolves to the updated pull request record if found, or null.
-   */
-  public async setPullRequestStatus(
-    prNumber: number,
-    repoId: number,
-    status: EPullRequestStatus
-  ): Promise<TPullRequest | null> {
-    const query = `
-      UPDATE pull_requests
-      SET status = $1,
-          updated_at = CURRENT_TIMESTAMP
-      WHERE pr_number = $2 AND repo_id = $3
-      RETURNING *;
-    `;
-    const { rows } = await this.pg.query<TPullRequest>(query, [
-      status,
-      prNumber,
-      repoId,
-    ]);
-    return rows.length > 0 ? rows[0] : null;
-  }
+    // Build SET clauses and parameters dynamically.
+    if (updates.state !== undefined) {
+      params.push(updates.state);
+      setClauses.push(`state = $${params.length}`);
+    }
+    if (updates.checkPassed !== undefined) {
+      params.push(updates.checkPassed);
+      setClauses.push(`check_passed = $${params.length}`);
+    }
+    // If no fields are provided, return the existing record.
+    if (setClauses.length === 0) {
+      return await this.getPullRequest(prNumber, repoId);
+    }
+    setClauses.push(`updated_at = CURRENT_TIMESTAMP`);
 
-  /**
-   * setPullRequestCheck:
-   * Changes the status of a given pull request check_passed
-   *
-   * @param prNumber - The pull request number from the git service.
-   * @param repoId - The internal repository id (from your repos table).
-   * @param status - The new status of Pull Request
-   * @returns - A Promise that resolves to the updated pull request record if found, or null.
-   */
-  public async setPullRequestCheck(
-    prNumber: number,
-    repoId: number,
-    checkPassed: boolean
-  ): Promise<TPullRequest | null> {
+    // Add the WHERE clause parameters.
+    params.push(prNumber, repoId);
+
+    // The position of prNumber and repoId in the parameter array.
+    const prParamPosition = params.length - 1; // second-to-last parameter
+    const repoParamPosition = params.length; // last parameter
+
     const query = `
-      UPDATE pull_requests
-      SET check_passed = $1,
-          updated_at = CURRENT_TIMESTAMP
-      WHERE pr_number = $2 AND repo_id = $3
-      RETURNING *;
-    `;
-    const { rows } = await this.pg.query<TPullRequest>(query, [
-      checkPassed,
-      prNumber,
-      repoId,
-    ]);
+    UPDATE pull_requests
+    SET ${setClauses.join(", ")}
+    WHERE pr_number = $${prParamPosition} AND repo_id = $${repoParamPosition}
+    RETURNING *;
+  `;
+
+    const { rows } = await this.pg.query<TPullRequest>(query, params);
     return rows.length > 0 ? rows[0] : null;
   }
 }

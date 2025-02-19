@@ -6,6 +6,7 @@ import tb from "../db/tigerbeetle.ts";
 import {
   ADMIN_TRIGGER_RECHECK_EMOJI,
   EGithubEndpoints,
+  EPullRequestState,
   githubHeaders,
   GITKARMA_CHECK_NAME,
   TRIGGER_RECHECK_EMOJI,
@@ -13,10 +14,42 @@ import {
 import { getOrDefaultGithubUser } from "./utils.ts";
 
 /**
- * handlePullRequestClosed:
+ * handleIssueComment:
  *
- * @param { Octokit, payload }
+ * This handler processes an issue comment event and, if the comment is on a pull request,
+ * it triggers a re-check of the GitKarma check based on the content of the comment.
+ *
+ * - Verifies that the comment is on a pull request (checks for the existence of payload.issue.pull_request).
+ * - Determines if the comment triggers a re-check:
+ *   - Uses a specific emoji (e.g., "✨") for a standard re-check.
+ *   - Uses a designated admin emoji (e.g., "🚀") to indicate an admin override.
+ * - Retrieves the repository record and pull request record from the local database.
+ * - If the pull request is closed, it exits early.
+ * - If the pull request's GitKarma check has already passed, it posts a comment and exits.
+ * - Sets the GitKarma check to "in_progress" using the stored head_sha.
+ * - If the admin override emoji is used:
+ *   - Checks if the sender is a repository admin (via payload permissions or an API call).
+ *   - If the sender is an admin, updates the PR record to mark the check as passed,
+ *     posts an override comment, and creates a completed check run with a "success" conclusion.
+ *   - If the sender is not an admin, logs the unauthorized attempt and continues.
+ * - For a standard re-check:
+ *   - Retrieves the GitHub user and their account details.
+ *   - Checks if the user has sufficient tokens (balance) to meet the merge deduction requirement.
+ *   - Updates the pull request record's check status based on the token balance.
+ *   - If sufficient tokens exist:
+ *     - Deducts the required tokens from the user's account.
+ *     - Posts a comment with the updated balance.
+ *     - Creates a check run with a "success" conclusion.
+ *   - If not enough tokens are available:
+ *     - Posts a comment indicating the insufficient token balance.
+ *     - Creates a check run with a "failure" conclusion.
+ *
+ * @param {Octokit} octokit - An authenticated Octokit instance for GitHub API interactions.
+ * @param {IssueCommentEvent} payload - The webhook payload for an issue comment event from GitHub.
+ *
+ * @returns {Promise<void>} A promise that resolves when processing is complete.
  */
+
 export const handleIssueComment = async ({
   octokit,
   payload,
@@ -67,6 +100,11 @@ export const handleIssueComment = async ({
     );
   }
 
+  // if pr is closed do nothing
+  if (pr?.state === EPullRequestState.Closed) {
+    return;
+  }
+
   // if check is already passing, exit early.
   if (pr?.check_passed) {
     const message = `Pull request #${prNumber} is already passing GitKarma Check. Nothing to do here.`;
@@ -81,6 +119,19 @@ export const handleIssueComment = async ({
     });
     return;
   }
+
+  // set the check to in progress
+  await octokit.rest.checks.create({
+    owner,
+    repo: repoName,
+    name: "Gitkarma Tokens Check",
+    head_sha: pr.head_sha,
+    status: "in_progress",
+    output: {
+      title: "Tokens Check",
+      summary: `User has enough tokens to merge!`,
+    },
+  });
 
   // If the admin emoji is used, verify if the sender is a repo admin:
   let isAdmin = false;
@@ -111,7 +162,7 @@ export const handleIssueComment = async ({
   // if admin approved check, then pass it
   if (isAdmin && isTriggeringAdminRecheck) {
     // hard-code true to checks passing
-    await db.setPullRequestCheck(prNumber, repo.id, true);
+    await db.updatePullRequest(prNumber, repo.id, { checkPassed: true });
     const message = `Admin override. ${payload.sender.login} has manually approved the GitKarma Check, bypassing the funds verification.`;
     await octokit.request(EGithubEndpoints.Comments, {
       owner,
@@ -141,19 +192,6 @@ export const handleIssueComment = async ({
   }
 
   // triggering regular re-check...
-  // set the check to in progress
-  await octokit.rest.checks.create({
-    owner,
-    repo: repoName,
-    name: "Gitkarma Tokens Check",
-    head_sha: pr.head_sha,
-    status: "in_progress",
-    output: {
-      title: "Tokens Check",
-      summary: `User has enough tokens to merge!`,
-    },
-  });
-
   const { user, account } = await getOrDefaultGithubUser(
     repo,
     prOwnerGithubId,
@@ -167,81 +205,66 @@ export const handleIssueComment = async ({
   const hasEnoughDebits = balance >= repo.pr_merge_deduction_debits;
 
   // set pull request check to passed / not passed based on balance
-  await db.setPullRequestCheck(prNumber, repo.id, hasEnoughDebits);
+  await db.updatePullRequest(prNumber, repo.id, {
+    checkPassed: hasEnoughDebits,
+  });
 
   if (hasEnoughDebits) {
-    try {
-      // remove funds from user
-      await tb.repoChargesFundsToUser(
-        BigInt(repo.tigerbeetle_account_id),
-        BigInt(account.id),
-        BigInt(repo.pr_merge_deduction_debits),
-        repo.id
-      );
+    // remove funds from user
+    await tb.repoChargesFundsToUser(
+      BigInt(repo.tigerbeetle_account_id),
+      BigInt(account.id),
+      BigInt(repo.pr_merge_deduction_debits),
+      repo.id
+    );
 
-      // send comment to github user
-      const newBalance = balance - repo.pr_merge_deduction_debits;
-      const message = `Balance for ${prOwnerGithubName} is ${newBalance}💰. You're good!`;
-      await octokit.request(EGithubEndpoints.Comments, {
-        owner,
-        repo: payload.repository.name,
-        issue_number: payload.issue.number,
-        body: message,
-        headers: githubHeaders,
-      });
-
-      // notify github to pass check
-      await octokit.rest.checks.create({
-        owner,
-        repo: repoName,
-        name: "Gitkarma Tokens Check",
-        head_sha: pr.head_sha,
-        status: "completed",
-        conclusion: "success",
-        output: {
-          title: "Tokens Check",
-          summary: `User has enough tokens to merge!`,
-        },
-      });
-    } catch (error: any) {
-      if (error.response) {
-        log.error(
-          `Error! Status: ${error.response.status}. Message: ${error.response.data.message}`
-        );
-      }
-      log.error(error);
-    }
-  }
-
-  // send error because not enough debits
-  try {
-    const message = `Balance for ${prOwnerGithubName} is ${balance}💰.\n\nA minimum of ${repo.pr_merge_deduction_debits} tokens are required! Review PRs to get more tokens! 🪙`;
+    // send comment to github user
+    const newBalance = balance - repo.pr_merge_deduction_debits;
+    const message = `Glad you came back. Pull Request funded. Current balance for ${prOwnerGithubName} is ${newBalance}💰.`;
     await octokit.request(EGithubEndpoints.Comments, {
       owner,
       repo: payload.repository.name,
-      issue_number: prNumber,
+      issue_number: payload.issue.number,
       body: message,
       headers: githubHeaders,
     });
 
+    // notify github to pass check
     await octokit.rest.checks.create({
       owner,
       repo: repoName,
       name: "Gitkarma Tokens Check",
       head_sha: pr.head_sha,
       status: "completed",
-      conclusion: "failure",
+      conclusion: "success",
       output: {
-        title: "Insufficient Tokens",
-        summary: `This PR cannot pass because user ${prOwnerGithubName} does not have enough tokens.`,
+        title: "Tokens Check",
+        summary: `User has enough tokens to merge!`,
       },
     });
-  } catch (error: any) {
-    if (error.response) {
-      log.error(
-        `Error! Status: ${error.response.status}. Message: ${error.response.data.message}`
-      );
-    }
-    log.error(error);
+    return;
   }
+
+  // send error because not enough debits
+  const message = `Still not enough tokens! Balance for ${prOwnerGithubName} is ${balance}💰. A minimum of ${repo.pr_merge_deduction_debits} tokens are required! Review PRs to get more tokens! 🪙`;
+  await octokit.request(EGithubEndpoints.Comments, {
+    owner,
+    repo: payload.repository.name,
+    issue_number: prNumber,
+    body: message,
+    headers: githubHeaders,
+  });
+
+  await octokit.rest.checks.create({
+    owner,
+    repo: repoName,
+    name: "Gitkarma Tokens Check",
+    head_sha: pr.head_sha,
+    status: "completed",
+    conclusion: "failure",
+    output: {
+      title: "Insufficient Tokens",
+      summary: `This PR cannot pass because user ${prOwnerGithubName} does not have enough tokens.`,
+    },
+  });
 };
