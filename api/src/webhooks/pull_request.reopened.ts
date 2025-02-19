@@ -90,7 +90,7 @@ export const handlePullRequestReopened = async ({
       repo.id
     );
     const newBalance = balance - repo.pr_merge_deduction_debits;
-    const message = `Pull Request funded. Current balance for ${githubUsername} is ${newBalance}💰.`;
+    const message = `Pull Request funded. Current balance for **${githubUsername}** is ${newBalance}💰.`;
     await octokit.request(EGithubEndpoints.Comments, {
       owner,
       repo: repoName,
@@ -115,7 +115,7 @@ export const handlePullRequestReopened = async ({
   }
 
   // send error because not enough debits
-  const message = `Not enough tokens! Balance for ${githubUsername} is ${balance}💰. A minimum of ${repo.pr_merge_deduction_debits} tokens are required! Review PRs to get more tokens! 🪙`;
+  const message = `Not enough tokens! Balance for **${githubUsername}** is ${balance}💰. A minimum of **${repo.pr_merge_deduction_debits}** tokens are required! Review PRs to get more tokens! 🪙`;
   await octokit.request(EGithubEndpoints.Comments, {
     owner,
     repo: repoName,

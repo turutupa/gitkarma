@@ -64,7 +64,7 @@ export const handleIssueComment = async ({
       owner,
       repo: payload.repository.name,
       issue_number: prNumber,
-      body: `Balance for user ${payload.sender.login} is ${balance}💰`,
+      body: `Balance for **${payload.sender.login}** is ${balance}💰`,
       headers: githubHeaders,
     });
     return;
@@ -161,7 +161,7 @@ export const handleIssueComment = async ({
   if (isAdmin && isTriggeringAdminRecheck) {
     // hard-code true to checks passing
     await db.updatePullRequest(prNumber, repo.id, { checkPassed: true });
-    const message = `Admin override. ${payload.sender.login} has manually approved the GitKarma Check, bypassing the funds verification.`;
+    const message = `**Admin override.** ${payload.sender.login} has manually approved the GitKarma Check, bypassing the funds verification.`;
     await octokit.request(EGithubEndpoints.Comments, {
       owner,
       repo: repoName,
@@ -218,7 +218,7 @@ export const handleIssueComment = async ({
 
     // send comment to github user
     const newBalance = balance - repo.pr_merge_deduction_debits;
-    const message = `Glad you came back. Pull Request funded. Current balance for ${prOwnerGithubName} is ${newBalance}💰.`;
+    const message = `Pull Request funded. Current balance for **${prOwnerGithubName}** is ${newBalance}💰.`;
     await octokit.request(EGithubEndpoints.Comments, {
       owner,
       repo: payload.repository.name,
@@ -244,7 +244,7 @@ export const handleIssueComment = async ({
   }
 
   // send error because not enough debits
-  const message = `Still not enough tokens! Balance for ${prOwnerGithubName} is ${balance}💰. A minimum of ${repo.pr_merge_deduction_debits} tokens are required! Review PRs to get more tokens! 🪙`;
+  const message = `Still not enough tokens! Balance for **${prOwnerGithubName}** is ${balance}💰. A minimum of **${repo.pr_merge_deduction_debits}** tokens are required! Review PRs to get more tokens!`;
   await octokit.request(EGithubEndpoints.Comments, {
     owner,
     repo: payload.repository.name,
