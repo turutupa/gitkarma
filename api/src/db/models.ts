@@ -1,3 +1,5 @@
+import type { Account } from "tigerbeetle-node";
+
 export type TUser = {
   id: number;
   github_id: number;
@@ -35,6 +37,19 @@ export type TRepo = {
   max_complexity_bonus_debits: number;
   pr_merge_deduction_debits: number;
 };
+
+export type TJsonAccount = {
+  [K in keyof Account]: Account[K] extends bigint ? string : Account[K];
+};
+
+type TUserData = {
+  account: TJsonAccount;
+} & TUser &
+  TUserRepo;
+
+export type TRepoAndUsers = {
+  users: TUserData[];
+} & TRepo;
 
 export type TPullRequest = {
   id: number;

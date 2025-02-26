@@ -5,7 +5,13 @@ import { dirname, join } from "path";
 import pgk from "pg";
 import { fileURLToPath } from "url";
 import type { EPullRequestState } from "webhooks/constants.ts";
-import type { TPullRequest, TRepo, TUser, TUserRepo } from "./models.ts";
+import type {
+  TPullRequest,
+  TRepo,
+  TRepoAndUsers,
+  TUser,
+  TUserRepo,
+} from "./models.ts";
 const { Pool } = pgk;
 
 dotenv.config();
@@ -59,8 +65,43 @@ class DB {
     return db;
   }
 
+  public async getAllReposDataForUser(
+    gitUserId: string
+  ): Promise<TRepoAndUsers[]> {
+    const query = `
+      SELECT
+        r.*,
+        (
+          SELECT json_agg(
+                  json_build_object(
+                    'id', u.id,
+                    'github_id', u.github_id,
+                    'github_username', u.github_username,
+                    'prs_opened', ur.prs_opened,
+                    'prs_approved', ur.prs_approved,
+                    'comments_count', ur.comments_count,
+                    'created_at', u.created_at
+                  )
+                )
+          FROM user_repo ur
+          JOIN users u ON ur.user_id = u.id
+          WHERE ur.repo_id = r.id
+        ) AS users
+      FROM repos r
+      WHERE r.id IN (
+        SELECT repo_id
+        FROM user_repo
+        WHERE user_id = (
+          SELECT id FROM users WHERE github_id = $1
+        )
+      );
+    `;
+    const { rows } = await this.pg.query(query, [gitUserId]);
+    return rows;
+  }
+
   /**
-   * getUserById:
+   * getUserByGithubId:
    * Checks if a user exists in the `users` table by their GitHub ID.
    *
    * @param githubId - The GitHub user ID to look up.
@@ -232,7 +273,7 @@ class DB {
         pull_requests (pr_number, repo_id, user_id, head_sha, state, check_passed)
       VALUES 
         ($1, $2, $3, $4, $5, $6)
-      RETURNING *;
+      RETURNING *
     `;
     const { rows } = await this.pg.query<TPullRequest>(query, [
       prNumber,
@@ -261,7 +302,7 @@ class DB {
       SELECT *
       FROM pull_requests
       WHERE pr_number = $1 AND repo_id = $2
-      LIMIT 1;
+      LIMIT 1
     `;
     const { rows } = await this.pg.query<TPullRequest>(query, [
       prNumber,
@@ -313,7 +354,7 @@ class DB {
     UPDATE pull_requests
     SET ${setClauses.join(", ")}
     WHERE pr_number = $${prParamPosition} AND repo_id = $${repoParamPosition}
-    RETURNING *;
+    RETURNING *
   `;
 
     const { rows } = await this.pg.query<TPullRequest>(query, params);

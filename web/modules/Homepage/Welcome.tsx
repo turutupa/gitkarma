@@ -1,0 +1,30 @@
+import { Anchor, Text, Title, useMantineColorScheme } from '@mantine/core';
+import css from './Welcome.module.css';
+
+export default function Welcome() {
+  const { colorScheme } = useMantineColorScheme();
+
+  return (
+    <>
+      <Title className={css.title} ta="center" mt={100}>
+        Welcome to{' '}
+        <Text
+          inherit
+          variant="gradient"
+          component="span"
+          gradient={{ from: '#2CDD66', to: colorScheme === 'light' ? 'black' : 'white', deg: 90 }}
+        >
+          gitkarma
+        </Text>
+      </Title>
+      <Text color="dimmed" ta="center" size="lg" maw={580} mx="auto" mt="xl">
+        This starter Next.js project includes a minimal setup for server side rendering, if you want
+        to learn more on Mantine + Next.js integration follow{' '}
+        <Anchor href="https://mantine.dev/guides/next/" size="lg">
+          this guide
+        </Anchor>
+        . To get started edit index.tsx file.
+      </Text>
+    </>
+  );
+}

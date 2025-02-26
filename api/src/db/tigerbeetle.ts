@@ -1,4 +1,5 @@
 import crypto from "crypto";
+import dotenv from "dotenv";
 import log from "log.ts";
 import {
   AccountFlags,
@@ -10,6 +11,8 @@ import {
   type CreateTransfersError,
   type Transfer,
 } from "tigerbeetle-node";
+
+dotenv.config();
 
 export enum EAccountType {
   User = 1001,
@@ -27,10 +30,11 @@ class TigerBeetle {
   public static async connect(): Promise<TigerBeetle> {
     const tbHost = process.env.TB_HOST || "";
     const tbPort = Number(process.env.TB_PORT) || 3001;
+    const address = `${tbHost}:${tbPort}`;
     const tigerbeetle = new TigerBeetle();
     tigerbeetle.tb = createClient({
       cluster_id: 0n,
-      replica_addresses: [`${tbHost}:${tbPort}` || "127.0.0.1:3001"],
+      replica_addresses: [address || "127.0.0.1:3001"],
     });
     const isConnected = await tigerbeetle.tb.lookupAccounts([BigInt(1)]);
     if (isConnected) {
@@ -260,9 +264,9 @@ class TigerBeetle {
    * @param account
    * @returns
    */
-  public getBalance(account: Account) {
+  public getBalance(account: Account): bigint {
     return account.debits_posted - account.credits_posted;
   }
 }
 
-export default TigerBeetle.connect();
+export default await TigerBeetle.connect();
