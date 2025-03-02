@@ -37,7 +37,7 @@ export const handlePullRequestClosed = async ({
   const prOwnerId = payload.pull_request.user.id; // GitHub user id
   const merged = payload.pull_request.merged;
 
-  const repo = await db.getRepoByGitServiceRepoId(repoId);
+  const repo = await db.getRepoByGithubRepoId(repoId);
 
   // Fetch first PR to know current state before closing it. To know if it was passing or not.
   const pr = await db.getPullRequest(prNumber, repo.id);
@@ -99,7 +99,7 @@ export const handlePullRequestClosed = async ({
     return;
   }
   // Case where pull request was passing gitkarma check -> refund-user
-  const user = await db.getUserByGithubId(prOwnerId);
+  const user = await db.getUserByGithubUserId(prOwnerId);
   const userRepo = await db.getUserRepo(user.id, repo.id);
   log.info(
     { repo, user: userRepo },

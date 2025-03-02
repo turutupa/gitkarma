@@ -63,7 +63,7 @@ export const handlePullRequestSynchronize = async ({
     },
   });
 
-  const repo = await getOrDefaultGithubRepo(repoId, repoName);
+  const repo = await getOrDefaultGithubRepo(repoId, repoName, owner);
   const { user, account } = await getOrDefaultGithubUser(
     repo,
     prOwnerGithubId,

@@ -1,54 +1,232 @@
 TigerBeetle is already installed.
+Creating TigerBeetle data file...
+2025-03-02 08:40:06.871Z warning: a cluster id of 0 is reserved for testing and benchmarking, do not use in production
+2025-03-02 08:40:06.871Z warning: omit --cluster=0 to randomly generate a suitable id
+
+2025-03-02 08:40:06.871Z info(io): creating "0_0.tigerbeetle"...
+2025-03-02 08:40:06.871Z info(io): allocating 1.06298828125GiB...
+2025-03-02 08:40:08.786Z info(main): 0: formatted: cluster=0 replica_count=1
 Starting TigerBeetle server...
-2025-02-26 22:23:58.143Z info(io): opening "0_0.tigerbeetle"...
-2025-02-26 22:23:58.191Z info(main): release=0.16.27
-2025-02-26 22:23:58.191Z info(main): release_client_min=0.15.3
-2025-02-26 22:23:58.191Z info(main): releases_bundled={ 0.16.21, 0.16.23, 0.16.25, 0.16.26, 0.16.27 }
-2025-02-26 22:23:58.191Z info(main): git_commit=1c7db9310d65ef9b8dcef61431cd4d8b6da95459
-2025-02-26 22:23:58.525Z info(replica): superblock release=0.16.27
-2025-02-26 22:23:58.958Z info(main): 0: Allocated 3105MiB during replica init
-2025-02-26 22:23:58.958Z info(main): 0: Grid cache: 1024MiB, LSM-tree manifests: 128MiB
-2025-02-26 22:23:58.958Z info(main): 0: cluster=0: listening on 127.0.0.1:3001
-2025-02-26 22:23:58.958Z info(main): 0: started with extra verification checks
-2025-02-26 22:23:58.958Z warning(main): a cluster id of 0 is reserved for testing and benchmarking, do not use in production
-2025-02-26 22:23:59.315Z warning(replica): 0: client_table_entry_create: clients=64/64 evicting client=279057829657907819581825828921573510574
-2025-02-26 22:23:59.321Z warning(replica): 0: client_table_entry_create: clients=64/64 evicting client=312130308479514189557434944362789286610
-2025-02-26 22:23:59.327Z warning(replica): 0: client_table_entry_create: clients=64/64 evicting client=221370405341399296331161502058531720757
-2025-02-26 22:23:59.333Z warning(replica): 0: client_table_entry_create: clients=64/64 evicting client=68669266211912512646715227923328883341
-2025-02-26 22:23:59.339Z warning(replica): 0: client_table_entry_create: clients=64/64 evicting client=84510605832578665656356715252042880359
-2025-02-26 22:23:59.345Z warning(replica): 0: client_table_entry_create: clients=64/64 evicting client=76798976319541659998314157235441367664
-2025-02-26 22:23:59.351Z warning(replica): 0: client_table_entry_create: clients=64/64 evicting client=288264495738816179033296523917870332776
-2025-02-26 22:23:59.357Z warning(replica): 0: client_table_entry_create: clients=64/64 evicting client=245725522208052506563018401251921994266
-2025-02-26 22:23:59.363Z warning(replica): 0: client_table_entry_create: clients=64/64 evicting client=147509128284597220201226748569602127806
-2025-02-26 22:23:59.369Z warning(replica): 0: client_table_entry_create: clients=64/64 evicting client=294523891703581231602119512215945997234
-2025-02-26 22:23:59.375Z warning(replica): 0: client_table_entry_create: clients=64/64 evicting client=132862422938876556436093274286554594490
-2025-02-26 22:23:59.384Z warning(replica): 0: client_table_entry_create: clients=64/64 evicting client=209619453189021512446292829119516006581
-2025-02-26 22:23:59.393Z warning(replica): 0: client_table_entry_create: clients=64/64 evicting client=144153879710478316034764222566046644586
-2025-02-26 22:23:59.400Z warning(replica): 0: client_table_entry_create: clients=64/64 evicting client=268495901848839649643262753445442030484
-2025-02-26 22:23:59.407Z warning(replica): 0: client_table_entry_create: clients=64/64 evicting client=110067415787442925452607031790698769185
-2025-02-26 22:23:59.412Z warning(replica): 0: client_table_entry_create: clients=64/64 evicting client=256674447973456454842989372431430181623
-2025-02-26 22:23:59.418Z warning(replica): 0: client_table_entry_create: clients=64/64 evicting client=254505256611041854936571631888639300974
-2025-02-26 22:23:59.423Z warning(replica): 0: client_table_entry_create: clients=64/64 evicting client=183614292122361903916105456374781596216
-2025-02-26 22:23:59.442Z warning(replica): 0: client_table_entry_create: clients=64/64 evicting client=286094870745691539001347417989563256257
-2025-02-26 22:23:59.447Z warning(replica): 0: client_table_entry_create: clients=64/64 evicting client=185571809998851428776163624429594859291
-2025-02-26 22:23:59.452Z warning(replica): 0: client_table_entry_create: clients=64/64 evicting client=35314860685184214026289937043532908446
-2025-02-26 22:23:59.462Z warning(replica): 0: client_table_entry_create: clients=64/64 evicting client=322006755376452411479032598082462245194
-2025-02-26 22:23:59.467Z warning(replica): 0: client_table_entry_create: clients=64/64 evicting client=330797063296631622690181100065984593144
-2025-02-26 22:23:59.472Z warning(replica): 0: client_table_entry_create: clients=64/64 evicting client=282799867764411760732077054288787718835
-2025-02-26 22:23:59.480Z warning(replica): 0: client_table_entry_create: clients=64/64 evicting client=217184255314295000172864727247860642566
-2025-02-26 22:23:59.485Z warning(replica): 0: client_table_entry_create: clients=64/64 evicting client=204126010652625049576030191464604791594
-2025-02-26 22:23:59.489Z warning(replica): 0: client_table_entry_create: clients=64/64 evicting client=271132931054528180970967625373973492244
-2025-02-26 22:23:59.495Z warning(replica): 0: client_table_entry_create: clients=64/64 evicting client=170293159418700058477323596970475665247
-2025-02-26 22:23:59.499Z warning(replica): 0: client_table_entry_create: clients=64/64 evicting client=64880327964692908064435882269482819137
-2025-02-26 22:23:59.506Z warning(replica): 0: client_table_entry_create: clients=64/64 evicting client=170229546627543933572038299680926368337
-2025-02-26 22:23:59.522Z warning(replica): 0: client_table_entry_create: clients=64/64 evicting client=196377877962363510907439943215808641770
-2025-02-26 22:23:59.527Z warning(replica): 0: client_table_entry_create: clients=64/64 evicting client=243632605432212574083835045392880608850
-2025-02-26 22:23:59.551Z warning(replica): 0: client_table_entry_create: clients=64/64 evicting client=61476449025780753838447092847685390721
-2025-02-26 22:23:59.566Z warning(replica): 0: client_table_entry_create: clients=64/64 evicting client=33692959420867811374412460568919896565
-2025-02-26 22:24:01.232Z warning(replica): 0: client_table_entry_create: clients=64/64 evicting client=137137656254651253037630455185466744333
-2025-02-26 22:24:01.343Z info(replica): 0: transition_to_normal_from_recovering_status: view=4 primary
-2025-02-26 22:24:02.736Z info(message_bus): connection from client 124784630519243059820017738800213095060
-2025-02-26 22:24:02.748Z warning(replica): 0: client_table_entry_create: clients=64/64 evicting client=256838441824282455691357426940952122656
-2025-02-26 23:15:35.627Z info(message_bus): peer performed an orderly shutdown: message_bus.MessageBusType(.replica).Connection.Peer{ .client = 124784630519243059820017738800213095060 }
-2025-02-26 23:15:36.726Z info(message_bus): connection from client 151704387658291880629586757644567570830
-2025-02-26 23:15:36.739Z warning(replica): 0: client_table_entry_create: clients=64/64 evicting client=330287222402849751745087978716669030806
+2025-03-02 08:40:08.797Z info(io): opening "0_0.tigerbeetle"...
+2025-03-02 08:40:08.874Z info(main): release=0.16.27
+2025-03-02 08:40:08.874Z info(main): release_client_min=0.15.3
+2025-03-02 08:40:08.874Z info(main): releases_bundled={ 0.16.21, 0.16.23, 0.16.25, 0.16.26, 0.16.27 }
+2025-03-02 08:40:08.874Z info(main): git_commit=1c7db9310d65ef9b8dcef61431cd4d8b6da95459
+2025-03-02 08:40:09.185Z info(replica): superblock release=0.16.27
+2025-03-02 08:40:09.618Z info(replica): 0: transition_to_normal_from_recovering_status: view=1 primary
+2025-03-02 08:40:09.618Z info(main): 0: Allocated 3105MiB during replica init
+2025-03-02 08:40:09.618Z info(main): 0: Grid cache: 1024MiB, LSM-tree manifests: 128MiB
+2025-03-02 08:40:09.618Z info(main): 0: cluster=0: listening on 127.0.0.1:3001
+2025-03-02 08:40:09.618Z info(main): 0: started with extra verification checks
+2025-03-02 08:40:09.618Z warning(main): a cluster id of 0 is reserved for testing and benchmarking, do not use in production
+2025-03-02 08:40:12.615Z info(message_bus): connection from client 331627603279489095195516384578827444647
+2025-03-02 08:40:13.100Z info(message_bus): peer performed an orderly shutdown: message_bus.MessageBusType(.replica).Connection.Peer{ .client = 331627603279489095195516384578827444647 }
+2025-03-02 08:41:30.779Z info(message_bus): connection from client 15549263619722069779418091642386189624
+2025-03-02 08:47:35.959Z info(message_bus): peer performed an orderly shutdown: message_bus.MessageBusType(.replica).Connection.Peer{ .client = 15549263619722069779418091642386189624 }
+2025-03-02 09:42:26.897Z info(message_bus): connection from client 48681059664798602639945452392345931564
+2025-03-02 09:42:42.410Z info(message_bus): peer performed an orderly shutdown: message_bus.MessageBusType(.replica).Connection.Peer{ .client = 48681059664798602639945452392345931564 }
+2025-03-02 09:42:43.375Z info(message_bus): connection from client 79215304578982668674503655429879962010
+2025-03-02 09:42:44.348Z info(message_bus): peer performed an orderly shutdown: message_bus.MessageBusType(.replica).Connection.Peer{ .client = 79215304578982668674503655429879962010 }
+2025-03-02 09:42:45.320Z info(message_bus): connection from client 316267904520352528842692656565245794220
+2025-03-02 09:42:46.034Z info(message_bus): peer performed an orderly shutdown: message_bus.MessageBusType(.replica).Connection.Peer{ .client = 316267904520352528842692656565245794220 }
+2025-03-02 09:42:47.071Z info(message_bus): connection from client 154970491504082188029183903771020653420
+2025-03-02 09:42:49.594Z info(message_bus): peer performed an orderly shutdown: message_bus.MessageBusType(.replica).Connection.Peer{ .client = 154970491504082188029183903771020653420 }
+2025-03-02 09:42:50.566Z info(message_bus): connection from client 161450429162550050325733309728646863371
+2025-03-02 09:43:26.156Z info(message_bus): peer performed an orderly shutdown: message_bus.MessageBusType(.replica).Connection.Peer{ .client = 161450429162550050325733309728646863371 }
+2025-03-02 09:43:27.094Z info(message_bus): connection from client 15501384642583276047282850363942152451
+2025-03-02 09:45:15.704Z info(message_bus): peer performed an orderly shutdown: message_bus.MessageBusType(.replica).Connection.Peer{ .client = 15501384642583276047282850363942152451 }
+2025-03-02 09:45:16.736Z info(message_bus): connection from client 186768139242243327603970009761169975394
+2025-03-02 09:45:23.243Z info(message_bus): peer performed an orderly shutdown: message_bus.MessageBusType(.replica).Connection.Peer{ .client = 186768139242243327603970009761169975394 }
+2025-03-02 09:45:24.235Z info(message_bus): connection from client 144516378739507715856778885616780957355
+2025-03-02 09:45:25.719Z info(message_bus): peer performed an orderly shutdown: message_bus.MessageBusType(.replica).Connection.Peer{ .client = 144516378739507715856778885616780957355 }
+2025-03-02 09:45:26.652Z info(message_bus): connection from client 69707233525040293355941719564099176288
+2025-03-02 09:46:35.223Z info(message_bus): peer performed an orderly shutdown: message_bus.MessageBusType(.replica).Connection.Peer{ .client = 69707233525040293355941719564099176288 }
+2025-03-02 09:46:36.217Z info(message_bus): connection from client 14224206220629997238091242352939818757
+2025-03-02 09:51:14.991Z info(message_bus): peer performed an orderly shutdown: message_bus.MessageBusType(.replica).Connection.Peer{ .client = 14224206220629997238091242352939818757 }
+2025-03-02 09:51:16.033Z info(message_bus): connection from client 23662701138576768573236672759901482090
+2025-03-02 09:51:25.548Z info(message_bus): peer performed an orderly shutdown: message_bus.MessageBusType(.replica).Connection.Peer{ .client = 23662701138576768573236672759901482090 }
+2025-03-02 09:51:26.497Z info(message_bus): connection from client 334849929193222670655900968984676502582
+2025-03-02 09:51:37.013Z info(message_bus): peer performed an orderly shutdown: message_bus.MessageBusType(.replica).Connection.Peer{ .client = 334849929193222670655900968984676502582 }
+2025-03-02 09:51:37.950Z info(message_bus): connection from client 322620649673725006404064295619621729415
+2025-03-02 09:52:02.481Z info(message_bus): peer performed an orderly shutdown: message_bus.MessageBusType(.replica).Connection.Peer{ .client = 322620649673725006404064295619621729415 }
+2025-03-02 09:52:03.485Z info(message_bus): connection from client 156957889288563226584934545928577588810
+2025-03-02 09:52:15.002Z info(message_bus): peer performed an orderly shutdown: message_bus.MessageBusType(.replica).Connection.Peer{ .client = 156957889288563226584934545928577588810 }
+2025-03-02 09:52:15.950Z info(message_bus): connection from client 97627252855365762831863946442094122085
+2025-03-02 09:52:27.476Z info(message_bus): peer performed an orderly shutdown: message_bus.MessageBusType(.replica).Connection.Peer{ .client = 97627252855365762831863946442094122085 }
+2025-03-02 09:52:28.444Z info(message_bus): connection from client 93939074010612705723030567799397962534
+2025-03-02 09:53:55.034Z info(message_bus): peer performed an orderly shutdown: message_bus.MessageBusType(.replica).Connection.Peer{ .client = 93939074010612705723030567799397962534 }
+2025-03-02 09:53:56.053Z info(message_bus): connection from client 111775527503174750694218661220347682905
+2025-03-02 09:54:17.579Z info(message_bus): peer performed an orderly shutdown: message_bus.MessageBusType(.replica).Connection.Peer{ .client = 111775527503174750694218661220347682905 }
+2025-03-02 09:54:18.576Z info(message_bus): connection from client 39514628298267810936339413874968481349
+2025-03-02 09:54:28.108Z info(message_bus): peer performed an orderly shutdown: message_bus.MessageBusType(.replica).Connection.Peer{ .client = 39514628298267810936339413874968481349 }
+2025-03-02 09:54:29.066Z info(message_bus): connection from client 337391742837151781035946412441206111913
+2025-03-02 09:54:33.582Z info(message_bus): peer performed an orderly shutdown: message_bus.MessageBusType(.replica).Connection.Peer{ .client = 337391742837151781035946412441206111913 }
+2025-03-02 09:54:34.530Z info(message_bus): connection from client 217015268952058297870558440917863499205
+2025-03-02 09:54:55.061Z info(message_bus): peer performed an orderly shutdown: message_bus.MessageBusType(.replica).Connection.Peer{ .client = 217015268952058297870558440917863499205 }
+2025-03-02 09:54:56.066Z info(message_bus): connection from client 19082238999194298319436008893494883561
+2025-03-02 09:55:12.581Z info(message_bus): peer performed an orderly shutdown: message_bus.MessageBusType(.replica).Connection.Peer{ .client = 19082238999194298319436008893494883561 }
+2025-03-02 09:55:13.525Z info(message_bus): connection from client 171709607731074361703105013845503784685
+2025-03-02 09:55:35.078Z info(message_bus): peer performed an orderly shutdown: message_bus.MessageBusType(.replica).Connection.Peer{ .client = 171709607731074361703105013845503784685 }
+2025-03-02 09:55:36.068Z info(message_bus): connection from client 314037011199420401545356531824699509468
+2025-03-02 09:56:00.595Z info(message_bus): peer performed an orderly shutdown: message_bus.MessageBusType(.replica).Connection.Peer{ .client = 314037011199420401545356531824699509468 }
+2025-03-02 09:56:01.640Z info(message_bus): connection from client 336776092173147672048114577791396162740
+2025-03-02 09:57:00.195Z info(message_bus): peer performed an orderly shutdown: message_bus.MessageBusType(.replica).Connection.Peer{ .client = 336776092173147672048114577791396162740 }
+2025-03-02 09:57:01.216Z info(message_bus): connection from client 56625798156751061572432720981107185681
+2025-03-02 09:57:28.754Z info(message_bus): peer performed an orderly shutdown: message_bus.MessageBusType(.replica).Connection.Peer{ .client = 56625798156751061572432720981107185681 }
+2025-03-02 09:57:29.745Z info(message_bus): connection from client 150462096202019890275647486796393178037
+2025-03-02 09:57:59.293Z info(message_bus): peer performed an orderly shutdown: message_bus.MessageBusType(.replica).Connection.Peer{ .client = 150462096202019890275647486796393178037 }
+2025-03-02 09:58:00.327Z info(message_bus): connection from client 188886438446751136974117980159874277123
+2025-03-02 09:58:06.841Z info(message_bus): peer performed an orderly shutdown: message_bus.MessageBusType(.replica).Connection.Peer{ .client = 188886438446751136974117980159874277123 }
+2025-03-02 09:58:07.844Z info(message_bus): connection from client 165976265205383407728980247602429861330
+2025-03-02 09:58:09.339Z info(message_bus): peer performed an orderly shutdown: message_bus.MessageBusType(.replica).Connection.Peer{ .client = 165976265205383407728980247602429861330 }
+2025-03-02 09:58:10.372Z info(message_bus): connection from client 121724535869834176782059332082880482885
+2025-03-02 09:58:22.907Z info(message_bus): peer performed an orderly shutdown: message_bus.MessageBusType(.replica).Connection.Peer{ .client = 121724535869834176782059332082880482885 }
+2025-03-02 09:58:23.962Z info(message_bus): connection from client 131388872766538231357447705047036038297
+2025-03-02 09:58:33.480Z info(message_bus): peer performed an orderly shutdown: message_bus.MessageBusType(.replica).Connection.Peer{ .client = 131388872766538231357447705047036038297 }
+2025-03-02 09:58:34.447Z info(message_bus): connection from client 204980502947987764364606840824521652950
+2025-03-02 10:00:57.088Z info(message_bus): peer performed an orderly shutdown: message_bus.MessageBusType(.replica).Connection.Peer{ .client = 204980502947987764364606840824521652950 }
+2025-03-02 10:00:58.038Z info(message_bus): connection from client 58612708547689570821870109495607997223
+2025-03-02 10:01:05.552Z info(message_bus): peer performed an orderly shutdown: message_bus.MessageBusType(.replica).Connection.Peer{ .client = 58612708547689570821870109495607997223 }
+2025-03-02 10:01:06.520Z info(message_bus): connection from client 220252173114819566875332043355405751538
+2025-03-02 10:12:21.164Z info(message_bus): peer performed an orderly shutdown: message_bus.MessageBusType(.replica).Connection.Peer{ .client = 220252173114819566875332043355405751538 }
+2025-03-02 10:12:22.245Z info(message_bus): connection from client 330455779627858319949724522401089031971
+2025-03-02 10:28:04.373Z info(message_bus): peer performed an orderly shutdown: message_bus.MessageBusType(.replica).Connection.Peer{ .client = 330455779627858319949724522401089031971 }
+2025-03-02 10:28:05.384Z info(message_bus): connection from client 244637847930164109902054782108876045897
+2025-03-02 10:28:09.898Z info(message_bus): peer performed an orderly shutdown: message_bus.MessageBusType(.replica).Connection.Peer{ .client = 244637847930164109902054782108876045897 }
+2025-03-02 10:28:10.973Z info(message_bus): connection from client 200288650446902903600878359909034421760
+2025-03-02 10:29:03.702Z info(message_bus): peer performed an orderly shutdown: message_bus.MessageBusType(.replica).Connection.Peer{ .client = 200288650446902903600878359909034421760 }
+2025-03-02 10:29:04.674Z info(message_bus): connection from client 286260992441980600398929272638224572017
+2025-03-02 10:29:26.255Z info(message_bus): peer performed an orderly shutdown: message_bus.MessageBusType(.replica).Connection.Peer{ .client = 286260992441980600398929272638224572017 }
+2025-03-02 10:29:27.196Z info(message_bus): connection from client 176000951964577655506440205959682076664
+2025-03-02 10:50:11.990Z info(message_bus): peer performed an orderly shutdown: message_bus.MessageBusType(.replica).Connection.Peer{ .client = 176000951964577655506440205959682076664 }
+2025-03-02 10:50:13.051Z info(message_bus): connection from client 35009603186506429576282419292691392448
+2025-03-02 10:50:16.573Z info(message_bus): peer performed an orderly shutdown: message_bus.MessageBusType(.replica).Connection.Peer{ .client = 35009603186506429576282419292691392448 }
+2025-03-02 10:50:17.533Z info(message_bus): connection from client 160172099926604257618118988806706593446
+2025-03-02 10:50:20.039Z info(message_bus): peer performed an orderly shutdown: message_bus.MessageBusType(.replica).Connection.Peer{ .client = 160172099926604257618118988806706593446 }
+2025-03-02 10:50:20.974Z info(message_bus): connection from client 245373002621211098845130775154050487669
+2025-03-02 10:50:23.482Z info(message_bus): peer performed an orderly shutdown: message_bus.MessageBusType(.replica).Connection.Peer{ .client = 245373002621211098845130775154050487669 }
+2025-03-02 10:50:24.469Z info(message_bus): connection from client 100486109128830670385079441149602273053
+2025-03-02 10:50:25.971Z info(message_bus): peer performed an orderly shutdown: message_bus.MessageBusType(.replica).Connection.Peer{ .client = 100486109128830670385079441149602273053 }
+2025-03-02 10:50:27.001Z info(message_bus): connection from client 24507955898196202442415412756461539066
+2025-03-02 10:51:33.692Z info(message_bus): peer performed an orderly shutdown: message_bus.MessageBusType(.replica).Connection.Peer{ .client = 24507955898196202442415412756461539066 }
+2025-03-02 10:51:34.623Z info(message_bus): connection from client 57530685553147007100448812100775541715
+2025-03-02 10:54:07.962Z info(message_bus): peer performed an orderly shutdown: message_bus.MessageBusType(.replica).Connection.Peer{ .client = 57530685553147007100448812100775541715 }
+2025-03-02 10:54:08.993Z info(message_bus): connection from client 123056807024587499169777903630549722332
+2025-03-02 10:54:24.512Z info(message_bus): peer performed an orderly shutdown: message_bus.MessageBusType(.replica).Connection.Peer{ .client = 123056807024587499169777903630549722332 }
+2025-03-02 10:54:25.460Z info(message_bus): connection from client 217699470107945846580315858223721048338
+2025-03-02 11:00:36.512Z info(message_bus): peer performed an orderly shutdown: message_bus.MessageBusType(.replica).Connection.Peer{ .client = 217699470107945846580315858223721048338 }
+2025-03-02 11:00:37.503Z info(message_bus): connection from client 119635431063549033676775199848870535911
+2025-03-02 11:00:55.170Z info(message_bus): peer performed an orderly shutdown: message_bus.MessageBusType(.replica).Connection.Peer{ .client = 119635431063549033676775199848870535911 }
+2025-03-02 11:00:56.154Z info(message_bus): connection from client 145303100822335188123864772823450322830
+2025-03-02 11:04:46.354Z info(message_bus): peer performed an orderly shutdown: message_bus.MessageBusType(.replica).Connection.Peer{ .client = 145303100822335188123864772823450322830 }
+2025-03-02 11:04:47.462Z info(message_bus): connection from client 54544995958923812706882690786528405352
+2025-03-02 11:05:09.987Z info(message_bus): peer performed an orderly shutdown: message_bus.MessageBusType(.replica).Connection.Peer{ .client = 54544995958923812706882690786528405352 }
+2025-03-02 11:05:10.971Z info(message_bus): connection from client 12742317551407125947720112805621855986
+2025-03-02 11:05:38.520Z info(message_bus): peer performed an orderly shutdown: message_bus.MessageBusType(.replica).Connection.Peer{ .client = 12742317551407125947720112805621855986 }
+2025-03-02 11:05:39.519Z info(message_bus): connection from client 198705427296895019691130411783240146093
+2025-03-02 11:05:43.020Z info(message_bus): peer performed an orderly shutdown: message_bus.MessageBusType(.replica).Connection.Peer{ .client = 198705427296895019691130411783240146093 }
+2025-03-02 11:05:43.989Z info(message_bus): connection from client 60903314538715825632199730757977497067
+2025-03-02 11:05:47.501Z info(message_bus): peer performed an orderly shutdown: message_bus.MessageBusType(.replica).Connection.Peer{ .client = 60903314538715825632199730757977497067 }
+2025-03-02 11:05:48.488Z info(message_bus): connection from client 80750404713194407717824252341330073783
+2025-03-02 11:06:02.005Z info(message_bus): peer performed an orderly shutdown: message_bus.MessageBusType(.replica).Connection.Peer{ .client = 80750404713194407717824252341330073783 }
+2025-03-02 11:06:02.939Z info(message_bus): connection from client 42519048491325680633291497608761694585
+2025-03-02 11:10:25.697Z info(message_bus): peer performed an orderly shutdown: message_bus.MessageBusType(.replica).Connection.Peer{ .client = 42519048491325680633291497608761694585 }
+2025-03-02 11:10:26.778Z info(message_bus): connection from client 288494562218367572319526610969519782390
+2025-03-02 11:11:20.336Z info(message_bus): peer performed an orderly shutdown: message_bus.MessageBusType(.replica).Connection.Peer{ .client = 288494562218367572319526610969519782390 }
+2025-03-02 11:11:21.289Z info(message_bus): connection from client 31749628640348941485298025109636416857
+2025-03-02 11:12:08.837Z info(message_bus): peer performed an orderly shutdown: message_bus.MessageBusType(.replica).Connection.Peer{ .client = 31749628640348941485298025109636416857 }
+2025-03-02 11:12:09.820Z info(message_bus): connection from client 316282940008777504272954596711743204952
+2025-03-02 11:12:28.339Z info(message_bus): peer performed an orderly shutdown: message_bus.MessageBusType(.replica).Connection.Peer{ .client = 316282940008777504272954596711743204952 }
+2025-03-02 11:12:29.321Z info(message_bus): connection from client 316283420199839364857015708635912598729
+2025-03-02 11:12:42.838Z info(message_bus): peer performed an orderly shutdown: message_bus.MessageBusType(.replica).Connection.Peer{ .client = 316283420199839364857015708635912598729 }
+2025-03-02 11:12:43.797Z info(message_bus): connection from client 329771331655331890174254581575595595161
+2025-03-02 11:12:44.257Z info(message_bus): peer performed an orderly shutdown: message_bus.MessageBusType(.replica).Connection.Peer{ .client = 329771331655331890174254581575595595161 }
+2025-03-02 11:12:45.202Z info(message_bus): connection from client 184211461425446751154606042809073225966
+2025-03-02 11:19:19.094Z info(message_bus): peer performed an orderly shutdown: message_bus.MessageBusType(.replica).Connection.Peer{ .client = 184211461425446751154606042809073225966 }
+2025-03-02 11:19:20.078Z info(message_bus): connection from client 205892142000431024782212498771128035109
+2025-03-02 11:19:48.614Z info(message_bus): peer performed an orderly shutdown: message_bus.MessageBusType(.replica).Connection.Peer{ .client = 205892142000431024782212498771128035109 }
+2025-03-02 11:19:49.691Z info(message_bus): connection from client 277931289818136296505586507379802556863
+2025-03-02 11:20:13.220Z info(message_bus): peer performed an orderly shutdown: message_bus.MessageBusType(.replica).Connection.Peer{ .client = 277931289818136296505586507379802556863 }
+2025-03-02 11:20:14.223Z info(message_bus): connection from client 316918366939303651659438270247583657135
+2025-03-02 11:20:14.234Z warning(replica): 0: client_table_entry_create: clients=64/64 evicting client=331627603279489095195516384578827444647
+2025-03-02 11:20:33.755Z info(message_bus): peer performed an orderly shutdown: message_bus.MessageBusType(.replica).Connection.Peer{ .client = 316918366939303651659438270247583657135 }
+2025-03-02 11:20:34.733Z info(message_bus): connection from client 281535561360494804767556981436134760108
+2025-03-02 11:20:34.745Z warning(replica): 0: client_table_entry_create: clients=64/64 evicting client=15549263619722069779418091642386189624
+2025-03-02 11:22:46.391Z info(message_bus): peer performed an orderly shutdown: message_bus.MessageBusType(.replica).Connection.Peer{ .client = 281535561360494804767556981436134760108 }
+2025-03-02 11:22:47.406Z info(message_bus): connection from client 292781785284863856123555051258241097538
+2025-03-02 11:22:47.416Z warning(replica): 0: client_table_entry_create: clients=64/64 evicting client=48681059664798602639945452392345931564
+2025-03-02 11:24:00.983Z info(message_bus): peer performed an orderly shutdown: message_bus.MessageBusType(.replica).Connection.Peer{ .client = 292781785284863856123555051258241097538 }
+2025-03-02 11:24:01.985Z info(message_bus): connection from client 285277121185256964052228327106379103734
+2025-03-02 11:24:01.994Z warning(replica): 0: client_table_entry_create: clients=64/64 evicting client=79215304578982668674503655429879962010
+2025-03-02 11:24:40.530Z info(message_bus): peer performed an orderly shutdown: message_bus.MessageBusType(.replica).Connection.Peer{ .client = 285277121185256964052228327106379103734 }
+2025-03-02 11:24:41.499Z info(message_bus): connection from client 301714312375831842115631578017569683664
+2025-03-02 11:24:41.509Z warning(replica): 0: client_table_entry_create: clients=64/64 evicting client=316267904520352528842692656565245794220
+2025-03-02 11:25:34.058Z info(message_bus): peer performed an orderly shutdown: message_bus.MessageBusType(.replica).Connection.Peer{ .client = 301714312375831842115631578017569683664 }
+2025-03-02 11:25:35.065Z info(message_bus): connection from client 95884274805290301167219235191490288418
+2025-03-02 11:25:35.075Z warning(replica): 0: client_table_entry_create: clients=64/64 evicting client=154970491504082188029183903771020653420
+2025-03-02 11:26:08.600Z info(message_bus): peer performed an orderly shutdown: message_bus.MessageBusType(.replica).Connection.Peer{ .client = 95884274805290301167219235191490288418 }
+2025-03-02 11:26:09.533Z info(message_bus): connection from client 160233055181886199517645052002323257542
+2025-03-02 11:26:09.543Z warning(replica): 0: client_table_entry_create: clients=64/64 evicting client=161450429162550050325733309728646863371
+2025-03-02 11:26:17.051Z info(message_bus): peer performed an orderly shutdown: message_bus.MessageBusType(.replica).Connection.Peer{ .client = 160233055181886199517645052002323257542 }
+2025-03-02 11:26:18.016Z info(message_bus): connection from client 258220779296089676082866035523511854776
+2025-03-02 11:26:18.024Z warning(replica): 0: client_table_entry_create: clients=64/64 evicting client=15501384642583276047282850363942152451
+2025-03-02 11:26:38.540Z info(message_bus): peer performed an orderly shutdown: message_bus.MessageBusType(.replica).Connection.Peer{ .client = 258220779296089676082866035523511854776 }
+2025-03-02 11:26:39.519Z info(message_bus): connection from client 319179083333061187342717383697818093886
+2025-03-02 11:26:39.530Z warning(replica): 0: client_table_entry_create: clients=64/64 evicting client=186768139242243327603970009761169975394
+2025-03-02 11:26:51.040Z info(message_bus): peer performed an orderly shutdown: message_bus.MessageBusType(.replica).Connection.Peer{ .client = 319179083333061187342717383697818093886 }
+2025-03-02 11:26:51.994Z info(message_bus): connection from client 167672881350695077929805561411303462232
+2025-03-02 11:26:52.005Z warning(replica): 0: client_table_entry_create: clients=64/64 evicting client=144516378739507715856778885616780957355
+2025-03-02 11:26:57.513Z info(message_bus): peer performed an orderly shutdown: message_bus.MessageBusType(.replica).Connection.Peer{ .client = 167672881350695077929805561411303462232 }
+2025-03-02 11:26:58.498Z info(message_bus): connection from client 119516808983976195492288635560889430949
+2025-03-02 11:26:58.511Z warning(replica): 0: client_table_entry_create: clients=64/64 evicting client=69707233525040293355941719564099176288
+2025-03-02 11:27:20.229Z info(message_bus): peer performed an orderly shutdown: message_bus.MessageBusType(.replica).Connection.Peer{ .client = 119516808983976195492288635560889430949 }
+2025-03-02 11:27:21.179Z info(message_bus): connection from client 261358567149026148654237130687647378459
+2025-03-02 11:27:21.192Z warning(replica): 0: client_table_entry_create: clients=64/64 evicting client=14224206220629997238091242352939818757
+2025-03-02 11:28:24.374Z info(message_bus): peer performed an orderly shutdown: message_bus.MessageBusType(.replica).Connection.Peer{ .client = 261358567149026148654237130687647378459 }
+2025-03-02 11:28:25.397Z info(message_bus): connection from client 87586444823583497390876849893203308803
+2025-03-02 11:28:25.406Z warning(replica): 0: client_table_entry_create: clients=64/64 evicting client=23662701138576768573236672759901482090
+2025-03-02 11:28:38.491Z info(message_bus): peer performed an orderly shutdown: message_bus.MessageBusType(.replica).Connection.Peer{ .client = 87586444823583497390876849893203308803 }
+2025-03-02 11:28:39.437Z info(message_bus): connection from client 309975598083545281228352471553181663503
+2025-03-02 11:28:39.448Z warning(replica): 0: client_table_entry_create: clients=64/64 evicting client=334849929193222670655900968984676502582
+2025-03-02 11:29:07.063Z info(message_bus): peer performed an orderly shutdown: message_bus.MessageBusType(.replica).Connection.Peer{ .client = 309975598083545281228352471553181663503 }
+2025-03-02 11:29:08.013Z info(message_bus): connection from client 310974075206698128737179149296445152573
+2025-03-02 11:29:08.021Z warning(replica): 0: client_table_entry_create: clients=64/64 evicting client=322620649673725006404064295619621729415
+2025-03-02 11:30:04.653Z info(message_bus): peer performed an orderly shutdown: message_bus.MessageBusType(.replica).Connection.Peer{ .client = 310974075206698128737179149296445152573 }
+2025-03-02 11:30:05.595Z info(message_bus): connection from client 270952248752576298692672036024513024718
+2025-03-02 11:30:05.602Z warning(replica): 0: client_table_entry_create: clients=64/64 evicting client=156957889288563226584934545928577588810
+2025-03-02 11:30:31.215Z info(message_bus): peer performed an orderly shutdown: message_bus.MessageBusType(.replica).Connection.Peer{ .client = 270952248752576298692672036024513024718 }
+2025-03-02 11:30:32.244Z info(message_bus): connection from client 143636123250433491921823204102144111962
+2025-03-02 11:30:32.255Z warning(replica): 0: client_table_entry_create: clients=64/64 evicting client=97627252855365762831863946442094122085
+2025-03-02 11:32:03.308Z info(message_bus): peer performed an orderly shutdown: message_bus.MessageBusType(.replica).Connection.Peer{ .client = 143636123250433491921823204102144111962 }
+2025-03-02 11:32:04.312Z info(message_bus): connection from client 212359454551761496217998077806418379944
+2025-03-02 11:32:04.322Z warning(replica): 0: client_table_entry_create: clients=64/64 evicting client=93939074010612705723030567799397962534
+2025-03-02 11:32:26.967Z info(message_bus): peer performed an orderly shutdown: message_bus.MessageBusType(.replica).Connection.Peer{ .client = 212359454551761496217998077806418379944 }
+2025-03-02 11:32:27.951Z info(message_bus): connection from client 66267168576160425552760936305807846469
+2025-03-02 11:32:27.962Z warning(replica): 0: client_table_entry_create: clients=64/64 evicting client=111775527503174750694218661220347682905
+2025-03-02 11:32:48.666Z info(message_bus): peer performed an orderly shutdown: message_bus.MessageBusType(.replica).Connection.Peer{ .client = 66267168576160425552760936305807846469 }
+2025-03-02 11:32:49.691Z info(message_bus): connection from client 163808095209142530742398207826356539631
+2025-03-02 11:32:49.701Z warning(replica): 0: client_table_entry_create: clients=64/64 evicting client=39514628298267810936339413874968481349
+2025-03-02 11:33:52.920Z info(message_bus): peer performed an orderly shutdown: message_bus.MessageBusType(.replica).Connection.Peer{ .client = 163808095209142530742398207826356539631 }
+2025-03-02 11:33:53.875Z info(message_bus): connection from client 17529020836990554226102377711183204174
+2025-03-02 11:33:53.885Z warning(replica): 0: client_table_entry_create: clients=64/64 evicting client=337391742837151781035946412441206111913
+2025-03-02 11:33:58.384Z info(message_bus): peer performed an orderly shutdown: message_bus.MessageBusType(.replica).Connection.Peer{ .client = 17529020836990554226102377711183204174 }
+2025-03-02 11:33:59.354Z info(message_bus): connection from client 26739015821047160735104529394850318120
+2025-03-02 11:33:59.364Z warning(replica): 0: client_table_entry_create: clients=64/64 evicting client=217015268952058297870558440917863499205
+2025-03-02 11:34:41.450Z info(message_bus): peer performed an orderly shutdown: message_bus.MessageBusType(.replica).Connection.Peer{ .client = 26739015821047160735104529394850318120 }
+2025-03-02 11:34:42.253Z info(message_bus): connection from client 93960523306981830752960942265922648675
+2025-03-02 11:34:42.263Z warning(replica): 0: client_table_entry_create: clients=64/64 evicting client=19082238999194298319436008893494883561
+2025-03-02 11:34:45.767Z info(message_bus): peer performed an orderly shutdown: message_bus.MessageBusType(.replica).Connection.Peer{ .client = 93960523306981830752960942265922648675 }
+2025-03-02 11:34:46.733Z info(message_bus): connection from client 307942707275759723043084549095145973286
+2025-03-02 11:34:46.743Z warning(replica): 0: client_table_entry_create: clients=64/64 evicting client=171709607731074361703105013845503784685
+2025-03-02 11:34:52.243Z info(message_bus): peer performed an orderly shutdown: message_bus.MessageBusType(.replica).Connection.Peer{ .client = 307942707275759723043084549095145973286 }
+2025-03-02 11:34:53.204Z info(message_bus): connection from client 277738840644100424343904577008350776702
+2025-03-02 11:34:53.214Z warning(replica): 0: client_table_entry_create: clients=64/64 evicting client=314037011199420401545356531824699509468
+2025-03-02 11:34:58.716Z info(message_bus): peer performed an orderly shutdown: message_bus.MessageBusType(.replica).Connection.Peer{ .client = 277738840644100424343904577008350776702 }
+2025-03-02 11:34:59.659Z info(message_bus): connection from client 313270140306336089664822007986050204148
+2025-03-02 11:34:59.668Z warning(replica): 0: client_table_entry_create: clients=64/64 evicting client=336776092173147672048114577791396162740
+2025-03-02 11:35:18.291Z info(message_bus): peer performed an orderly shutdown: message_bus.MessageBusType(.replica).Connection.Peer{ .client = 313270140306336089664822007986050204148 }
+2025-03-02 11:35:19.241Z info(message_bus): connection from client 275928421154269060660626326945373336612
+2025-03-02 11:35:19.252Z warning(replica): 0: client_table_entry_create: clients=64/64 evicting client=56625798156751061572432720981107185681
+2025-03-02 11:35:21.754Z info(message_bus): peer performed an orderly shutdown: message_bus.MessageBusType(.replica).Connection.Peer{ .client = 275928421154269060660626326945373336612 }
+2025-03-02 11:35:22.716Z info(message_bus): connection from client 97816859955015882563691322083082000682
+2025-03-02 11:35:22.727Z warning(replica): 0: client_table_entry_create: clients=64/64 evicting client=150462096202019890275647486796393178037

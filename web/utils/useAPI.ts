@@ -1,9 +1,8 @@
-// lib/useAxiosSWR.ts
 import axios, { AxiosError } from 'axios';
 import useSWR, { KeyedMutator } from 'swr';
 
-const axiosInstance = axios.create({
-  baseURL: '/api/proxy/',
+export const useApiInstance = axios.create({
+  baseURL: '/api/proxy',
   // You can also set headers or other options here
 });
 
@@ -16,7 +15,7 @@ type TResponse<T> = {
 
 export function useAPI<T>(url: string | null): TResponse<T> {
   const { data, error, mutate } = useSWR(url, async (url) => {
-    const response = await axiosInstance.get(url);
+    const response = await useApiInstance.get(url);
     return response.data;
   });
 

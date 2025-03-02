@@ -34,7 +34,7 @@ export type TUserRepo = {
 
 export type TRepo = {
   id: number;
-  repo_id: string;
+  repo_id: number;
   repo_name: string;
   tigerbeetle_account_id: bigint;
   created_at: Date;

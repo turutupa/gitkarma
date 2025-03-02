@@ -6,7 +6,12 @@
   "scripts": {
     "server": "node app.js",
     "dev": "clear && bash ../scripts/gitkarma.sh && npx tsx watch src/app.ts",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "typeorm": "node typeorm-cli.js -f ormconfig.json",
+    "migration:generate": "node typeorm-cli.js migration:generate",
+    "migration:create": "node typeorm-cli.js migration:create",
+    "migration:run": "node typeorm-cli.js migration:run",
+    "migration:revert": "node typeorm-cli.js migration:revert"
   },
   "keywords": [],
   "author": "",
@@ -18,15 +23,19 @@
     "@types/express": "^5.0.0",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2",
     "octokit": "^4.1.1",
     "pg": "^8.13.3",
     "pino": "^9.6.0",
     "pino-pretty": "^13.0.0",
-    "tigerbeetle-node": "0.16.27"
+    "reflect-metadata": "^0.2.2",
+    "tigerbeetle-node": "0.16.27",
+    "typeorm": "^0.3.20"
   },
   "devDependencies": {
     "@octokit/tsconfig": "^4.0.0",
     "@octokit/webhooks-types": "^7.6.1",
+    "@types/jsonwebtoken": "^9.0.9",
     "@types/node": "^22.13.1",
     "@types/pg": "^8.11.11",
     "smee-client": "^2.0.4",

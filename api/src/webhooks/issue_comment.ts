@@ -52,11 +52,11 @@ export const handleIssueComment = async ({
     return;
   }
 
-  const repo = await db.getRepoByGitServiceRepoId(repoId);
+  const repo = await db.getRepoByGithubRepoId(repoId);
 
   const isUserBalanceCheck = commentBody === BALANCE_CHECK_EMOJI;
   if (payload.action === "created" && isUserBalanceCheck) {
-    const user = await db.getUserByGithubId(payload.sender.id);
+    const user = await db.getUserByGithubUserId(payload.sender.id);
     const account = await tb.getUserAccount(BigInt(user.id), BigInt(repo.id));
     const balance = tb.getBalance(account);
 
@@ -148,10 +148,7 @@ export const handleIssueComment = async ({
           repo: repoName,
           username: payload.sender.login,
         });
-      if (
-        permissionData.permission === "admin" ||
-        permissionData.permission === "maintain"
-      ) {
+      if (permissionData.permission === "admin") {
         isAdmin = true;
       }
     }

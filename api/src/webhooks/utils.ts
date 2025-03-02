@@ -10,16 +10,18 @@ import { DEFAULT_REPO_CONFIG } from "./constants.ts";
  *
  * @param repoId - git service repo id
  * @param repoName - git service repo name
+ * @param repoOwner - git service repo owner
  * @returns - repo entry from pg db and with
  */
 export const getOrDefaultGithubRepo = async (
   repoId: number,
-  repoName: string
+  repoName: string,
+  repoOwner: string
 ) => {
   // get repo
-  let repo: TRepo = await db.getRepoByGitServiceRepoId(repoId);
+  let repo: TRepo = await db.getRepoByGithubRepoId(repoId);
   if (!repo) {
-    repo = await db.createRepo(repoId, repoName);
+    repo = await db.createRepo(repoId, repoName, repoOwner); // pass repoOwner
   }
   // create tiger beetle account for repo
   if (!repo.tigerbeetle_account_id) {
@@ -49,7 +51,7 @@ export const getOrDefaultGithubUser = async (
   githubUsername: string
 ) => {
   // get user
-  let user = await db.getUserByGithubId(githubUserId);
+  let user = await db.getUserByGithubUserId(githubUserId);
   if (!user) {
     user = await db.createUser(githubUserId, githubUsername);
   }
@@ -78,5 +80,5 @@ export const getOrDefaultGithubUser = async (
     userRepo = await db.createUserRepo(user.id, repo.id, userTBAccount.id);
   }
 
-  return { user, account: userTBAccount };
+  return { user, userRepo, account: userTBAccount };
 };

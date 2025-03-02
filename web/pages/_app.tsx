@@ -2,10 +2,13 @@ import { MantineProvider } from '@mantine/core';
 import Layout from '@/components/Layout';
 
 import '@mantine/core/styles.css';
+import '@mantine/notifications/styles.css';
 
 import type { AppProps } from 'next/app';
 import Head from 'next/head';
 import { SessionProvider } from 'next-auth/react';
+import { Notifications } from '@mantine/notifications';
+import { RepoProvider } from '../context/RepoContext';
 import { theme } from '../theme';
 
 export default function App({ Component, pageProps: { session, ...pageProps } }: AppProps) {
@@ -20,9 +23,12 @@ export default function App({ Component, pageProps: { session, ...pageProps } }:
           />
           <link rel="shortcut icon" href="/favicon.svg" />
         </Head>
-        <Layout>
-          <Component {...pageProps} />
-        </Layout>
+        <Notifications />
+        <RepoProvider>
+          <Layout>
+            <Component {...pageProps} />
+          </Layout>
+        </RepoProvider>
       </MantineProvider>
     </SessionProvider>
   );

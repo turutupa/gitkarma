@@ -11,6 +11,10 @@ export const TRIGGER_RECHECK_EMOJI: string = "✨";
 export const ADMIN_TRIGGER_RECHECK_EMOJI: string = "🚀";
 export const BALANCE_CHECK_EMOJI = "💰";
 
+/**
+ * @deprecated
+ * this should be deprecated. octokit alread has builtin methods for this at **octokit.rest**
+ */
 export enum EGithubEndpoints {
   Comments = "POST /repos/{owner}/{repo}/issues/{issue_number}/comments",
 }

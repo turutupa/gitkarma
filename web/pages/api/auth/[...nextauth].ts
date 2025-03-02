@@ -10,6 +10,7 @@ export default NextAuth({
       authorization: { params: { scope: 'read:user repo' } },
     }),
   ],
+  secret: process.env.NEXTAUTH_SECRET, // This value should match the backend's JWT_SECRET.
   callbacks: {
     async jwt({ token, account }) {
       if (account) {

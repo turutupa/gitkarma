@@ -1,7 +1,7 @@
 import { IconMoneybag } from '@tabler/icons-react';
 import { NumberInput, Stack, Title } from '@mantine/core';
 
-const moneyIcon = <IconMoneybag size={22} stroke={1.5} />;
+const moneyIcon = <IconMoneybag size={18} stroke={1.5} />;
 
 const RepoSettings = () => {
   return (

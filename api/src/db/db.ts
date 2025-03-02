@@ -1,9 +1,6 @@
 import dotenv from "dotenv";
-import { readFileSync } from "fs";
 import log from "log.ts";
-import { dirname, join } from "path";
 import pgk from "pg";
-import { fileURLToPath } from "url";
 import type { EPullRequestState } from "webhooks/constants.ts";
 import type {
   TPullRequest,
@@ -40,12 +37,7 @@ class DB {
 
   public static async connect(): Promise<DB> {
     const db = new DB();
-    const __filename = fileURLToPath(import.meta.url);
-    const __dirname = dirname(__filename);
-    const schemaPath = join(__dirname, "schema.sql");
-    const schemaSQL = readFileSync(schemaPath, "utf-8");
     db.pg = new Pool(db.credentials);
-
     // test connection on start
     try {
       await db.pg.query("SELECT NOW()");
@@ -53,15 +45,6 @@ class DB {
     } catch (error) {
       log.error({ error }, "Could not connect to db");
     }
-
-    // run schemas on start
-    try {
-      await db.pg.query(schemaSQL);
-      log.info("Database schema loaded successfully.");
-    } catch (error) {
-      log.error({ error }, "Error loading database schema:");
-    }
-
     return db;
   }
 
@@ -107,10 +90,14 @@ class DB {
    * @param githubId - The GitHub user ID to look up.
    * @returns A Promise that resolves to the user if found, or null if not.
    */
-  public async getUserByGithubId(githubId: number): Promise<TUser> {
+  public async getUserByGithubUserId(githubId: number): Promise<TUser> {
     const query = `
-      SELECT id, github_id, github_username, created_at 
-      FROM users 
+      SELECT 
+        id, 
+        github_id, 
+        github_username, 
+        created_at 
+      FROM users u
       WHERE github_id = $1
     `;
     const { rows } = await this.pg.query<TUser>(query, [githubId]);
@@ -152,11 +139,41 @@ class DB {
   public async getUserRepo(userId: number, repoId: number): Promise<TUserRepo> {
     const query = `
       SELECT *
-      FROM user_repo
+      FROM user_repo 
       WHERE user_id = $1
       AND repo_id = $2
     `;
     const { rows } = await this.pg.query<TUserRepo>(query, [userId, repoId]);
+    return rows[0];
+  }
+
+  /**
+   * getUserRepoByGithubUserAndRepoId:
+   *
+   *
+   * @param githubUserId
+   * @param githubRepoId
+   * @returns
+   */
+  public async getUserRepoByGithubUserAndRepoId(
+    githubUserId: number,
+    githubRepoId: number
+  ): Promise<TUserRepo> {
+    const query = `
+      SELECT 
+        ur.*,
+        (SELECT u.github_username FROM users u WHERE u.id = ur.user_id) AS github_username
+      FROM 
+        user_repo ur
+      WHERE 
+        ur.user_id = (SELECT id FROM users u WHERE u.github_id = $1) 
+      AND 
+        ur.repo_id = (SELECT id FROM repos r WHERE r.repo_id = $2)
+    `;
+    const { rows } = await this.pg.query<TUserRepo>(query, [
+      githubUserId,
+      githubRepoId,
+    ]);
     return rows[0];
   }
 
@@ -189,19 +206,28 @@ class DB {
 
   /**
    * createRepo:
-   * Inserts a new repository into the `repos` table with the provided GitHub repository ID and name.
+   * Inserts a new repository into the `repos` table with the provided GitHub repository ID, name, and owner.
    *
    * @param repoId - The GitHub repository ID.
    * @param repoName - The repository name.
+   * @param repoOwner - The repository owner.
    * @returns A Promise that resolves to the newly created repository.
    */
-  public async createRepo(repoId: number, repoName: string): Promise<TRepo> {
+  public async createRepo(
+    repoId: number,
+    repoName: string,
+    repoOwner: string
+  ): Promise<TRepo> {
     const query = `
-      INSERT INTO repos (repo_id, repo_name)
-      VALUES ($1, $2)
+      INSERT INTO repos (repo_id, repo_name, repo_owner)
+      VALUES ($1, $2, $3)
       RETURNING *
     `;
-    const { rows } = await this.pg.query<TRepo>(query, [repoId, repoName]);
+    const { rows } = await this.pg.query<TRepo>(query, [
+      repoId,
+      repoName,
+      repoOwner,
+    ]);
     return rows[0];
   }
 
@@ -238,7 +264,7 @@ class DB {
    * @param githubRepoId - The GitHub repository ID.
    * @returns A Promise that resolves to a TDBResponse<TRepo> containing the repository data if found.
    */
-  public async getRepoByGitServiceRepoId(githubRepoId: number): Promise<TRepo> {
+  public async getRepoByGithubRepoId(githubRepoId: number): Promise<TRepo> {
     const query = `
       SELECT * 
       FROM repos 

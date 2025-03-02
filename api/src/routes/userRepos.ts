@@ -5,25 +5,38 @@ import type { Request, Response } from "express";
 import log from "log.ts";
 import type { Account } from "tigerbeetle-node";
 
+/**
+ * Converts a Tigerbeetle account into a JSON-friendly format.
+ *
+ * Iterates over the properties of the account and converts any BigInt values to strings.
+ *
+ * @param account - The Tigerbeetle account object.
+ * @returns A JSON-friendly account representation.
+ */
 function jsonifyAccount(account: Account): TJsonAccount {
-  const result = {} as TJsonAccount;
+  const result: Partial<Record<keyof Account, string | number>> = {};
   for (const key in account) {
     if (Object.prototype.hasOwnProperty.call(account, key)) {
       const k = key as keyof Account;
       const value = account[k];
-      // @ts-ignore
       result[k] = (
         typeof value === "bigint" ? value.toString() : value
       ) as TJsonAccount[typeof k];
     }
   }
-  return result;
+  return result as TJsonAccount;
 }
 
-export const repo = async (req: Request, res: Response) => {
-  const userId = req.params.userId;
-  log.info({ userId }, "Fetching all user data");
-  const allReposData = await db.getAllReposDataForUser(userId);
+/**
+ * repos:
+ * Fetches all repository data for a user, including user accounts, and sends it as a JSON response.
+ *
+ * @param req - The request object containing the user ID parameter.
+ * @param res - The response object used to send the JSON data.
+ */
+export const userRepos = async (req: Request, res: Response) => {
+  const user = req.jwt!;
+  const allReposData = await db.getAllReposDataForUser(String(user.id));
 
   await Promise.all(
     allReposData.map(async (repo) => {
@@ -39,6 +52,6 @@ export const repo = async (req: Request, res: Response) => {
     })
   );
 
-  log.info({ allReposData }, "All user data");
+  log.debug({ allReposData }, "All user data");
   res.json(allReposData);
 };

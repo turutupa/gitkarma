@@ -36,10 +36,15 @@ export const handleInstallationCreated = async ({
   const repositories = payload.repositories || [];
   // Create repo && collabs entries
   for (const repository of repositories) {
-    const repo = await getOrDefaultGithubRepo(repository.id, repository.name);
+    const repoOwner = payload.installation.account.login;
+    const repo = await getOrDefaultGithubRepo(
+      repository.id,
+      repository.name,
+      repoOwner
+    );
     const { data: collaborators } = await octokit.rest.repos.listCollaborators({
-      owner: payload.installation.account.login,
-      repo: repo.repo_name,
+      owner: repoOwner,
+      repo: repository.name,
     });
     for (const collaborator of collaborators) {
       const { id, login } = collaborator;

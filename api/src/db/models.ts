@@ -20,8 +20,9 @@ export type TUserRepo = {
 
 export type TRepo = {
   id: number;
-  repo_id: string;
+  repo_id: number;
   repo_name: string;
+  repo_owner: string;
   tigerbeetle_account_id: bigint;
   created_at: Date;
 
@@ -42,7 +43,7 @@ export type TJsonAccount = {
   [K in keyof Account]: Account[K] extends bigint ? string : Account[K];
 };
 
-type TUserData = {
+export type TUserData = {
   account: TJsonAccount;
 } & TUser &
   TUserRepo;
@@ -62,4 +63,10 @@ export type TPullRequest = {
   created_at: Date;
   updated_at: Date;
   // Add additional fields here if needed.
+};
+
+export type TUserRepoAccount = {
+  user: TUser;
+  userRepo: TUserRepo;
+  account: Account;
 };

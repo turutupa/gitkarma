@@ -2,8 +2,12 @@ import { createNodeMiddleware } from "@octokit/webhooks";
 import dotenv from "dotenv";
 import express from "express";
 import fs from "fs";
+import { jwtMiddleware } from "middleware/jwt.ts";
+import { createInjectOctokit } from "middleware/octokit.ts";
+import { createInjectUserRepo } from "middleware/userRepo.ts";
 import { App } from "octokit";
-import { repo } from "routes/repos.ts";
+import { transferFunds } from "routes/transferFunds.ts";
+import { userRepos } from "routes/userRepos.ts";
 import { handleInstallationCreated } from "webhooks/installation.created.ts";
 import { handleIssueComment } from "webhooks/issue_comment.ts";
 import { handlePullRequestClosed } from "webhooks/pull_request.closed.ts";
@@ -71,15 +75,24 @@ const startApp = async () => {
     path: webhookPath,
   });
 
+  // Create shared middleware injecting the octokit instance.
+  // @ts-ignore
+  const injectOctokit = createInjectOctokit(octokit);
+
   const app = express();
 
+  app.use(express.json());
   // @ts-ignore
   app.use(octokitMiddleware);
+  app.use(injectOctokit);
+  app.use(jwtMiddleware);
+  app.use(createInjectUserRepo);
 
   app.get("/", (_, res) => {
     res.json("hello world");
   });
-  app.get("/api/repos/:userId", repo);
+  app.get("/api/repos", userRepos);
+  app.post("/api/funds", transferFunds);
 
   // Start the server
   app.listen(port, () => {
