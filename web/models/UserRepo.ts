@@ -52,6 +52,8 @@ export type TRepo = {
   merge_penalty: number; // debits deducted from a PR author upon merge
   enable_complexity_bonus: boolean; // enable complexity bonus
   enable_review_quality_bonus: boolean; // enable review quality bonus
+  trigger_recheck_text: string; // text for PR recheck trigger
+  admin_trigger_recheck_text: string; // text for admin PR recheck trigger
 };
 
 export type TJsonAccount = {

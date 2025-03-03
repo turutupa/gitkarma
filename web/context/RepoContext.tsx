@@ -1,30 +1,38 @@
-import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
-import { TRepoAndUsers } from '@/models/UserRepo';
+import { createContext, ReactNode, useContext, useEffect } from 'react';
 import { useApiInstance } from '@/utils/useAPI';
+import { useSessionStorage } from '@/utils/useSessionStorage';
 import { http } from '../utils/http';
 
 type RepoContextType = {
-  currentRepo: TRepoAndUsers | null;
-  setCurrentRepo: (repo: TRepoAndUsers | null) => void;
+  currentRepoGithubId: number | null;
+  setCurrentRepoGithubId: (repo: number | null) => void;
 };
 
-const RepoContext = createContext<RepoContextType>({ currentRepo: null, setCurrentRepo: () => {} });
+const RepoContext = createContext<RepoContextType>({
+  currentRepoGithubId: null,
+  setCurrentRepoGithubId: () => {},
+});
 
 export const RepoProvider = ({ children }: { children: ReactNode }) => {
-  const [currentRepo, setCurrentRepo] = useState<TRepoAndUsers | null>(null);
+  const [currentRepoGithubId, setCurrentRepoGithubId] = useSessionStorage<number | null>(
+    'currentRepo',
+    null
+  );
 
   useEffect(() => {
-    if (currentRepo) {
-      http.defaults.headers.common.repoId = currentRepo.repo_id;
-      useApiInstance.defaults.headers.common.repoId = currentRepo.repo_id;
+    if (currentRepoGithubId) {
+      http.defaults.headers.common.repoId = currentRepoGithubId;
+      useApiInstance.defaults.headers.common.repoId = currentRepoGithubId;
     } else {
       delete http.defaults.headers.common.repoId;
       delete useApiInstance.defaults.headers.common.repoId;
     }
-  }, [currentRepo]);
+  }, [currentRepoGithubId]);
 
   return (
-    <RepoContext.Provider value={{ currentRepo, setCurrentRepo }}>{children}</RepoContext.Provider>
+    <RepoContext.Provider value={{ currentRepoGithubId, setCurrentRepoGithubId }}>
+      {children}
+    </RepoContext.Provider>
   );
 };
 

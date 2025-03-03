@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { IconAlertCircle } from '@tabler/icons-react';
 import { useSession } from 'next-auth/react';
 import {
@@ -14,27 +14,54 @@ import {
 import { useRepoContext } from '@/context/RepoContext';
 import { TRepoAndUsers } from '@/models/UserRepo';
 import { useAPI } from '@/utils/useAPI';
+import { useSessionStorage } from '@/utils/useSessionStorage';
 import RepoSettings from './RepoSettings';
 import Users from './Users';
 import css from './Admin.module.css';
 
 export default function Admin() {
   const { data: user } = useSession();
-  const { currentRepo, setCurrentRepo } = useRepoContext();
-  const [currentTab, setCurrentTab] = useState('Users');
+  const { currentRepoGithubId, setCurrentRepoGithubId } = useRepoContext();
+  const [currentRepo, setCurrentRepo] = useState<TRepoAndUsers | null>(null);
+  const [currentTab, setCurrentTab] = useSessionStorage('adminCurrentTab', 'Users');
+
+  const { data: reposAndUsers, error, isLoading, mutate } = useAPI<TRepoAndUsers[]>(`/repos`);
+
+  useEffect(() => {
+    if (!reposAndUsers) {
+      return;
+    }
+    const repo = reposAndUsers.find((repo) => repo.repo_id === currentRepoGithubId);
+    if (!repo) {
+      return;
+    }
+    setCurrentRepo(repo);
+  }, [currentRepoGithubId, reposAndUsers]);
 
   if (!user) {
     return <></>;
   }
 
-  const { data: reposAndUsers, error, isLoading } = useAPI<TRepoAndUsers[]>(`/repos`);
+  const mutateReposAndUsers = useCallback(
+    (repoData: Record<string, string | number>) => {
+      const updatedReposAndUsers = reposAndUsers.map((repo) => {
+        if (repo.repo_id === repoData.repo_id) {
+          return { ...repo, ...repoData };
+        }
+        return repo;
+      });
+      mutate(updatedReposAndUsers);
+    },
+    [reposAndUsers]
+  );
 
   // auto-populate select on data loaded
   useEffect(() => {
-    if (reposAndUsers?.length && !currentRepo) {
-      setCurrentRepo(reposAndUsers[0]);
+    if (reposAndUsers?.length && !currentRepoGithubId) {
+      const repoId = reposAndUsers[0].repo_id;
+      setCurrentRepoGithubId(repoId);
     }
-  }, [reposAndUsers, currentRepo, setCurrentRepo]);
+  }, [reposAndUsers, currentRepoGithubId, setCurrentRepoGithubId]);
 
   if (error) {
     return (
@@ -76,19 +103,20 @@ export default function Admin() {
   }
 
   const renderTabContent = () => {
+    if (!currentRepoGithubId || !currentRepo) {
+      return null;
+    }
+
     /** USERS LIST */
     if (currentTab === 'Users') {
-      if (!currentRepo) {
-        return null;
-      }
       return reposAndUsers.map((repo: any) => (
         <div key={repo.id}>
-          {currentRepo && <Users users={currentRepo.users} repoId={currentRepo.repo_id} />}
+          {currentRepoGithubId && <Users users={currentRepo.users} repoId={currentRepo.repo_id} />}
         </div>
       ));
     } else if (currentTab === 'Settings') {
       /** REPO SETTINGS */
-      return <RepoSettings currentRepo={currentRepo!} />;
+      return <RepoSettings currentRepo={currentRepo} mutateReposAndUsers={mutateReposAndUsers} />;
     } else if (currentTab === 'Stats') {
       /** REPO STATS */
       return (
@@ -112,7 +140,7 @@ export default function Admin() {
             value={currentRepo?.repo_name}
             onChange={(val) => {
               const targetRepo = reposAndUsers.find((rau) => rau.repo_name === val);
-              setCurrentRepo(targetRepo || null);
+              setCurrentRepoGithubId(targetRepo?.repo_id || null);
             }}
             allowDeselect={false}
           />

@@ -10,17 +10,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     res.status(401).json({ error: 'Unauthorized: No token found' });
     return;
   }
-  // populate tokenData with only the necessary fields.
-  tokenData.id = tokenData.sub;
-  delete tokenData.accessToken;
-  delete tokenData.expires;
-  delete tokenData.jti;
-  delete tokenData.exp;
-  delete tokenData.sub;
-  delete tokenData.iat;
+  const jwtData = {
+    id: tokenData.sub,
+    name: tokenData.name,
+    picture: tokenData.picture,
+  };
   // Generate JWT using the tokenData.
   const jwtSecret = process.env.NEXTAUTH_SECRET || 'defaultSecret';
-  const jwtToken = jwt.sign(tokenData, jwtSecret, { algorithm: 'HS256' });
+  const jwtToken = jwt.sign(jwtData, jwtSecret, { algorithm: 'HS256' });
 
   const { slug } = req.query;
   const targetPath = Array.isArray(slug) ? slug.join('/') : slug;

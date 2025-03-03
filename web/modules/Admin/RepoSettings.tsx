@@ -1,16 +1,22 @@
 import { useState } from 'react';
-import { IconMoneybag } from '@tabler/icons-react';
+import data from '@emoji-mart/data';
+import Picker from '@emoji-mart/react';
+import { IconMoneybag, IconMoodSmile } from '@tabler/icons-react';
 import axios from 'axios';
 import {
+  ActionIcon,
   Button,
   Group,
   NumberInput,
   Paper,
+  Popover,
   Stack,
   Switch,
   Text,
+  TextInput,
   Title,
   Transition,
+  useMantineColorScheme,
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { showNotification } from '@mantine/notifications';
@@ -26,13 +32,19 @@ type RepoSettingsProps = {
     merge_penalty: number;
     enable_complexity_bonus: boolean;
     enable_review_quality_bonus: boolean;
+    trigger_recheck_text: string;
+    admin_trigger_recheck_text: string;
   };
+  mutateReposAndUsers?: (repoData: any) => void;
 };
 
 const moneyIcon = <IconMoneybag size={18} stroke={1.5} />;
 
-const RepoSettings = ({ currentRepo }: RepoSettingsProps) => {
+const RepoSettings = ({ currentRepo, mutateReposAndUsers }: RepoSettingsProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [activeEmojiField, setActiveEmojiField] = useState<string | null>(null);
+  const { colorScheme } = useMantineColorScheme();
+
   const form = useForm({
     initialValues: {
       initial_debits: currentRepo.initial_debits,
@@ -42,6 +54,8 @@ const RepoSettings = ({ currentRepo }: RepoSettingsProps) => {
       merge_penalty: currentRepo.merge_penalty,
       enable_complexity_bonus: currentRepo.enable_complexity_bonus,
       enable_review_quality_bonus: currentRepo.enable_review_quality_bonus,
+      trigger_recheck_text: currentRepo.trigger_recheck_text,
+      admin_trigger_recheck_text: currentRepo.admin_trigger_recheck_text,
     },
     validate: {
       initial_debits: (val: number) => (val < 0 ? 'Must be at least 0' : null),
@@ -49,6 +63,8 @@ const RepoSettings = ({ currentRepo }: RepoSettingsProps) => {
       comment_bonus: (val: number) => (val < 0 ? 'Must be at least 0' : null),
       complexity_bonus: (val: number) => (val < 0 ? 'Must be at least 0' : null),
       merge_penalty: (val: number) => (val < 0 ? 'Must be at least 0' : null),
+      trigger_recheck_text: (val: string) => (!val ? 'Cannot be empty' : null),
+      admin_trigger_recheck_text: (val: string) => (!val ? 'Cannot be empty' : null),
     },
   });
 
@@ -62,6 +78,10 @@ const RepoSettings = ({ currentRepo }: RepoSettingsProps) => {
           message: 'Repository settings saved successfully',
           color: 'green',
         });
+        // Trigger SWR cache revalidation if available
+        if (mutateReposAndUsers) {
+          mutateReposAndUsers(values);
+        }
       } else {
         showNotification({
           title: 'Error',
@@ -88,7 +108,7 @@ const RepoSettings = ({ currentRepo }: RepoSettingsProps) => {
         });
       } else {
         showNotification({
-          title: 'Error',
+          title: 'Update Error',
           message: error instanceof Error ? error.message : 'Failed to update settings',
           color: 'red',
         });
@@ -96,6 +116,19 @@ const RepoSettings = ({ currentRepo }: RepoSettingsProps) => {
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const handleEmojiSelect = (emoji: any) => {
+    const emojiChar = emoji.native;
+    if (activeEmojiField === 'trigger_recheck_text') {
+      form.setFieldValue('trigger_recheck_text', form.values.trigger_recheck_text + emojiChar);
+    } else if (activeEmojiField === 'admin_trigger_recheck_text') {
+      form.setFieldValue(
+        'admin_trigger_recheck_text',
+        form.values.admin_trigger_recheck_text + emojiChar
+      );
+    }
+    setActiveEmojiField(null);
   };
 
   return (
@@ -195,6 +228,101 @@ const RepoSettings = ({ currentRepo }: RepoSettingsProps) => {
                 </div>
               )}
             </Transition>
+
+            {/* Trigger Recheck Settings */}
+            <Title mt="xl" order={4}>
+              Recheck Triggers
+            </Title>
+
+            {/* user trigger recheck text */}
+            <TextInput
+              label="User Trigger Recheck Text"
+              placeholder=":sparkles:"
+              description="Text/emoji that users can comment to trigger a PR recheck."
+              {...form.getInputProps('trigger_recheck_text')}
+              rightSection={
+                <Popover
+                  trapFocus
+                  position="top-end"
+                  width="auto"
+                  opened={activeEmojiField === 'trigger_recheck_text'}
+                  onChange={(opened) => {
+                    if (!opened) {
+                      setActiveEmojiField(null);
+                    }
+                  }}
+                >
+                  <Popover.Target>
+                    <ActionIcon
+                      variant="subtle"
+                      color="gray"
+                      onClick={() =>
+                        setActiveEmojiField(
+                          activeEmojiField === 'trigger_recheck_text'
+                            ? null
+                            : 'trigger_recheck_text'
+                        )
+                      }
+                    >
+                      <IconMoodSmile size={18} />
+                    </ActionIcon>
+                  </Popover.Target>
+                  <Popover.Dropdown p={0} m={0} bg="transparent" bd="none">
+                    <Picker
+                      title="Pick your emoji"
+                      data={data}
+                      theme={colorScheme}
+                      onEmojiSelect={handleEmojiSelect}
+                    />
+                  </Popover.Dropdown>
+                </Popover>
+              }
+            />
+
+            {/* admin trigger recheck text */}
+            <TextInput
+              label="Admin Trigger Recheck Text"
+              placeholder=":rocket:"
+              description="Text/emoji that admins can comment to trigger a PR recheck."
+              {...form.getInputProps('admin_trigger_recheck_text')}
+              rightSection={
+                <Popover
+                  trapFocus
+                  position="top-end"
+                  width="auto"
+                  opened={activeEmojiField === 'admin_trigger_recheck_text'}
+                  onChange={(opened) => {
+                    if (!opened) {
+                      setActiveEmojiField(null);
+                    }
+                  }}
+                >
+                  <Popover.Target>
+                    <ActionIcon
+                      variant="subtle"
+                      color="gray"
+                      onClick={() =>
+                        setActiveEmojiField(
+                          activeEmojiField === 'admin_trigger_recheck_text'
+                            ? null
+                            : 'admin_trigger_recheck_text'
+                        )
+                      }
+                    >
+                      <IconMoodSmile size={18} />
+                    </ActionIcon>
+                  </Popover.Target>
+                  <Popover.Dropdown p={0} m={0} bg="transparent" bd="none">
+                    <Picker
+                      theme={colorScheme}
+                      data={data}
+                      onEmojiSelect={handleEmojiSelect}
+                      title="Pick your emoji"
+                    />
+                  </Popover.Dropdown>
+                </Popover>
+              }
+            />
 
             {/* ACTION BUTTONS */}
             <Group justify="flex-end">

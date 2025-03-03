@@ -21,6 +21,8 @@
     "storybook:build": "storybook build"
   },
   "dependencies": {
+    "@emoji-mart/data": "^1.2.1",
+    "@emoji-mart/react": "^1.1.1",
     "@mantine/core": "7.17.0",
     "@mantine/form": "^7.17.0",
     "@mantine/hooks": "7.17.0",
@@ -31,6 +33,7 @@
     "@tabler/icons-react": "^3.28.1",
     "@types/axios": "^0.14.4",
     "axios": "^1.7.9",
+    "emoji-mart": "^5.6.0",
     "jsonwebtoken": "^9.0.2",
     "next": "15.1.5",
     "next-auth": "^4.24.11",
