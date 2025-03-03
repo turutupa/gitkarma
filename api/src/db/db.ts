@@ -285,6 +285,8 @@ class DB {
       merge_penalty?: number;
       enable_complexity_bonus?: boolean;
       enable_review_quality_bonus?: boolean;
+      trigger_recheck_text?: string;
+      admin_trigger_recheck_text?: string;
     }
   ): Promise<TRepo> {
     const setClauses: string[] = [];
@@ -317,6 +319,14 @@ class DB {
     if (settings.enable_review_quality_bonus !== undefined) {
       params.push(settings.enable_review_quality_bonus);
       setClauses.push(`enable_review_quality_bonus = $${params.length}`);
+    }
+    if (settings.trigger_recheck_text !== undefined) {
+      params.push(settings.trigger_recheck_text);
+      setClauses.push(`trigger_recheck_text = $${params.length}`);
+    }
+    if (settings.admin_trigger_recheck_text !== undefined) {
+      params.push(settings.admin_trigger_recheck_text);
+      setClauses.push(`admin_trigger_recheck_text = $${params.length}`);
     }
 
     if (setClauses.length === 0) {

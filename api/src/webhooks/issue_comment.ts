@@ -4,13 +4,11 @@ import db from "db/db.ts";
 import log from "log.ts";
 import tb from "../db/tigerbeetle.ts";
 import {
-  ADMIN_TRIGGER_RECHECK_EMOJI,
   BALANCE_CHECK_EMOJI,
   EGithubEndpoints,
   EPullRequestState,
   githubHeaders,
   GITKARMA_CHECK_NAME,
-  TRIGGER_RECHECK_EMOJI,
 } from "./constants.ts";
 import { getOrDefaultGithubUser } from "./utils.ts";
 
@@ -72,10 +70,11 @@ export const handleIssueComment = async ({
     return;
   }
 
-  // check if a user has triggered a re-check on PR owner funds,
-  // otherwise just exit
-  const isTriggeringRecheck = commentBody === TRIGGER_RECHECK_EMOJI;
-  const isTriggeringAdminRecheck = commentBody === ADMIN_TRIGGER_RECHECK_EMOJI;
+  // Use the custom trigger texts from the repo settings
+  const isTriggeringRecheck = commentBody === repo.trigger_recheck_text;
+  const isTriggeringAdminRecheck =
+    commentBody === repo.admin_trigger_recheck_text;
+
   if (
     payload.action != "created" ||
     (!isTriggeringRecheck && !isTriggeringAdminRecheck)
@@ -83,6 +82,8 @@ export const handleIssueComment = async ({
     log.info(
       {
         commentBody,
+        expectedTrigger: repo.trigger_recheck_text,
+        expectedAdminTrigger: repo.admin_trigger_recheck_text,
         action: payload.action,
         isTriggeringAdminRecheck,
         isTriggeringRecheck,

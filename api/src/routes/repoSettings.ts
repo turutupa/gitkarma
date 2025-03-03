@@ -15,9 +15,11 @@ export async function repoSettings(req: Request, res: Response): Promise<void> {
     merge_penalty,
     enable_complexity_bonus,
     enable_review_quality_bonus,
+    trigger_recheck_text,
+    admin_trigger_recheck_text,
   } = req.body;
 
-  log.debug(
+  log.info(
     {
       repo,
       sender,
@@ -29,6 +31,8 @@ export async function repoSettings(req: Request, res: Response): Promise<void> {
         merge_penalty,
         enable_complexity_bonus,
         enable_review_quality_bonus,
+        trigger_recheck_text,
+        admin_trigger_recheck_text,
       },
     },
     "Repo settings update"
@@ -46,6 +50,8 @@ export async function repoSettings(req: Request, res: Response): Promise<void> {
       merge_penalty,
       enable_complexity_bonus,
       enable_review_quality_bonus,
+      trigger_recheck_text,
+      admin_trigger_recheck_text,
     });
 
     res.json(updatedRepo);

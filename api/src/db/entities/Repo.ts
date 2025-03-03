@@ -57,6 +57,12 @@ export class Repo {
   @Column({ default: false })
   enable_review_quality_bonus: boolean;
 
+  @Column({ default: "✨" })
+  trigger_recheck_text: string;
+
+  @Column({ default: "🚀" })
+  admin_trigger_recheck_text: string;
+
   // Analytics
   @Column({ default: 0 })
   total_prs_opened: number;

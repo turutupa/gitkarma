@@ -31,7 +31,7 @@ export type TRepo = {
   total_prs_approved: number;
   total_comments: number;
 
-  // Configuration fields using snake_case
+  // Configuration fields
   initial_debits: number;
   approval_bonus: number;
   comment_bonus: number;
@@ -39,6 +39,8 @@ export type TRepo = {
   merge_penalty: number;
   enable_complexity_bonus: boolean;
   enable_review_quality_bonus: boolean;
+  trigger_recheck_text: string;
+  admin_trigger_recheck_text: string;
 };
 
 export type TJsonAccount = {
