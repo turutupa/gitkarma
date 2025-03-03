@@ -88,7 +88,7 @@ export default function Admin() {
       ));
     } else if (currentTab === 'Settings') {
       /** REPO SETTINGS */
-      return <RepoSettings />;
+      return <RepoSettings currentRepo={currentRepo!} />;
     } else if (currentTab === 'Stats') {
       /** REPO STATS */
       return (

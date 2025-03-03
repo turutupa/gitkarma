@@ -82,7 +82,7 @@ export const handlePullRequestClosed = async ({
       await tb.repoTransfersFundsToUser(
         BigInt(repo.tigerbeetle_account_id),
         BigInt(account.id),
-        BigInt(repo.review_approval_debits),
+        BigInt(repo.approval_bonus),
         repo.id
       );
     }
@@ -108,7 +108,7 @@ export const handlePullRequestClosed = async ({
   await tb.repoTransfersFundsToUser(
     BigInt(repo.tigerbeetle_account_id),
     BigInt(userRepo.tigerbeetle_account_id),
-    BigInt(repo.pr_merge_deduction_debits),
+    BigInt(repo.merge_penalty),
     repo.id
   );
 };

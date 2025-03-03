@@ -44,12 +44,14 @@ export type TRepo = {
   total_prs_approved: number;
   total_comments: number;
 
-  // Configuration fields
-  default_debits: number;
-  review_approval_debits: number;
-  comment_debits: number;
-  max_complexity_bonus_debits: number;
-  pr_merge_deduction_debits: number;
+  // Configuration fields using snake_case
+  initial_debits: number; // initial debits assigned when a user is added
+  approval_bonus: number; // debits awarded to a PR approver upon review approval
+  comment_bonus: number; // bonus debits for high-quality PR comments
+  complexity_bonus: number; // extra debits for high complexity PR
+  merge_penalty: number; // debits deducted from a PR author upon merge
+  enable_complexity_bonus: boolean; // enable complexity bonus
+  enable_review_quality_bonus: boolean; // enable review quality bonus
 };
 
 export type TJsonAccount = {

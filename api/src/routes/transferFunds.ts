@@ -34,15 +34,7 @@ export const transferFunds = async (req: Request, res: Response) => {
   }
 
   // Verify if the executing user is an admin/owner of the repo using sessionUser.id.
-  const isAdmin = await verifyUserIsRepoAdmin(octokit, sender, repo!);
-  if (!isAdmin) {
-    log.error(
-      req.body,
-      "Transfer funds error: Forbidden: Insufficient permissions"
-    );
-    res.status(403).json({ error: "Forbidden: Insufficient permissions" });
-    return;
-  }
+  await verifyUserIsRepoAdmin(octokit, sender, repo!);
 
   try {
     const targetUserRepo = await db.getUserRepoByGithubUserAndRepoId(
@@ -52,6 +44,19 @@ export const transferFunds = async (req: Request, res: Response) => {
 
     // Call TigerBeetle to perform the funds transfer.
     if (amount < 0) {
+      // if the amount is negative, check if the user has enough funds
+      const account = await tb.getUserAccount(
+        BigInt(targetUserRepo.user_id),
+        BigInt(targetUserRepo.repo_id)
+      );
+      const balance = tb.getBalance(account);
+      if (balance < Math.abs(amount)) {
+        res
+          .status(406)
+          .json({ error: "Insufficient funds", message: "Insufficient funds" });
+        return;
+      }
+
       await tb.repoChargesFundsToUser(
         BigInt(repo?.tigerbeetle_account_id!),
         BigInt(targetUserRepo.tigerbeetle_account_id),

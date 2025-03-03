@@ -274,6 +274,66 @@ class DB {
     return rows[0];
   }
 
+  // New method to update repo configuration settings
+  public async updateRepoSettings(
+    repoInternalId: number,
+    settings: {
+      initial_debits?: number;
+      approval_bonus?: number;
+      comment_bonus?: number;
+      complexity_bonus?: number;
+      merge_penalty?: number;
+      enable_complexity_bonus?: boolean;
+      enable_review_quality_bonus?: boolean;
+    }
+  ): Promise<TRepo> {
+    const setClauses: string[] = [];
+    const params: any[] = [];
+
+    if (settings.initial_debits !== undefined) {
+      params.push(settings.initial_debits);
+      setClauses.push(`initial_debits = $${params.length}`);
+    }
+    if (settings.approval_bonus !== undefined) {
+      params.push(settings.approval_bonus);
+      setClauses.push(`approval_bonus = $${params.length}`);
+    }
+    if (settings.comment_bonus !== undefined) {
+      params.push(settings.comment_bonus);
+      setClauses.push(`comment_bonus = $${params.length}`);
+    }
+    if (settings.complexity_bonus !== undefined) {
+      params.push(settings.complexity_bonus);
+      setClauses.push(`complexity_bonus = $${params.length}`);
+    }
+    if (settings.merge_penalty !== undefined) {
+      params.push(settings.merge_penalty);
+      setClauses.push(`merge_penalty = $${params.length}`);
+    }
+    if (settings.enable_complexity_bonus !== undefined) {
+      params.push(settings.enable_complexity_bonus);
+      setClauses.push(`enable_complexity_bonus = $${params.length}`);
+    }
+    if (settings.enable_review_quality_bonus !== undefined) {
+      params.push(settings.enable_review_quality_bonus);
+      setClauses.push(`enable_review_quality_bonus = $${params.length}`);
+    }
+
+    if (setClauses.length === 0) {
+      throw new Error("No fields provided to update");
+    }
+
+    params.push(repoInternalId);
+    const query = `
+      UPDATE repos
+      SET ${setClauses.join(", ")}
+      WHERE id = $${params.length}
+      RETURNING *
+    `;
+    const { rows } = await this.pg.query<TRepo>(query, params);
+    return rows[0];
+  }
+
   /**
    * createPullRequest:
    * Inserts a new pull request record into the pull_requests table.

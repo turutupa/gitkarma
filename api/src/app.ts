@@ -1,11 +1,12 @@
 import { createNodeMiddleware } from "@octokit/webhooks";
 import dotenv from "dotenv";
-import express from "express";
+import express, { NextFunction, Request, Response } from "express";
 import fs from "fs";
 import { jwtMiddleware } from "middleware/jwt.ts";
 import { createInjectOctokit } from "middleware/octokit.ts";
-import { createInjectUserRepo } from "middleware/userRepo.ts";
+import { createInjectUserRepoMiddleware as injectUserRepoMiddleware } from "middleware/userRepo.ts";
 import { App } from "octokit";
+import { repoSettings } from "routes/repoSettings.ts";
 import { transferFunds } from "routes/transferFunds.ts";
 import { userRepos } from "routes/userRepos.ts";
 import { handleInstallationCreated } from "webhooks/installation.created.ts";
@@ -69,30 +70,45 @@ const startOctokit = () => {
 const startApp = async () => {
   const port = process.env.PORT || 4000;
   const host = process.env.HOST || "0.0.0.0";
+
+  // create express app!
+  const app = express();
+
+  // add octokit router
   const octokit = startOctokit();
   const webhookPath = "/api/webhook";
-  const octokitMiddleware = createNodeMiddleware(octokit.webhooks, {
-    path: webhookPath,
-  });
+  const octokitMiddleware = (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    Promise.resolve(
+      createNodeMiddleware(octokit.webhooks, {
+        path: webhookPath,
+      })(req, res, next)
+    ).catch(next);
+  };
+  app.use(octokitMiddleware);
 
   // Create shared middleware injecting the octokit instance.
   // @ts-ignore
-  const injectOctokit = createInjectOctokit(octokit);
+  const injectOctokitMiddleware = createInjectOctokit(octokit);
 
-  const app = express();
+  // Create a router for routes
+  const routes = express.Router();
+  routes.use(express.json());
+  routes.use(injectOctokitMiddleware);
+  routes.use(jwtMiddleware);
+  routes.use(injectUserRepoMiddleware);
 
-  app.use(express.json());
-  // @ts-ignore
-  app.use(octokitMiddleware);
-  app.use(injectOctokit);
-  app.use(jwtMiddleware);
-  app.use(createInjectUserRepo);
-
-  app.get("/", (_, res) => {
+  routes.get("/", (_, res) => {
     res.json("hello world");
   });
-  app.get("/api/repos", userRepos);
-  app.post("/api/funds", transferFunds);
+  routes.get("/api/repos", userRepos);
+  routes.put("/api/repos", repoSettings);
+  routes.post("/api/funds", transferFunds);
+
+  app.use(routes);
 
   // Start the server
   app.listen(port, () => {

@@ -74,7 +74,7 @@ export const handlePullRequestOpened = async ({
   log.debug({ account }, "pull_request.opened > user account");
 
   const balance = Number(tb.getBalance(account));
-  const hasEnoughDebits = balance >= repo.pr_merge_deduction_debits;
+  const hasEnoughDebits = balance >= repo.merge_penalty;
 
   // Create pull request entry with user assigned as owner
   await db.createPullRequest(
@@ -91,10 +91,10 @@ export const handlePullRequestOpened = async ({
     await tb.repoChargesFundsToUser(
       BigInt(repo.tigerbeetle_account_id),
       BigInt(account.id),
-      BigInt(repo.pr_merge_deduction_debits),
+      BigInt(repo.merge_penalty),
       repo.id
     );
-    const newBalance = balance - repo.pr_merge_deduction_debits;
+    const newBalance = balance - repo.merge_penalty;
     const message = `Pull Request funded. Current balance for **${githubUsername}** is ${newBalance}💰.`;
     await octokit.request(EGithubEndpoints.Comments, {
       owner,
@@ -120,7 +120,7 @@ export const handlePullRequestOpened = async ({
   }
 
   // send error because not enough debits
-  const message = `Not enough tokens! Balance for **${githubUsername}** is ${balance}💰. A minimum of ${repo.pr_merge_deduction_debits} tokens are required! Review PRs to get more tokens! 🪙`;
+  const message = `Not enough tokens! Balance for **${githubUsername}** is ${balance}💰. A minimum of ${repo.merge_penalty} tokens are required! Review PRs to get more tokens! 🪙`;
   await octokit.request(EGithubEndpoints.Comments, {
     owner,
     repo: repoName,

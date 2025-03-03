@@ -31,12 +31,14 @@ export type TRepo = {
   total_prs_approved: number;
   total_comments: number;
 
-  // Configuration fields
-  default_debits: number;
-  review_approval_debits: number;
-  comment_debits: number;
-  max_complexity_bonus_debits: number;
-  pr_merge_deduction_debits: number;
+  // Configuration fields using snake_case
+  initial_debits: number;
+  approval_bonus: number;
+  comment_bonus: number;
+  complexity_bonus: number;
+  merge_penalty: number;
+  enable_complexity_bonus: boolean;
+  enable_review_quality_bonus: boolean;
 };
 
 export type TJsonAccount = {

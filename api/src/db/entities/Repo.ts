@@ -37,19 +37,25 @@ export class Repo {
 
   // Configuration fields
   @Column({ default: 400 })
-  default_debits: number;
+  initial_debits: number;
 
   @Column({ default: 50 })
-  review_approval_debits: number;
+  approval_bonus: number;
 
   @Column({ default: 5 })
-  comment_debits: number;
+  comment_bonus: number;
 
   @Column({ default: 20 })
-  max_complexity_bonus_debits: number;
+  complexity_bonus: number;
 
   @Column({ default: 100 })
-  pr_merge_deduction_debits: number;
+  merge_penalty: number;
+
+  @Column({ default: false })
+  enable_complexity_bonus: boolean;
+
+  @Column({ default: false })
+  enable_review_quality_bonus: boolean;
 
   // Analytics
   @Column({ default: 0 })

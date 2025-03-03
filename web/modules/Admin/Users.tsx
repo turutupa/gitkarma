@@ -32,7 +32,18 @@ const Users: React.FC<Props> = ({ users, repoId }) => {
 
   const handleTransfer = useCallback(
     async (user: TUserData) => {
+      const balance = Number(user.account.debits_posted) - Number(user.account.credits_posted);
       const amount = transferAmounts[user.github_username];
+
+      if (amount < 0 && Math.abs(amount) > balance) {
+        showNotification({
+          title: 'Error',
+          message: 'The user does not have enough funds',
+          color: 'red',
+        });
+        return;
+      }
+
       if (!amount || isTransferring[user.github_username]) {
         return;
       }
@@ -73,15 +84,16 @@ const Users: React.FC<Props> = ({ users, repoId }) => {
           });
         }
       } catch (error: unknown) {
+        console.log('error', error);
         if (axios.isAxiosError(error)) {
           const status = error.response?.status;
-          let message = 'Transfer failed';
+          // Check both 'error' and 'message' keys in the response payload
+          let message =
+            error?.response?.data?.error || error?.response?.data?.message || 'Transfer failed';
           if (status === 401) {
             message = 'Unauthorized access - please log in again';
           } else if (status === 403) {
             message = 'Forbidden - you do not have permission to perform this action';
-          } else if (error.response?.data?.message) {
-            message = error.response.data.message;
           }
           showNotification({
             title: 'Transfer Error',

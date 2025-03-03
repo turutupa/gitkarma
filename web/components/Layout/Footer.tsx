@@ -21,7 +21,7 @@ const Footer = () => {
       <Container className={css.inner} size="lg">
         <ActionIcon
           size="lg"
-          color="var(--mantine-colors-primary-6)"
+          color="var(--mantine-color-primary-6)"
           radius="xl"
           onClick={onLogoClick}
         >

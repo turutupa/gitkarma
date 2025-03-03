@@ -24,18 +24,16 @@ export async function verifyUserIsRepoAdmin(
   }
 
   // Use GitHub API only for collaborator permission check.
-  try {
-    const { data: permissionData } =
-      await octokit.rest.repos.getCollaboratorPermissionLevel({
-        owner: repo.repo_owner,
-        repo: repo.repo_name,
-        username: user.user.github_username,
-      });
-    return permissionData.permission === "admin";
-  } catch (error: any) {
-    if (error.status === 404) {
-      return false;
-    }
-    throw error;
+  const { data: permissionData } =
+    await octokit.rest.repos.getCollaboratorPermissionLevel({
+      owner: repo.repo_owner,
+      repo: repo.repo_name,
+      username: user.user.github_username,
+    });
+
+  const isAdmin = permissionData.permission === "admin";
+  if (!isAdmin) {
+    log.error({ user, repo }, "Forbidden: Insufficient permissions");
+    throw new Error("Forbidden: Insufficient permissions");
   }
 }

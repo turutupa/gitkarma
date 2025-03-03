@@ -23,9 +23,10 @@ export function jwtMiddleware(req: Request, res: Response, next: NextFunction) {
     const jwtSecret = process.env.JWT_SECRET || "defaultSecret";
     const payload = jwt.verify(token, jwtSecret, { algorithms: ["HS256"] });
     req.jwt = payload as TJWT;
-    log.info({ jwt: payload }, "JWT token verified");
+    log.debug({ jwt: payload }, "JWT token verified");
     next();
   } catch (error) {
+    log.error({ error }, "JWT token invalid");
     res.status(401).json({ error: "Token invalid" });
   }
 }

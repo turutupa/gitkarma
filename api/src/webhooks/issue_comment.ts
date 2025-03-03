@@ -46,6 +46,8 @@ export const handleIssueComment = async ({
   const prOwnerGithubName = payload.issue.user.login; // GitHub user id
   const commentBody: string = payload.comment.body.trim();
 
+  log.info("Processing issue comment event");
+
   // its an issues' comment, not a pr comment
   if (!payload.issue.pull_request) {
     log.debug({ payload }, "issue_comment > not a pull request, skipping");
@@ -197,7 +199,7 @@ export const handleIssueComment = async ({
   log.info({ account }, "issue_comment > user account");
 
   const balance = Number(tb.getBalance(account));
-  const hasEnoughDebits = balance >= repo.pr_merge_deduction_debits;
+  const hasEnoughDebits = balance >= repo.merge_penalty;
 
   // set pull request check to passed / not passed based on balance
   await db.updatePullRequest(prNumber, repo.id, {
@@ -209,12 +211,12 @@ export const handleIssueComment = async ({
     await tb.repoChargesFundsToUser(
       BigInt(repo.tigerbeetle_account_id),
       BigInt(account.id),
-      BigInt(repo.pr_merge_deduction_debits),
+      BigInt(repo.merge_penalty),
       repo.id
     );
 
     // send comment to github user
-    const newBalance = balance - repo.pr_merge_deduction_debits;
+    const newBalance = balance - repo.merge_penalty;
     const message = `Pull Request funded. Current balance for **${prOwnerGithubName}** is ${newBalance}💰.`;
     await octokit.request(EGithubEndpoints.Comments, {
       owner,
@@ -241,7 +243,7 @@ export const handleIssueComment = async ({
   }
 
   // send error because not enough debits
-  const message = `Still not enough tokens! Balance for **${prOwnerGithubName}** is ${balance}💰. A minimum of **${repo.pr_merge_deduction_debits}** tokens are required! Review PRs to get more tokens!`;
+  const message = `Still not enough tokens! Balance for **${prOwnerGithubName}** is ${balance}💰. A minimum of **${repo.merge_penalty}** tokens are required! Review PRs to get more tokens!`;
   await octokit.request(EGithubEndpoints.Comments, {
     owner,
     repo: payload.repository.name,

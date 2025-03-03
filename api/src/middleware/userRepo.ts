@@ -14,7 +14,7 @@ declare global {
   }
 }
 
-export async function createInjectUserRepo(
+export async function createInjectUserRepoMiddleware(
   req: Request,
   _: Response,
   next: NextFunction
