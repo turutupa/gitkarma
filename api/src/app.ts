@@ -1,6 +1,6 @@
 import { createNodeMiddleware } from "@octokit/webhooks";
 import dotenv from "dotenv";
-import express, { NextFunction, Request, Response } from "express";
+import express from "express";
 import fs from "fs";
 import { jwtMiddleware } from "middleware/jwt.ts";
 import { createInjectOctokit } from "middleware/octokit.ts";
@@ -77,17 +77,10 @@ const startApp = async () => {
   // add octokit router
   const octokit = startOctokit();
   const webhookPath = "/api/webhook";
-  const octokitMiddleware = (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) => {
-    Promise.resolve(
-      createNodeMiddleware(octokit.webhooks, {
-        path: webhookPath,
-      })(req, res, next)
-    ).catch(next);
-  };
+  const octokitMiddleware = createNodeMiddleware(octokit.webhooks, {
+    path: webhookPath,
+  });
+  // @ts-ignore
   app.use(octokitMiddleware);
 
   // Create shared middleware injecting the octokit instance.

@@ -70,8 +70,8 @@ export const handlePullRequestOpened = async ({
     githubUsername
   );
 
-  log.debug({ user }, "pull_request.opened > user");
-  log.debug({ account }, "pull_request.opened > user account");
+  log.info({ user }, "pull_request.opened > user");
+  log.info({ account }, "pull_request.opened > user account");
 
   const balance = Number(tb.getBalance(account));
   const hasEnoughDebits = balance >= repo.merge_penalty;

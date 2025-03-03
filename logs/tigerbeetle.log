@@ -460,3 +460,13 @@ Starting TigerBeetle server...
 2025-03-03 08:20:00.622Z info(replica): 0: commit_checkpoint_data_callback_join: checkpoint_data done (op=1951 current_checkpoint=959 next_checkpoint=1919)
 2025-03-03 08:20:00.622Z info(replica): 0: commit_checkpoint_superblock: checkpoint_superblock start (op=1951 checkpoint=959..1919 view_durable=1..1 log_view_durable=1..1)
 2025-03-03 08:20:00.640Z info(replica): 0: commit_checkpoint_superblock_callback: checkpoint_superblock done (op=1951 new_checkpoint=1919)
+2025-03-03 09:04:30.897Z info(message_bus): peer performed an orderly shutdown: message_bus.MessageBusType(.replica).Connection.Peer{ .client = 283322742100533303345892480689543931546 }
+2025-03-03 09:04:31.928Z info(message_bus): connection from client 323226709773629748120072116681983026496
+2025-03-03 09:04:31.940Z warning(replica): 0: client_table_entry_create: clients=64/64 evicting client=138332104313756063517154172479437254387
+2025-03-03 09:05:47.521Z info(message_bus): peer performed an orderly shutdown: message_bus.MessageBusType(.replica).Connection.Peer{ .client = 323226709773629748120072116681983026496 }
+2025-03-03 09:05:48.511Z info(message_bus): connection from client 290851980189382580905235644097503790981
+2025-03-03 09:05:48.522Z warning(replica): 0: client_table_entry_create: clients=64/64 evicting client=65379648660069613973336810086382700309
+2025-03-03 09:05:51.021Z info(message_bus): peer performed an orderly shutdown: message_bus.MessageBusType(.replica).Connection.Peer{ .client = 290851980189382580905235644097503790981 }
+2025-03-03 09:05:52.010Z info(message_bus): connection from client 194368424810305012166711110408885501768
+2025-03-03 09:05:52.021Z warning(replica): 0: client_table_entry_create: clients=64/64 evicting client=225720208815003585858029671848041321441
+2025-03-03 17:51:51.172Z info(message_bus): peer performed an orderly shutdown: message_bus.MessageBusType(.replica).Connection.Peer{ .client = 194368424810305012166711110408885501768 }
