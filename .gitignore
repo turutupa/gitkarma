@@ -1,4 +1,6 @@
 /tigerbeetle
+/logs
+
 
 .env
 **/.env

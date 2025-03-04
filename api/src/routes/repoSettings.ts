@@ -2,7 +2,7 @@ import { TUserRepoAccount } from "db/models.ts";
 import { Request, Response } from "express";
 import log from "log.ts";
 import DB from "../db/db.ts";
-import { verifyUserIsRepoAdmin } from "./common.ts";
+import { verifyUserIsRepoAdmin } from "./utils.ts";
 
 export async function repoSettings(req: Request, res: Response): Promise<void> {
   const { octokit, repo } = req;

@@ -139,6 +139,8 @@ const RepoSettings = ({ currentRepo, mutateReposAndUsers }: RepoSettingsProps) =
       <Paper shadow="none" p="md">
         <form onSubmit={form.onSubmit(handleSubmit)}>
           <Stack gap="md">
+            {/* Funds */}
+            <Title order={4}>Financial Settings</Title>
             <NumberInput
               label="Initial Debits"
               placeholder="400"

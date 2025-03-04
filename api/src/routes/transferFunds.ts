@@ -3,7 +3,7 @@ import { TUserRepoAccount } from "db/models.ts";
 import type { Request, Response } from "express";
 import log from "log.ts";
 import tb from "../db/tigerbeetle.ts";
-import { verifyUserIsRepoAdmin } from "./common.ts";
+import { verifyUserIsRepoAdmin } from "./utils.ts";
 
 /**
  * transferFunds:
