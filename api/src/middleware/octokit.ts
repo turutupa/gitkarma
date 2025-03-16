@@ -1,5 +1,5 @@
 import { Octokit } from "@octokit/rest";
-import { NextFunction, Request, Response } from "express";
+import type { NextFunction, Request, Response } from "express";
 
 // Extend Request type to include octokit.
 declare global {

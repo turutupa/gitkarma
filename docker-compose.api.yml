@@ -1,0 +1,10 @@
+services:
+  api:
+    build: ./api
+    restart: unless-stopped
+    privileged: true
+    ports:
+      - "${PORT}:${PORT}"
+    network_mode: "host"
+    env_file:
+      - .env

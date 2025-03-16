@@ -1,7 +1,7 @@
-import db from "db/db.ts";
-import type { TRepo } from "db/models.ts";
-import tb from "db/tigerbeetle.ts";
-import { DEFAULT_REPO_CONFIG } from "./constants.ts";
+import db from "@/db/db";
+import type { TRepo } from "@/db/models";
+import tb from "@/db/tigerbeetle";
+import { DEFAULT_REPO_CONFIG } from "./constants";
 
 /**
  * getOrDefaultGithubRepo:

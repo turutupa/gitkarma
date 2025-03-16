@@ -6,11 +6,12 @@ import {
   IconBrandYoutube,
   IconGitPullRequest,
 } from '@tabler/icons-react';
-import { ActionIcon, Container, Group } from '@mantine/core';
+import { ActionIcon, Container, Group, useMantineTheme } from '@mantine/core';
 import css from './Footer.module.css';
 
 const Footer = () => {
   const router = useRouter();
+  const theme = useMantineTheme();
 
   const onLogoClick = useCallback(() => {
     router.push('/');
@@ -19,12 +20,7 @@ const Footer = () => {
   return (
     <div className={css.footer}>
       <Container className={css.inner} size="lg">
-        <ActionIcon
-          size="lg"
-          color="var(--mantine-color-primary-6)"
-          radius="xl"
-          onClick={onLogoClick}
-        >
+        <ActionIcon size="lg" color={theme.colors.primary[6]} radius="xl" onClick={onLogoClick}>
           <IconGitPullRequest size={22} stroke={1.5} />
         </ActionIcon>
         <Group gap={0} className={css.links} justify="flex-end" wrap="nowrap">

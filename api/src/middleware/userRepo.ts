@@ -1,7 +1,7 @@
-import db from "db/db.ts";
-import { TRepo, TUser, TUserRepoAccount } from "db/models.ts";
+import db from "@/db/db";
+import type { TRepo, TUser, TUserRepoAccount } from "@/db/models";
+import { getOrDefaultGithubUser } from "@/webhooks/utils";
 import type { NextFunction, Request, Response } from "express";
-import { getOrDefaultGithubUser } from "webhooks/utils.ts";
 
 // Extend Express Request to include TUser data.
 declare global {

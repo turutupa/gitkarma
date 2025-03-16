@@ -1,5 +1,5 @@
-const Pricing = () => {
-  return <div>nothing to see here</div>;
-};
+import Pricing from '@/modules/Pricing/Pricing';
 
-export default Pricing;
+export default function PricingPage() {
+  return <Pricing />;
+}

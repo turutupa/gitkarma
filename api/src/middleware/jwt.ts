@@ -1,7 +1,7 @@
+import log from "@/log";
 import type { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
-import log from "log.ts";
-import type { TJWT } from "../types/JWT.ts";
+import type { TJWT } from "../types/JWT";
 
 // Extend Express Request to include TUser data.
 declare global {

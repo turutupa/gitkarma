@@ -13,6 +13,7 @@ lines=(
 "         888                                                              "
 "    Y8b d88P                                                              "
 "     \"Y88P\" "
+
 )
 
 # Determine the maximum length among all lines.
@@ -44,5 +45,11 @@ echo ""
 for line in "${lines[@]}"; do
   echo "${pad}${line}"
 done
+# Check if an argument is passed and print it
+if [ $# -gt 0 ]; then
+  padding_length=$((padding + max_len - 6 - ${#1}))
+  padding=$(printf "%${padding_length}s" "")
+  echo "${padding}app=${1}"
+fi
 echo ""
 echo ""

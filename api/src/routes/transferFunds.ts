@@ -1,9 +1,9 @@
-import db from "db/db.ts";
-import { TUserRepoAccount } from "db/models.ts";
+import db from "@/db/db";
+import type { TUserRepoAccount } from "@/db/models";
+import log from "@/log";
 import type { Request, Response } from "express";
-import log from "log.ts";
-import tb from "../db/tigerbeetle.ts";
-import { verifyUserIsRepoAdmin } from "./utils.ts";
+import tb from "../db/tigerbeetle";
+import { verifyUserIsRepoAdmin } from "./utils";
 
 /**
  * transferFunds:

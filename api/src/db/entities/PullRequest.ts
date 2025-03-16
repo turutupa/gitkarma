@@ -7,8 +7,8 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
-import { Repo } from "./Repo.ts";
-import { User } from "./User.ts";
+import { Repo } from "./Repo";
+import { User } from "./User";
 
 @Entity({ name: "pull_requests" })
 export class PullRequest {

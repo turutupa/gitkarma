@@ -5,8 +5,8 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from "typeorm";
-import type { PullRequest } from "./PullRequest.ts";
-import type { UserRepo } from "./UserRepo.ts";
+import type { PullRequest } from "./PullRequest";
+import type { UserRepo } from "./UserRepo";
 
 @Entity({ name: "repos" })
 export class Repo {

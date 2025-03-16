@@ -1,6 +1,6 @@
+import type { TRepo, TUserRepoAccount } from "@/db/models";
+import log from "@/log";
 import { Octokit } from "@octokit/rest";
-import { TRepo, TUserRepoAccount } from "db/models.ts";
-import log from "log.ts";
 
 /**
  * Verifies if the authenticated user is an admin or owner of a repository.

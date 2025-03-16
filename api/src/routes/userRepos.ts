@@ -1,8 +1,8 @@
-import db from "db/db.ts";
-import type { TJsonAccount } from "db/models.ts";
-import tb from "db/tigerbeetle.ts";
+import db from "@/db/db";
+import type { TJsonAccount } from "@/db/models";
+import tb from "@/db/tigerbeetle";
+import log from "@/log";
 import type { Request, Response } from "express";
-import log from "log.ts";
 import type { Account } from "tigerbeetle-node";
 
 /**

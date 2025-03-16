@@ -1,6 +1,9 @@
 /tigerbeetle
 /logs
+/secrets
+/api/secrets
 
+/api/dist
 
 .env
 **/.env

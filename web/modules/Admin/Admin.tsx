@@ -10,6 +10,7 @@ import {
   Select,
   Skeleton,
   Title,
+  Transition,
 } from '@mantine/core';
 import { useRepoContext } from '@/context/RepoContext';
 import { TRepoAndUsers } from '@/models/UserRepo';
@@ -24,6 +25,9 @@ export default function Admin() {
   const { currentRepoGithubId, setCurrentRepoGithubId } = useRepoContext();
   const [currentRepo, setCurrentRepo] = useState<TRepoAndUsers | null>(null);
   const [currentTab, setCurrentTab] = useSessionStorage('adminCurrentTab', 'Users');
+  // these 2 states are used to trigger transition when switching between repos
+  const [isContentVisible, setIsVisible] = useState(true);
+  const [prevRepoId, setPrevRepoId] = useState(currentRepoGithubId);
 
   const { data: reposAndUsers, error, isLoading, mutate } = useAPI<TRepoAndUsers[]>(`/repos`);
 
@@ -37,6 +41,19 @@ export default function Admin() {
     }
     setCurrentRepo(repo);
   }, [currentRepoGithubId, reposAndUsers]);
+
+  useEffect(() => {
+    // If repo changed, trigger transition
+    if (currentRepoGithubId !== prevRepoId) {
+      setIsVisible(false);
+
+      // Short timeout to let fade-out complete
+      setTimeout(() => {
+        setPrevRepoId(currentRepoGithubId);
+        setIsVisible(true);
+      }, 200); // Match duration with transition duration
+    }
+  }, [currentRepoGithubId, prevRepoId]);
 
   if (!user) {
     return <></>;
@@ -63,22 +80,65 @@ export default function Admin() {
     }
   }, [reposAndUsers, currentRepoGithubId, setCurrentRepoGithubId]);
 
-  if (error) {
+  const renderTabContent = useCallback(() => {
+    if (!currentRepoGithubId || !currentRepo) {
+      return null;
+    }
+
+    // Create content based on current tab
+    const getTabContent = () => {
+      switch (currentTab) {
+        case 'Users':
+          return <Users users={currentRepo.users} repoId={currentRepo.repo_id} />;
+        case 'Settings':
+          return (
+            <RepoSettings currentRepo={currentRepo} mutateReposAndUsers={mutateReposAndUsers} />
+          );
+        case 'Stats':
+          return (
+            <Center>
+              <Title mt="xl" order={2}>
+                🏗️ Stats page under construction 🚧
+              </Title>
+            </Center>
+          );
+        default:
+          return null;
+      }
+    };
+
+    // wrap content with transition
     return (
-      <Center>
-        <Alert
-          mt="xl"
-          maw="500"
-          variant="light"
-          color="red"
-          title="Error Fetching Data"
-          icon={<IconAlertCircle />}
-        >
-          An error occurred while retrieving your user information. Please try again later or
-          contact support if the issue persists.
-        </Alert>
-      </Center>
+      <Transition
+        key={`${currentRepo.repo_id}-${currentTab}`}
+        mounted={isContentVisible}
+        transition="scale-y"
+        duration={200}
+        timingFunction="ease"
+      >
+        {(styles) => <div style={styles}>{getTabContent()}</div>}
+      </Transition>
     );
+  }, [currentRepo, currentRepoGithubId, currentTab, isContentVisible, mutateReposAndUsers]);
+
+  const errorComponent = (
+    <Center>
+      <Alert
+        mt="xl"
+        maw="500"
+        variant="light"
+        color="red"
+        title="Error Fetching Data"
+        icon={<IconAlertCircle />}
+      >
+        An error occurred while retrieving your user information. Please try again later or contact
+        support if the issue persists.
+      </Alert>
+    </Center>
+  );
+
+  if (error) {
+    return errorComponent;
   }
 
   if (isLoading) {
@@ -101,33 +161,6 @@ export default function Admin() {
       </Center>
     );
   }
-
-  const renderTabContent = () => {
-    if (!currentRepoGithubId || !currentRepo) {
-      return null;
-    }
-
-    /** USERS LIST */
-    if (currentTab === 'Users') {
-      return reposAndUsers.map((repo: any) => (
-        <div key={repo.id}>
-          {currentRepoGithubId && <Users users={currentRepo.users} repoId={currentRepo.repo_id} />}
-        </div>
-      ));
-    } else if (currentTab === 'Settings') {
-      /** REPO SETTINGS */
-      return <RepoSettings currentRepo={currentRepo} mutateReposAndUsers={mutateReposAndUsers} />;
-    } else if (currentTab === 'Stats') {
-      /** REPO STATS */
-      return (
-        <Center>
-          <Title mt="xl" order={2}>
-            🏗️ Stats page under construction 🚧
-          </Title>
-        </Center>
-      );
-    }
-  };
 
   return (
     <Container>
@@ -154,7 +187,6 @@ export default function Admin() {
           onChange={(value) => setCurrentTab(value)}
         />
       </Group>
-
       {renderTabContent()}
     </Container>
   );

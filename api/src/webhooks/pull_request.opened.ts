@@ -1,15 +1,15 @@
-import { Octokit } from "@octokit/rest";
-import type { PullRequestOpenedEvent } from "@octokit/webhooks-types";
-import db from "db/db.ts";
-import tb from "db/tigerbeetle.ts";
-import log from "log.ts";
+import db from "@/db/db";
+import tb from "@/db/tigerbeetle";
+import log from "@/log";
 import {
   EGithubEndpoints,
   EPullRequestState,
   githubHeaders,
   GITKARMA_CHECK_NAME,
-} from "webhooks/constants.ts";
-import { getOrDefaultGithubRepo, getOrDefaultGithubUser } from "./utils.ts";
+} from "@/webhooks/constants";
+import { Octokit } from "@octokit/rest";
+import type { PullRequestOpenedEvent } from "@octokit/webhooks-types";
+import { getOrDefaultGithubRepo, getOrDefaultGithubUser } from "./utils";
 
 /**
  * handlePullRequestOpened:

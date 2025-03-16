@@ -1,21 +1,100 @@
 services:
-  db:
+  postgres:
     image: postgres:latest
     container_name: postgres
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: mysupersecretpassword
-      POSTGRES_DB: gitkarma
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    networks:
-      - app_network
+    network_mode: "host"
+    env_file:
+      - .env
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  migration:
+    image: node:20-alpine
+    working_dir: /api
+    volumes:
+      - ./api:/api
+    command: >
+      sh -c '
+        echo "Starting migration service..." &&
+        npm ci &&
+        echo "Running migrations..." &&
+        (npm run migration:run || echo "No migrations to run or error occurred") &&
+        echo "Migration complete, creating marker file" &&
+        touch /tmp/migration_complete &&
+        echo "Migration service completed successfully, keeping container alive" &&
+        tail -f /dev/null
+      '
+    depends_on:
+      postgres:
+        condition: service_healthy
+    env_file:
+      - .env
+    network_mode: "host"
+    healthcheck:
+      test: ["CMD-SHELL", "test -f /tmp/migration_complete"]
+      interval: 2s
+      timeout: 5s
+      retries: 10
+      start_period: 5s
+
+  tigerbeetle:
+    image: ghcr.io/tigerbeetle/tigerbeetle
+    command: "start --addresses=0.0.0.0:3001 /data/0_0.tigerbeetle"
+    network_mode: host
+    volumes:
+      - ./tigerbeetle:/data
+    security_opt:
+      - "seccomp=unconfined"
+    privileged: true
+    depends_on:
+      postgres:
+        condition: service_healthy
+      migration:
+        condition: service_healthy
+
+  api:
+    build: ./api
+    depends_on:
+      postgres:
+        condition: service_healthy
+      migration:
+        condition: service_healthy
+      tigerbeetle:
+        condition: service_started
+    restart: unless-stopped
+    privileged: true
+    ports:
+      - "${PORT}:${PORT}"
+    network_mode: "host"
+    env_file:
+      - .env
+
+  web:
+    build:
+      context: ./web
+      dockerfile: Dockerfile
+    depends_on:
+      - api
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+    network_mode: "host"
+    env_file:
+      - .env
 
 volumes:
   postgres_data:
-
-networks:
-  app_network:
-    driver: bridge

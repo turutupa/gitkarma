@@ -1,44 +1,58 @@
 import {
+  IconBrain,
   IconBubbleText,
   IconCircleCheck,
   IconGitPullRequest,
   IconMoneybag,
 } from '@tabler/icons-react';
-import { Avatar, Container, Text, Timeline, Title } from '@mantine/core';
+import { Avatar, Container, Text, Timeline, Title, useMantineTheme } from '@mantine/core';
 
 const GitkarmaFlow = () => {
+  const theme = useMantineTheme();
+
   return (
-    <Container size="sm">
-      <Title order={3} ta="center" mb="md">
-        How GitKarma Works
+    <Container size="sm" my={60}>
+      <Title order={3} ta="center" mb="xl">
+        How gitkarma Works
       </Title>
-      <Timeline color="var(--mantine-color-primary-6)" active={2} bulletSize={28} lineWidth={2}>
+      <Timeline color={theme.colors.primary[6]} active={5} bulletSize={28} lineWidth={2}>
         <Timeline.Item bullet={<IconGitPullRequest size={16} />} title="Pull Request Created">
           <Text color="dimmed" size="sm">
-            A developer creates a pull request. GitKarma immediately records the event and deducts
-            the required tokens from the PR creator's account.
+            A developer creates a pull request. gitkarma immediately records the event and checks if
+            the developer has sufficient tokens in their account.
           </Text>
           <Text size="xs" mt={4}>
-            2 hours ago
+            Step 1
           </Text>
         </Timeline.Item>
 
         <Timeline.Item bullet={<IconMoneybag size={17} />} title="Tokens Deducted">
           <Text color="dimmed" size="sm">
-            The system deducts the necessary tokens (credits) from the PR creator's balance.
+            The required tokens are deducted from the PR creator's balance. The PR check passes,
+            allowing the review process to begin.
           </Text>
           <Text size="xs" mt={4}>
-            52 minutes ago
+            Step 2
+          </Text>
+        </Timeline.Item>
+
+        <Timeline.Item bullet={<IconBrain size={16} />} title="AI Analysis">
+          <Text color="dimmed" size="sm">
+            Our AI analyzes the PR's complexity to determine appropriate token values and identify
+            potential issues for reviewers to focus on.
+          </Text>
+          <Text size="xs" mt={4}>
+            Step 3
           </Text>
         </Timeline.Item>
 
         <Timeline.Item bullet={<IconBubbleText size={16} />} title="PR Reviewed">
           <Text color="dimmed" size="sm">
-            Other developers review the PR and approve it. Their review actions are recorded by
-            GitKarma.
+            Team members review the PR. The AI evaluates review quality to determine fair token
+            rewards for meaningful contributions.
           </Text>
           <Text size="xs" mt={4}>
-            34 minutes ago
+            Step 4
           </Text>
         </Timeline.Item>
 
@@ -50,24 +64,24 @@ const GitkarmaFlow = () => {
               src="https://github.com/mantinedev/mantine/blob/master/.demo/avatars/avatar-2.png?raw=true"
             />
           }
-          title="Approvers Rewarded"
-          lineVariant="dashed"
+          title="Reviewers Rewarded"
         >
           <Text color="dimmed" size="sm">
-            Token rewards are credited back to the reviewers' accounts for their approval.
+            Token rewards are credited to reviewers' accounts based on review quality and PR
+            complexity. Bonus tokens are awarded for detecting critical issues.
           </Text>
           <Text size="xs" mt={4}>
-            12 minutes ago
+            Step 5
           </Text>
         </Timeline.Item>
 
         <Timeline.Item bullet={<IconCircleCheck size={18} />} title="Merge Approved">
           <Text color="dimmed" size="sm">
-            Once the PR has enough approvals and tokens are verified, the pull request is cleared
-            for merging.
+            Once the PR has sufficient approvals, it's cleared for merging. All activities are
+            recorded for team performance analytics.
           </Text>
           <Text size="xs" mt={4}>
-            3 minutes ago
+            Step 6
           </Text>
         </Timeline.Item>
       </Timeline>

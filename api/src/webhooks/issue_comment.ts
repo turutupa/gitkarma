@@ -1,16 +1,16 @@
+import db from "@/db/db";
+import tb from "@/db/tigerbeetle";
+import log from "@/log";
 import type { Octokit } from "@octokit/rest";
 import type { IssueCommentEvent } from "@octokit/webhooks-types";
-import db from "db/db.ts";
-import log from "log.ts";
-import tb from "../db/tigerbeetle.ts";
 import {
   BALANCE_CHECK_EMOJI,
   EGithubEndpoints,
   EPullRequestState,
   githubHeaders,
   GITKARMA_CHECK_NAME,
-} from "./constants.ts";
-import { getOrDefaultGithubUser } from "./utils.ts";
+} from "./constants";
+import { getOrDefaultGithubUser } from "./utils";
 
 /**
  * handleIssueComment:

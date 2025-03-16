@@ -1,4 +1,4 @@
-import { Anchor, Text, Title, useMantineColorScheme } from '@mantine/core';
+import { Text, Title, useMantineColorScheme } from '@mantine/core';
 import css from './Welcome.module.css';
 
 export default function Welcome() {
@@ -17,13 +17,9 @@ export default function Welcome() {
           gitkarma
         </Text>
       </Title>
-      <Text color="dimmed" ta="center" size="lg" maw={580} mx="auto" mt="xl">
-        This starter Next.js project includes a minimal setup for server side rendering, if you want
-        to learn more on Mantine + Next.js integration follow{' '}
-        <Anchor href="https://mantine.dev/guides/next/" size="lg">
-          this guide
-        </Anchor>
-        . To get started edit index.tsx file.
+      <Text color="dimmed" ta="center" size="lg" maw={700} mx="auto" mt="xl">
+        Boost developer productivity with a token-based reward system for pull request reviews. Get
+        insights, incentivize collaboration, and improve code quality across your team.
       </Text>
     </>
   );

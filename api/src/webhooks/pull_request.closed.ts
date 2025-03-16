@@ -1,13 +1,13 @@
+import db from "@/db/db";
+import tb from "@/db/tigerbeetle";
+import log from "@/log";
 import type { Octokit } from "@octokit/rest";
 import type {
   PullRequestClosedEvent,
   PullRequestReview,
 } from "@octokit/webhooks-types";
-import db from "db/db.ts";
-import log from "log.ts";
-import tb from "../db/tigerbeetle.ts";
-import { EPullRequestState } from "./constants.ts";
-import { getOrDefaultGithubUser } from "./utils.ts";
+import { EPullRequestState } from "./constants";
+import { getOrDefaultGithubUser } from "./utils";
 
 /**
  * handlePullRequestClosed:

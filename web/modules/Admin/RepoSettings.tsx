@@ -17,6 +17,7 @@ import {
   Title,
   Transition,
   useMantineColorScheme,
+  useMantineTheme,
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { showNotification } from '@mantine/notifications';
@@ -44,6 +45,7 @@ const RepoSettings = ({ currentRepo, mutateReposAndUsers }: RepoSettingsProps) =
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [activeEmojiField, setActiveEmojiField] = useState<string | null>(null);
   const { colorScheme } = useMantineColorScheme();
+  const theme = useMantineTheme();
 
   const form = useForm({
     initialValues: {
@@ -341,7 +343,7 @@ const RepoSettings = ({ currentRepo, mutateReposAndUsers }: RepoSettingsProps) =
               <Button
                 type="submit"
                 mt="md"
-                color="var(--mantine-color-primary-6)"
+                color={theme.colors.primary[6]}
                 loading={isSubmitting}
                 disabled={isSubmitting}
               >

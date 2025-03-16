@@ -1,7 +1,7 @@
+import log from "@/log";
 import type { Octokit } from "@octokit/rest";
 import type { InstallationCreatedEvent } from "@octokit/webhooks-types";
-import log from "../log.ts";
-import { getOrDefaultGithubRepo, getOrDefaultGithubUser } from "./utils.ts";
+import { getOrDefaultGithubRepo, getOrDefaultGithubUser } from "./utils";
 
 /**
  * handleInstallationCreated:
@@ -32,10 +32,11 @@ export const handleInstallationCreated = async ({
     return;
   }
 
-  log.debug("GitKarma app installed. Processing installation event...");
+  log.info("GitKarma app installed. Processing installation event...");
   const repositories = payload.repositories || [];
   // Create repo && collabs entries
   for (const repository of repositories) {
+    log.info(`Processing repository: ${repository.full_name}`);
     const repoOwner = payload.installation.account.login;
     const repo = await getOrDefaultGithubRepo(
       repository.id,

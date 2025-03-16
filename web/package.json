@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "clear && bash ../scripts/gitkarma.sh && next dev",
+    "dev": "clear && bash ../scripts/gitkarma.sh webapp && next dev",
     "build": "next build",
     "analyze": "ANALYZE=true next build",
     "start": "next start",

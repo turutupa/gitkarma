@@ -1,6 +1,6 @@
+import log from "@/log";
 import crypto from "crypto";
 import dotenv from "dotenv";
-import log from "log.ts";
 import {
   AccountFlags,
   CreateAccountError,
@@ -31,9 +31,14 @@ class TigerBeetle {
     const tbHost = process.env.TB_HOST || "";
     const tbPort = Number(process.env.TB_PORT) || 3001;
     const address = `${tbHost}:${tbPort}`;
+    const addressLog = {
+      address: address,
+      cluster_id: String(BigInt(process.env.TB_CLUSTER_ID || 0n)),
+    };
+    console.log("[tigerbeetle]", JSON.stringify(addressLog, null, 2));
     const tigerbeetle = new TigerBeetle();
     tigerbeetle.tb = createClient({
-      cluster_id: 0n,
+      cluster_id: BigInt(process.env.TB_CLUSTER_ID || 0n),
       replica_addresses: [address || "127.0.0.1:3001"],
     });
     const isConnected = await tigerbeetle.tb.lookupAccounts([BigInt(1)]);

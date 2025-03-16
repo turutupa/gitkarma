@@ -6,8 +6,8 @@ import {
   PrimaryGeneratedColumn,
   Unique,
 } from "typeorm";
-import type { Repo } from "./Repo.ts";
-import type { User } from "./User.ts";
+import type { Repo } from "./Repo";
+import type { User } from "./User";
 
 @Entity({ name: "user_repo" })
 @Unique(["user", "repo"])

@@ -1,14 +1,14 @@
+import log from "@/log";
+import type { EPullRequestState } from "@/webhooks/constants";
 import dotenv from "dotenv";
-import log from "log.ts";
 import pgk from "pg";
-import type { EPullRequestState } from "webhooks/constants.ts";
 import type {
   TPullRequest,
   TRepo,
   TRepoAndUsers,
   TUser,
   TUserRepo,
-} from "./models.ts";
+} from "./models";
 const { Pool } = pgk;
 
 dotenv.config();
@@ -37,6 +37,10 @@ class DB {
 
   public static async connect(): Promise<DB> {
     const db = new DB();
+    const addressLog = {
+      address: db.credentials.host + ":" + db.credentials.port,
+    };
+    console.log("[postgres]", JSON.stringify(addressLog, null, 2));
     db.pg = new Pool(db.credentials);
     // test connection on start
     try {

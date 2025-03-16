@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 # Define dirs
 PROJECT_ROOT=$(pwd)
 TIGERBEETLE_DIR="$PROJECT_ROOT/tigerbeetle"
@@ -49,7 +48,7 @@ fi
 if [ ! -f "$TIGERBEETLE_DIR/0_0.tigerbeetle" ]; then
   # Each TigerBeetle node uses a single data file to store its state. Create the data file using the format command:
   echo "Creating TigerBeetle data file..."
-  "$TIGERBEETLE_DIR/tigerbeetle" format --cluster=0 --replica=0 --replica-count=1 "$TIGERBEETLE_DIR/0_0.tigerbeetle"
+  "$TIGERBEETLE_DIR/tigerbeetle" format --cluster=95350771365285246630312463627596684690 --replica=0 --replica-count=1 "$TIGERBEETLE_DIR/0_0.tigerbeetle"
 fi
 
 # Start the TigerBeetle server
