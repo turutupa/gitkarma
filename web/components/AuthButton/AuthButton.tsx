@@ -31,7 +31,7 @@ const AuthButton = () => {
 
   return (
     <Button
-      leftSection={<GithubIcon size={20} />}
+      leftSection={<GithubIcon size={16} />}
       className={css.githubButton}
       onClick={() => signIn('github')}
     >

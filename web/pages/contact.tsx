@@ -17,7 +17,7 @@ const Contact = () => {
   });
 
   return (
-    <Container size="sm">
+    <Container size="sm" p={0}>
       <form onSubmit={form.onSubmit(() => {})}>
         <Title
           order={2}

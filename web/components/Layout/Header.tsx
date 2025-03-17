@@ -3,7 +3,16 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { FaSun } from 'react-icons/fa';
 import { MdOutlineDarkMode } from 'react-icons/md';
-import { Burger, Container, Group, ThemeIcon, useMantineColorScheme } from '@mantine/core';
+import {
+  Burger,
+  Container,
+  Drawer,
+  Group,
+  Stack,
+  ThemeIcon,
+  Title,
+  useMantineColorScheme,
+} from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import AuthButton from '../AuthButton';
 import css from './Header.module.css';
@@ -19,7 +28,7 @@ const links = [
 
 const Header = () => {
   const router = useRouter();
-  const [opened, { toggle }] = useDisclosure(false);
+  const [opened, { toggle, close }] = useDisclosure(false);
   const [active, setActive] = useState(router.asPath || links[0].link);
   const { setColorScheme, colorScheme } = useMantineColorScheme();
 
@@ -37,6 +46,22 @@ const Header = () => {
       data-active={active === link.link || undefined}
       onClick={() => {
         setActive(link.link);
+        close(); // Close the drawer when a link is clicked
+      }}
+    >
+      {link.label}
+    </Link>
+  ));
+
+  const mobileItems = links.map((link) => (
+    <Link
+      key={link.label}
+      href={link.link}
+      className={css.mobileLink}
+      data-active={active === link.link || undefined}
+      onClick={() => {
+        setActive(link.link);
+        close();
       }}
     >
       {link.label}
@@ -45,6 +70,32 @@ const Header = () => {
 
   return (
     <header className={css.header}>
+      <Drawer
+        opened={opened}
+        onClose={close}
+        title={<Title order={3}>Navigation</Title>}
+        padding="sm"
+        size="100%"
+        position="bottom"
+        offset={8}
+        radius="md"
+      >
+        <Stack pt="sm">
+          {mobileItems}
+          <Group justify="space-between">
+            <AuthButton />
+            <ThemeIcon
+              variant="light"
+              radius="lg"
+              onClick={() => setColorScheme(colorScheme === 'light' ? 'dark' : 'light')}
+              className={css.pointer}
+            >
+              {colorScheme === 'light' ? <MdOutlineDarkMode /> : <FaSun />}
+            </ThemeIcon>
+          </Group>
+        </Stack>
+      </Drawer>
+
       <Container className={css.inner}>
         <Group gap={8} visibleFrom="xs">
           <ThemeIcon
@@ -58,9 +109,7 @@ const Header = () => {
           {items}
         </Group>
 
-        {/* <Group visibleFrom="lg"> */}
         <AuthButton />
-        {/* </Group> */}
 
         <Burger opened={opened} onClick={toggle} hiddenFrom="xs" size="sm" />
       </Container>

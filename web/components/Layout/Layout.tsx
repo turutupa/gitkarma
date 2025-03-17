@@ -8,7 +8,7 @@ type Props = {
 
 const Layout: React.FC<Props> = ({ children }) => {
   return (
-    <Container fluid mih="100vh" pos="relative" style={{ overflow: 'hidden' }}>
+    <Container fluid mih="100vh" pos="relative" p={0} style={{ overflow: 'hidden' }}>
       <Header />
       <Container mt="100px" pb="150px" size="lg">
         {children}

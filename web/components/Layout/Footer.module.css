@@ -10,13 +10,27 @@
   padding-bottom: var(--mantine-spacing-xl);
 
   @media (max-width: $mantine-breakpoint-xs) {
-    flex-direction: column;
+    flex-direction: row;
+    padding: var(--mantine-spacing-md);
+  }
+}
+
+.footerContent {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-direction: row;
+
+  @media (max-width: $mantine-breakpoint-xs) {
+    gap: var(--mantine-spacing-md);
   }
 }
 
 .links {
-  width: 100%;
+  width: auto;
   @media (max-width: $mantine-breakpoint-xs) {
-    margin-top: var(--mantine-spacing-md);
+    margin-top: 0;
+    justify-content: flex-end;
   }
 }

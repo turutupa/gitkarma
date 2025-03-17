@@ -12,6 +12,7 @@ import {
   Title,
   Transition,
 } from '@mantine/core';
+import { useMediaQuery } from '@mantine/hooks';
 import { useRepoContext } from '@/context/RepoContext';
 import { TRepoAndUsers } from '@/models/UserRepo';
 import { useAPI } from '@/utils/useAPI';
@@ -28,6 +29,8 @@ export default function Admin() {
   // these 2 states are used to trigger transition when switching between repos
   const [isContentVisible, setIsVisible] = useState(true);
   const [prevRepoId, setPrevRepoId] = useState(currentRepoGithubId);
+  const isDesktop = useMediaQuery('(min-width: 768px)');
+  const isMobile = useMediaQuery('(max-width: 450px)');
 
   const { data: reposAndUsers, error, isLoading, mutate } = useAPI<TRepoAndUsers[]>(`/repos`);
 
@@ -163,12 +166,12 @@ export default function Admin() {
   }
 
   return (
-    <Container>
-      <Group align="center" justify="space-between" gap="md" mb="xl">
+    <Container p={0}>
+      <Group align="center" justify="space-between" mb="xl">
         <Group>
-          <Title order={2}>Git Repository</Title>
+          {isDesktop && <Title order={2}>Git Repository</Title>}
           <Select
-            maw="300px"
+            w={isMobile ? '150px' : '200px'}
             data={reposAndUsers.map((rau) => rau.repo_name)}
             value={currentRepo?.repo_name}
             onChange={(val) => {

@@ -44,7 +44,7 @@ export default function Homepage() {
             Install App
           </Button>
           <Button variant="default" radius="xl" size="md" className={css.control}>
-            View Documentation
+            Documentation
           </Button>
         </Group>
       </div>
