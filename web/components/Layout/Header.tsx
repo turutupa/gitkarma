@@ -21,6 +21,7 @@ import css from './Header.module.css';
 
 const links = [
   { link: '/', label: 'About' },
+  { link: '/docs', label: 'Docs' },
   { link: '/pricing', label: 'Pricing' },
   { link: '/contact', label: 'Contact' },
   { link: '/admin', label: 'Admin' },

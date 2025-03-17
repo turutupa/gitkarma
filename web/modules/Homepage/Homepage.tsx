@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { IconCoin } from '@tabler/icons-react';
 import { Button, Group, Image, List, Text, ThemeIcon, Title } from '@mantine/core';
 import image from './image.svg';
@@ -40,10 +41,24 @@ export default function Homepage() {
         </List>
 
         <Group mt={30}>
-          <Button radius="xl" size="md" className={css.control}>
+          <Button
+            component="a"
+            href="https://github.com/apps/gitkarma-dev"
+            target="_blank"
+            radius="xl"
+            size="md"
+            className={css.control}
+          >
             Install App
           </Button>
-          <Button variant="default" radius="xl" size="md" className={css.control}>
+          <Button
+            component={Link}
+            href="/docs"
+            variant="default"
+            radius="xl"
+            size="md"
+            className={css.control}
+          >
             Documentation
           </Button>
         </Group>
