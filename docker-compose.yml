@@ -18,6 +18,7 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+    restart: unless-stopped
 
   # migration:
   #   image: node:20-alpine
@@ -60,6 +61,9 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+    restart:
+      unless-stopped
+
       # migration:
       #   condition: service_healthy
 
