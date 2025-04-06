@@ -18,7 +18,7 @@ export const getOrDefaultGithubRepo = async (
   repoId: number,
   repoName: string,
   repoOwner: string,
-  installationId: number
+  installationId: number = 0
 ) => {
   // get repo
   let repo: TRepo = await db.getRepoByGithubRepoId(repoId);
