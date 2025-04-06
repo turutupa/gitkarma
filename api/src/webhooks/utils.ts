@@ -1,4 +1,5 @@
 import db from "@/db/db";
+import { EUserRepoRole } from "@/db/entities/UserRepo";
 import type { TRepo } from "@/db/models";
 import tb from "@/db/tigerbeetle";
 import { DEFAULT_REPO_CONFIG } from "./constants";
@@ -48,7 +49,8 @@ export const getOrDefaultGithubRepo = async (
 export const getOrDefaultGithubUser = async (
   repo: TRepo,
   githubUserId: number,
-  githubUsername: string
+  githubUsername: string,
+  role = EUserRepoRole.COLLABORATOR
 ) => {
   // get user
   let user = await db.getUserByGithubUserId(githubUserId);
@@ -77,7 +79,12 @@ export const getOrDefaultGithubUser = async (
   // get user repo
   let userRepo = await db.getUserRepo(user.id, repo.id);
   if (!userRepo) {
-    userRepo = await db.createUserRepo(user.id, repo.id, userTBAccount.id);
+    userRepo = await db.createUserRepo(
+      user.id,
+      repo.id,
+      userTBAccount.id,
+      role
+    );
   }
 
   return { user, userRepo, account: userTBAccount };

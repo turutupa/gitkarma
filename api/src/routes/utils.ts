@@ -1,3 +1,4 @@
+import { EUserRepoRole } from "@/db/entities/UserRepo";
 import type { TRepo, TUserRepoAccount } from "@/db/models";
 import log from "@/log";
 import { Octokit } from "@octokit/rest";
@@ -23,6 +24,10 @@ export async function verifyUserIsRepoAdmin(
     return true;
   }
 
+  if (Number(user.userRepo.role) === EUserRepoRole.ADMIN) {
+    return true;
+  }
+
   // Use GitHub API only for collaborator permission check.
   const { data: permissionData } =
     await octokit.rest.repos.getCollaboratorPermissionLevel({
@@ -36,4 +41,6 @@ export async function verifyUserIsRepoAdmin(
     log.error({ user, repo }, "Forbidden: Insufficient permissions");
     throw new Error("Forbidden: Insufficient permissions");
   }
+
+  return true;
 }

@@ -1,3 +1,4 @@
+import { EUserRepoRole } from "@/db/entities/UserRepo";
 import log from "@/log";
 import type { Octokit } from "@octokit/rest";
 import type { InstallationCreatedEvent } from "@octokit/webhooks-types";
@@ -38,18 +39,72 @@ export const handleInstallationCreated = async ({
   for (const repository of repositories) {
     log.info(`Processing repository: ${repository.full_name}`);
     const repoOwner = payload.installation.account.login;
+    const repoOwnerId = payload.installation.account.id;
+    const senderId = payload.sender.id;
     const repo = await getOrDefaultGithubRepo(
       repository.id,
       repository.name,
       repoOwner
     );
+
+    // add repo owner as admin
+    await getOrDefaultGithubUser(
+      repo,
+      repoOwnerId,
+      repoOwner,
+      EUserRepoRole.ADMIN
+    );
+
+    // add sender as admin if it's not the repo owner
+    if (senderId !== repoOwnerId) {
+      await getOrDefaultGithubUser;
+    }
+
+    // 1. Get direct collaborators
     const { data: collaborators } = await octokit.rest.repos.listCollaborators({
       owner: repoOwner,
       repo: repository.name,
     });
+
     for (const collaborator of collaborators) {
       const { id, login } = collaborator;
-      await getOrDefaultGithubUser(repo, id, login);
+      await getOrDefaultGithubUser(repo, id, login, EUserRepoRole.COLLABORATOR);
+    }
+
+    // 2. Check if repository is in an organization
+    const { data: repoData } = await octokit.rest.repos.get({
+      owner: repoOwner,
+      repo: repository.name,
+    });
+
+    // 3. If it's an org repo, get teams with access
+    if (repoData.owner.type != "Organization") {
+      return;
+    }
+    try {
+      const { data: teams } = await octokit.rest.repos.listTeams({
+        owner: repoOwner,
+        repo: repository.name,
+      });
+
+      // 4. For each team, get members
+      for (const team of teams) {
+        const { data: members } = await octokit.rest.teams.listMembersInOrg({
+          org: repoData.owner.login,
+          team_slug: team.slug,
+        });
+        for (const member of members) {
+          const { id, login } = member;
+          await getOrDefaultGithubUser(
+            repo,
+            id,
+            login,
+            EUserRepoRole.ORGANIZATION_MEMBER
+          );
+        }
+      }
+    } catch (error) {
+      log.error({ error }, "Error fetching team members from organization");
     }
   }
 };

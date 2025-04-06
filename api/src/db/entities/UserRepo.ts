@@ -9,6 +9,12 @@ import {
 import type { Repo } from "./Repo";
 import type { User } from "./User";
 
+export enum EUserRepoRole {
+  COLLABORATOR = 0,
+  ADMIN = 1,
+  ORGANIZATION_MEMBER = 2,
+}
+
 @Entity({ name: "user_repo" })
 @Unique(["user", "repo"])
 export class UserRepo {
@@ -26,12 +32,19 @@ export class UserRepo {
   @Column({ type: "numeric" })
   tigerbeetle_account_id: number;
 
-  @Column({ default: 0 })
+  @Column({
+    type: "enum",
+    enum: EUserRepoRole,
+    default: EUserRepoRole.COLLABORATOR,
+  })
+  role: EUserRepoRole;
+
+  @Column({ type: "integer", default: 0 })
   prs_opened: number;
 
-  @Column({ default: 0 })
+  @Column({ type: "integer", default: 0 })
   prs_approved: number;
 
-  @Column({ default: 0 })
+  @Column({ type: "integer", default: 0 })
   comments_count: number;
 }

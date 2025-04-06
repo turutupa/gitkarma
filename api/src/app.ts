@@ -1,9 +1,10 @@
 import { jwtMiddleware } from "@/middleware/jwt";
-import { createInjectOctokit } from "@/middleware/octokit";
+import { injectOctokit } from "@/middleware/octokit";
 import { createInjectUserRepoMiddleware as injectUserRepoMiddleware } from "@/middleware/userRepo";
-import { repoSettings } from "@/routes/repoSettings";
+import { getUserRepos } from "@/routes/getUserRepos";
 import { transferFunds } from "@/routes/transferFunds";
-import { userRepos } from "@/routes/userRepos";
+import { updateRepoSettings } from "@/routes/updateRepoSettings";
+import { updateUserRepoRole } from "@/routes/updateUserRepoRole";
 import { handleInstallationCreated } from "@/webhooks/installation.created";
 import { handleIssueComment } from "@/webhooks/issue_comment";
 import { handlePullRequestClosed } from "@/webhooks/pull_request.closed";
@@ -14,6 +15,7 @@ import { createNodeMiddleware } from "@octokit/webhooks";
 import type { WebhookEventHandlerError } from "@octokit/webhooks/dist-types/types";
 import dotenv from "dotenv";
 import express from "express";
+import "express-async-errors";
 import fs from "fs";
 import { App } from "octokit";
 import log from "./log";
@@ -77,17 +79,13 @@ const startApp = async () => {
   const app = express();
 
   // add octokit router
-  const octokit = startOctokit();
+  const octokitApp = startOctokit();
   const webhookPath = "/api/webhook";
-  const octokitMiddleware = createNodeMiddleware(octokit.webhooks, {
+  const octokitMiddleware = createNodeMiddleware(octokitApp.webhooks, {
     path: webhookPath,
   });
   // @ts-ignore
   app.use(octokitMiddleware);
-
-  // Create shared middleware injecting the octokit instance.
-  // @ts-ignore
-  const injectOctokitMiddleware = createInjectOctokit(octokit);
 
   app.get("/api/health", (req, res) => {
     console.log(`Health check from ${req.ip} - ${req.get("User-Agent")}`);
@@ -97,13 +95,19 @@ const startApp = async () => {
   // Create a router for routes
   const routes = express.Router();
   routes.use(express.json());
-  routes.use(injectOctokitMiddleware);
   routes.use(jwtMiddleware);
   routes.use(injectUserRepoMiddleware);
+  routes.use(injectOctokit);
 
-  routes.get("/api/repos", userRepos);
-  routes.put("/api/repos", repoSettings);
+  routes.get("/api/repos", getUserRepos);
+  routes.put("/api/repos/settings", updateRepoSettings);
+  routes.put("/api/repos/roles", updateUserRepoRole);
   routes.post("/api/funds", transferFunds);
+
+  // routes.use((err, req, res, next) => {
+  //   log.error({ err, url: req.url }, "Unhandled error in route");
+  //   res.status(500).json({ error: err ?? "Internal server error" });
+  // });
 
   app.use(routes);
 

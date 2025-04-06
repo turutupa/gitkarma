@@ -34,10 +34,11 @@ function jsonifyAccount(account: Account): TJsonAccount {
  * @param req - The request object containing the user ID parameter.
  * @param res - The response object used to send the JSON data.
  */
-export const userRepos = async (req: Request, res: Response) => {
+export const getUserRepos = async (req: Request, res: Response) => {
   const user = req.jwt!;
-  const allReposData = await db.getAllReposDataForUser(String(user.id));
+  const allReposData = await db.getAllGithubReposDataForUser(String(user.id));
 
+  // fetch tiger beetle accounts for each user
   await Promise.all(
     allReposData.map(async (repo) => {
       await Promise.all(

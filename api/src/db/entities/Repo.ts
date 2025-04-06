@@ -16,6 +16,10 @@ export class Repo {
   @Column({ unique: true })
   repo_id: number; // GitHub repo id
 
+  // GitHub App installation ID - required for repository-specific API access
+  @Column({ nullable: true })
+  installation_id: number;
+
   @Column({ length: 255 })
   repo_name: string;
 

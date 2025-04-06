@@ -12,7 +12,7 @@ export const http = axios.create({
 http.interceptors.request.use(async (config) => {
   // Only add delay in development
   if (process.env.NODE_ENV === 'development') {
-    await delay(1000);
+    await delay(500);
   }
   return config;
 });

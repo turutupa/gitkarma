@@ -1,4 +1,5 @@
 import type { Account } from "tigerbeetle-node";
+import type { EUserRepoRole } from "./entities/UserRepo";
 
 export type TUser = {
   id: number;
@@ -12,6 +13,7 @@ export type TUserRepo = {
   user_id: number;
   repo_id: number;
   tigerbeetle_account_id: number;
+  role: EUserRepoRole;
   prs_opened: number;
   prs_approved: number;
   comments_count: number;
@@ -20,6 +22,7 @@ export type TUserRepo = {
 
 export type TRepo = {
   id: number;
+  installation_id: number;
   repo_id: number;
   repo_name: string;
   repo_owner: string;

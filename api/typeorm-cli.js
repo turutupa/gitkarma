@@ -9,7 +9,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const dataSourcePath = resolve(__dirname, "src/db/ormconfig.ts");
-const migrationDir = resolve(__dirname, "/src/db/migrations/migration");
+const migrationDir = resolve(__dirname, "src/db/migrations/migration");
 
 const args = process.argv.slice(2);
 const command = args.join(" ");

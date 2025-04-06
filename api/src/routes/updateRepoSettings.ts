@@ -4,7 +4,10 @@ import type { Request, Response } from "express";
 import DB from "../db/db";
 import { verifyUserIsRepoAdmin } from "./utils";
 
-export async function repoSettings(req: Request, res: Response): Promise<void> {
+export const updateRepoSettings = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
   const { octokit, repo } = req;
   const sender = req.user as TUserRepoAccount;
   const {
@@ -59,4 +62,4 @@ export async function repoSettings(req: Request, res: Response): Promise<void> {
     log.error(error);
     res.status(500).json({ error: error.message });
   }
-}
+};

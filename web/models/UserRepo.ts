@@ -21,11 +21,18 @@ export type TUser = {
   created_at: Date;
 };
 
+export enum EUserRepoRole {
+  COLLABORATOR = 0,
+  ADMIN = 1,
+  ORGANIZATION_MEMBER = 2,
+}
+
 export type TUserRepo = {
   id: number;
   user_id: number;
   repo_id: number;
   tigerbeetle_account_id: number;
+  role: EUserRepoRole;
   prs_opened: number;
   prs_approved: number;
   comments_count: number;

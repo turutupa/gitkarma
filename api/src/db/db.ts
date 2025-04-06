@@ -2,6 +2,7 @@ import log from "@/log";
 import type { EPullRequestState } from "@/webhooks/constants";
 import dotenv from "dotenv";
 import pgk from "pg";
+import { EUserRepoRole } from "./entities/UserRepo";
 import type {
   TPullRequest,
   TRepo,
@@ -52,8 +53,8 @@ class DB {
     return db;
   }
 
-  public async getAllReposDataForUser(
-    gitUserId: string
+  public async getAllGithubReposDataForUser(
+    githubUserId: string
   ): Promise<TRepoAndUsers[]> {
     const query = `
       SELECT
@@ -64,6 +65,7 @@ class DB {
                     'id', u.id,
                     'github_id', u.github_id,
                     'github_username', u.github_username,
+                    'role', ur.role,
                     'prs_opened', ur.prs_opened,
                     'prs_approved', ur.prs_approved,
                     'comments_count', ur.comments_count,
@@ -83,7 +85,7 @@ class DB {
         )
       );
     `;
-    const { rows } = await this.pg.query(query, [gitUserId]);
+    const { rows } = await this.pg.query(query, [githubUserId]);
     return rows;
   }
 
@@ -185,15 +187,16 @@ class DB {
     userId: number,
     repoId: number,
     tigerbeetleAccountId: bigint,
+    role = EUserRepoRole.COLLABORATOR,
     prs_opened = 0,
     prs_approved = 0,
     comments_count = 0
   ): Promise<TUserRepo> {
     const query = `
       INSERT INTO 
-        user_repo (user_id, repo_id, tigerbeetle_account_id, prs_opened, prs_approved, comments_count)
+        user_repo (user_id, repo_id, tigerbeetle_account_id, role, prs_opened, prs_approved, comments_count)
       VALUES 
-        ($1, $2, $3, $4, $5, $6)
+        ($1, $2, $3, $4, $5, $6, $7)
       RETURNING 
         *
     `;
@@ -201,10 +204,46 @@ class DB {
       userId,
       repoId,
       tigerbeetleAccountId,
+      role,
       prs_opened,
       prs_approved,
       comments_count,
     ]);
+    return rows[0];
+  }
+
+  /**
+   * updateUserRepoRole:
+   * Updates the role of a user for a specific repository in the user_repo table.
+   *
+   * @param userId - The internal user ID.
+   * @param repoId - The internal repository ID.
+   * @param role - The new role to assign to the user.
+   * @returns A Promise that resolves to the updated user-repo record if successful.
+   */
+  public async updateUserRepoRole(
+    userId: number,
+    repoId: number,
+    role: EUserRepoRole
+  ): Promise<TUserRepo> {
+    const query = `
+      UPDATE user_repo
+      SET role = $1
+      WHERE user_id = $2 AND repo_id = $3
+      RETURNING *
+    `;
+    const { rows } = await this.pg.query<TUserRepo>(query, [
+      role,
+      userId,
+      repoId,
+    ]);
+
+    if (rows.length === 0) {
+      throw new Error(
+        `No user-repo relation found for user ${userId} and repo ${repoId}`
+      );
+    }
+
     return rows[0];
   }
 
@@ -357,7 +396,7 @@ class DB {
    * @param userId - The internal user id for the PR creator.
    * @param headSha - The commit SHA of the PR's head.
    * @param state - The state of the pull request (e.g., 'open', 'closed', 'merged').
-   * @param checkPassed - Optional flag indicating if the GitKarma check has passed (defaults to false).
+   * @param checkPassed - Optional flag indicating if the gitkarma check has passed (defaults to false).
    * @returns A Promise that resolves to the newly created pull request record.
    */
   public async createPullRequest(

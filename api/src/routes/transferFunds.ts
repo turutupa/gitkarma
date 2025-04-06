@@ -29,7 +29,9 @@ export const transferFunds = async (req: Request, res: Response) => {
   // Extract data from request body.
   if (!repo || !sender || !targetUserId || !amount) {
     log.error(req.body, "Transfer funds error: Missing required fields");
-    res.status(400).json({ error: "Missing required fields" });
+    res.status(400).json({
+      error: "Couldn't get all required information to perform transaction",
+    });
     return;
   }
 

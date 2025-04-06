@@ -73,7 +73,7 @@ const RepoSettings = ({ currentRepo, mutateReposAndUsers }: RepoSettingsProps) =
   const handleSubmit = async (values: typeof form.values) => {
     setIsSubmitting(true);
     try {
-      const res = await http.put('/repos', values);
+      const res = await http.put('/repos/settings', values);
       if (res.status === 200) {
         showNotification({
           title: 'Success',

@@ -61,7 +61,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     axiosResponse.data.pipe(res);
   } catch (error: any) {
     if (axios.isAxiosError(error)) {
-      console.error('Axios error in proxy:', error);
       const status = error.response?.status || 500;
       // Avoid sending a body for 204 or 304 responses.
       if ([204, 304].includes(status)) {
@@ -71,7 +70,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       res.status(status).json({ error: error.message });
       return;
     }
-    console.error('Unexpected error in proxy:', error);
     res.status(500).json({ error: 'Failed to proxy request' });
   }
 }

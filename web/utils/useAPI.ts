@@ -20,7 +20,7 @@ export function useAPI<T>(url: string | null): TResponse<T> {
   const { data, error, mutate } = useSWR(url, async (url) => {
     // Only add delay in development
     if (process.env.NODE_ENV === 'development') {
-      await delay(1000);
+      await delay(500);
     }
     const response = await useApiInstance.get(url);
     return response.data;

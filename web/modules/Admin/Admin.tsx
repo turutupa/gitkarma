@@ -92,6 +92,7 @@ export default function Admin() {
     const getTabContent = () => {
       switch (currentTab) {
         case 'Users':
+          currentRepo.users.sort((a, b) => a.github_username.localeCompare(b.github_username));
           return <Users users={currentRepo.users} repoId={currentRepo.repo_id} />;
         case 'Settings':
           return (
