@@ -17,12 +17,13 @@ import { DEFAULT_REPO_CONFIG } from "./constants";
 export const getOrDefaultGithubRepo = async (
   repoId: number,
   repoName: string,
-  repoOwner: string
+  repoOwner: string,
+  installationId: number
 ) => {
   // get repo
   let repo: TRepo = await db.getRepoByGithubRepoId(repoId);
   if (!repo) {
-    repo = await db.createRepo(repoId, repoName, repoOwner); // pass repoOwner
+    repo = await db.createRepo(repoId, repoName, repoOwner, installationId); // pass repoOwner
   }
   // create tiger beetle account for repo
   if (!repo.tigerbeetle_account_id) {

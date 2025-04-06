@@ -19,6 +19,7 @@ import "express-async-errors";
 import fs from "fs";
 import { App } from "octokit";
 import log from "./log";
+import { handleInstallationRepositoriesAdded } from "./webhooks/installation_repositories.added";
 
 dotenv.config();
 
@@ -41,6 +42,11 @@ const startOctokit = () => {
   });
   // @ts-ignore
   app.webhooks.on("installation.created", handleInstallationCreated);
+  app.webhooks.on(
+    "installation_repositories.added",
+    // @ts-ignore
+    handleInstallationRepositoriesAdded
+  );
   // @ts-ignore
   app.webhooks.on("pull_request.opened", handlePullRequestOpened);
   // @ts-ignore

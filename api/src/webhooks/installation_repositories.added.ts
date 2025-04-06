@@ -1,7 +1,7 @@
 import { EUserRepoRole } from "@/db/entities/UserRepo";
 import log from "@/log";
 import type { Octokit } from "@octokit/rest";
-import type { InstallationCreatedEvent } from "@octokit/webhooks-types";
+import type { InstallationRepositoriesAddedEvent } from "@octokit/webhooks-types";
 import { getOrDefaultGithubRepo, getOrDefaultGithubUser } from "./utils";
 
 /**
@@ -18,23 +18,23 @@ import { getOrDefaultGithubRepo, getOrDefaultGithubUser } from "./utils";
  *
  * @param {Object} params - The parameters for the handler.
  * @param {Octokit} params.octokit - An authenticated Octokit instance for GitHub API interactions.
- * @param {InstallationCreatedEvent} params.payload - The webhook payload for the installation created event.
+ * @param {InstallationRepositoriesAddedEvent} params.payload - The webhook payload for the installation created event.
  *
  * @returns {Promise<void>} A promise that resolves when the event processing is complete.
  */
-export const handleInstallationCreated = async ({
+export const handleInstallationRepositoriesAdded = async ({
   octokit,
   payload,
 }: {
   octokit: Octokit;
-  payload: InstallationCreatedEvent;
+  payload: InstallationRepositoriesAddedEvent;
 }): Promise<void> => {
-  if (payload.action !== "created") {
+  if (payload.action !== "added") {
     return;
   }
 
   log.info("GitKarma app installed. Processing installation event...");
-  const repositories = payload.repositories || [];
+  const repositories = payload.repositories_added || [];
   // Create repo && collabs entries
   for (const repository of repositories) {
     log.info(`Processing repository: ${repository.full_name}`);

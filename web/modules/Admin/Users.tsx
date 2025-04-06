@@ -53,6 +53,7 @@ const Users: React.FC<Props> = ({ users, repoId }) => {
       if (user.role === role || isUpdatingRole[user.github_username]) {
         return;
       }
+
       // must have at least 1 admin at all times
       const adminsCounter = users.reduce((acc, u) => {
         if (Number(u.role) === EUserRepoRole.ADMIN) {
@@ -60,7 +61,11 @@ const Users: React.FC<Props> = ({ users, repoId }) => {
         }
         return acc;
       }, 0);
-      if (adminsCounter === 1 && role !== EUserRepoRole.ADMIN) {
+      if (
+        adminsCounter === 1 &&
+        role !== EUserRepoRole.ADMIN &&
+        Number(user.role) === EUserRepoRole.ADMIN
+      ) {
         showNotification({
           title: 'Error',
           message: 'You cannot remove the last admin from the repository',
@@ -286,7 +291,7 @@ const Users: React.FC<Props> = ({ users, repoId }) => {
           </Table.Td>
         </Table.Tr>
       )),
-    [users, isTransferring, isUpdatingRole]
+    [users, hasEditAccess, transferAmounts, isTransferring, isUpdatingRole]
   );
 
   return (

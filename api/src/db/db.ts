@@ -259,17 +259,19 @@ class DB {
   public async createRepo(
     repoId: number,
     repoName: string,
-    repoOwner: string
+    repoOwner: string,
+    installationId: number
   ): Promise<TRepo> {
     const query = `
-      INSERT INTO repos (repo_id, repo_name, repo_owner)
-      VALUES ($1, $2, $3)
+      INSERT INTO repos (repo_id, repo_name, repo_owner, installation_id)
+      VALUES ($1, $2, $3, $4)
       RETURNING *
     `;
     const { rows } = await this.pg.query<TRepo>(query, [
       repoId,
       repoName,
       repoOwner,
+      installationId,
     ]);
     return rows[0];
   }
