@@ -9,6 +9,9 @@ CHEVRON = \\033[1m»\\033[0m
 
 # prod: build run
 
+deploy:
+	@./scripts/deploy.sh
+
 # wip 
 prod:
 	@pkill -f tigerbeetle || true &

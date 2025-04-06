@@ -35,6 +35,9 @@ export class PullRequest {
   @Column({ default: false })
   check_passed: boolean;
 
+  @Column({ default: false })
+  admin_approved: boolean;
+
   @CreateDateColumn({ type: "timestamp" })
   created_at: Date;
 

@@ -9,6 +9,7 @@ import {
 } from "@/webhooks/constants";
 import { Octokit } from "@octokit/rest";
 import type { PullRequestOpenedEvent } from "@octokit/webhooks-types";
+import { checks, comments } from "./messages";
 import { getOrDefaultGithubRepo, getOrDefaultGithubUser } from "./utils";
 
 /**
@@ -50,6 +51,8 @@ export const handlePullRequestOpened = async ({
   const githubUserId = payload.pull_request.user.id; // GitHub user id
   const githubUsername = payload.pull_request.user.login; // GitHub user login name
 
+  const repo = await getOrDefaultGithubRepo(repoId, repoName, owner);
+
   // set remote pull request check to in progress
   await octokit.rest.checks.create({
     owner,
@@ -58,12 +61,11 @@ export const handlePullRequestOpened = async ({
     head_sha: headSha,
     status: "in_progress",
     output: {
-      title: "Tokens Check",
-      summary: `User has enough tokens to merge!`,
+      title: checks.title.inProgress,
+      summary: checks.summary.inProgress(githubUsername, repo.merge_penalty),
     },
   });
 
-  const repo = await getOrDefaultGithubRepo(repoId, repoName, owner);
   const { user, account } = await getOrDefaultGithubUser(
     repo,
     githubUserId,
@@ -95,50 +97,69 @@ export const handlePullRequestOpened = async ({
       repo.id
     );
     const newBalance = balance - repo.merge_penalty;
-    const message = `Pull Request funded. Current balance for **${githubUsername}** is ${newBalance}💰.`;
     await octokit.request(EGithubEndpoints.Comments, {
       owner,
       repo: repoName,
       issue_number: prNumber,
-      body: message,
+      body: comments.pullRequestFundedMessage(
+        githubUsername,
+        newBalance,
+        repo.trigger_recheck_text,
+        repo.admin_trigger_recheck_text
+      ),
       headers: githubHeaders,
     });
 
     await octokit.rest.checks.create({
       owner,
       repo: repoName,
-      name: "Gitkarma Tokens Check",
+      name: GITKARMA_CHECK_NAME,
       head_sha: headSha,
       status: "completed",
       conclusion: "success",
       output: {
-        title: "Tokens Check",
-        summary: `User has enough tokens to merge!`,
+        title: checks.title.completed,
+        summary: checks.summary.completed(
+          githubUsername,
+          balance,
+          newBalance,
+          repo.merge_penalty
+        ),
       },
     });
     return;
   }
 
-  // send error because not enough debits
-  const message = `Not enough tokens! Balance for **${githubUsername}** is ${balance}💰. A minimum of ${repo.merge_penalty} tokens are required! Review PRs to get more tokens! 🪙`;
+  // send error comment because not enough debits
   await octokit.request(EGithubEndpoints.Comments, {
     owner,
     repo: repoName,
     issue_number: prNumber,
-    body: message,
+    body: comments.pullRequestNotEnoughFundsMessage(
+      githubUsername,
+      balance,
+      repo.merge_penalty,
+      repo.trigger_recheck_text,
+      repo.admin_trigger_recheck_text
+    ),
     headers: githubHeaders,
   });
 
+  // complete check with failure
   await octokit.rest.checks.create({
     owner,
     repo: repoName,
-    name: "Gitkarma Tokens Check",
+    name: GITKARMA_CHECK_NAME,
     head_sha: headSha,
     status: "completed",
     conclusion: "failure",
     output: {
-      title: "Insufficient Tokens",
-      summary: `This PR cannot pass because user ${githubUsername} does not have enough tokens.`,
+      title: checks.title.failed,
+      summary: checks.summary.failed(
+        githubUsername,
+        balance,
+        repo.merge_penalty
+      ),
     },
   });
 };

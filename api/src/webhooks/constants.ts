@@ -6,7 +6,7 @@ export const DEFAULT_REPO_CONFIG = {
   prMergeDeductionDebits: 100, // debits deducted from the PR creator when merged
 };
 
-export const GITKARMA_CHECK_NAME: string = "gitkarma funds check";
+export const GITKARMA_CHECK_NAME: string = "GitKarma Funds Check";
 export const TRIGGER_RECHECK_EMOJI: string = "✨";
 export const ADMIN_TRIGGER_RECHECK_EMOJI: string = "🚀";
 export const BALANCE_CHECK_EMOJI = "💰";
@@ -27,18 +27,4 @@ export enum EPullRequestState {
 
 export const githubHeaders = {
   "x-github-api-version": "2022-11-28",
-};
-
-export enum EPullRequestMessages {
-  Funded = "PullRequestFundedMessage",
-  NotEnoughFunds = "PullRequestNotEnoughFundsMessage",
-}
-
-export const pullRequestFundedMessage = () => {};
-
-export const pullRequestNotEnoughFundsMessage = () => {};
-
-export const pullRequestMessages = {
-  [EPullRequestMessages.Funded]: pullRequestFundedMessage,
-  [EPullRequestMessages.NotEnoughFunds]: pullRequestNotEnoughFundsMessage,
 };

@@ -67,6 +67,7 @@ export type TPullRequest = {
   head_sha: string;
   state: string;
   check_passed: boolean;
+  admin_approved: boolean;
   created_at: Date;
   updated_at: Date;
   // Add additional fields here if needed.

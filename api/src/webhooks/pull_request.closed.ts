@@ -45,7 +45,7 @@ export const handlePullRequestClosed = async ({
   const prState = merged ? EPullRequestState.Merged : EPullRequestState.Closed;
   await db.updatePullRequest(prNumber, repo.id, {
     state: prState,
-    checkPassed: merged, // update checksPassed to false if PR was closed but not merged
+    checkPassed: merged, // update checkPassed to false if PR was closed but not merged
   });
 
   // Handle pull request was closed && merged
@@ -98,6 +98,16 @@ export const handlePullRequestClosed = async ({
     );
     return;
   }
+
+  // Case where pull request was admin approved -> no refund
+  if (pr.admin_approved) {
+    log.info(
+      { pr },
+      "Pull request closed > Not issueing as it was admin approved"
+    );
+    return;
+  }
+
   // Case where pull request was passing gitkarma check -> refund-user
   const user = await db.getUserByGithubUserId(prOwnerId);
   const userRepo = await db.getUserRepo(user.id, repo.id);

@@ -464,7 +464,11 @@ class DB {
   public async updatePullRequest(
     prNumber: number,
     repoId: number,
-    updates: { state?: EPullRequestState; checkPassed?: boolean }
+    updates: {
+      state?: EPullRequestState;
+      checkPassed?: boolean;
+      adminApproved?: boolean;
+    }
   ): Promise<TPullRequest | null> {
     const setClauses: string[] = [];
     const params: any[] = [];
@@ -477,6 +481,10 @@ class DB {
     if (updates.checkPassed !== undefined) {
       params.push(updates.checkPassed);
       setClauses.push(`check_passed = $${params.length}`);
+    }
+    if (updates.adminApproved !== undefined) {
+      params.push(updates.adminApproved);
+      setClauses.push(`admin_approved = $${params.length}`);
     }
     // If no fields are provided, return the existing record.
     if (setClauses.length === 0) {

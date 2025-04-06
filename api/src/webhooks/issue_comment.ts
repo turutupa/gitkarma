@@ -1,4 +1,5 @@
 import db from "@/db/db";
+import { EUserRepoRole } from "@/db/entities/UserRepo";
 import tb from "@/db/tigerbeetle";
 import log from "@/log";
 import type { Octokit } from "@octokit/rest";
@@ -10,6 +11,7 @@ import {
   githubHeaders,
   GITKARMA_CHECK_NAME,
 } from "./constants";
+import { checks, comments } from "./messages";
 import { getOrDefaultGithubUser } from "./utils";
 
 /**
@@ -60,11 +62,12 @@ export const handleIssueComment = async ({
     const account = await tb.getUserAccount(BigInt(user.id), BigInt(repo.id));
     const balance = tb.getBalance(account);
 
+    const sender = payload.sender.login;
     await octokit.request(EGithubEndpoints.Comments, {
       owner,
       repo: payload.repository.name,
       issue_number: prNumber,
-      body: `Balance for **${payload.sender.login}** is ${balance}💰`,
+      body: comments.balanceCheckMessage(sender, Number(balance)),
       headers: githubHeaders,
     });
     return;
@@ -108,33 +111,47 @@ export const handleIssueComment = async ({
 
   // if check is already passing, exit early.
   if (pr?.check_passed) {
-    const message = `Pull request #${prNumber} is already passing GitKarma Check. Nothing to do here.`;
-    log.info(message);
+    log.info(comments.pullRequestAlreadyFundedMessage(prNumber));
     // send message to PR saying check is already passing
     await octokit.request(EGithubEndpoints.Comments, {
       owner,
       repo: payload.repository.name,
       issue_number: prNumber,
-      body: message,
+      body: comments.pullRequestAlreadyFundedMessage(prNumber),
       headers: githubHeaders,
     });
     return;
   }
 
+  const { user, account } = await getOrDefaultGithubUser(
+    repo,
+    prOwnerGithubId,
+    prOwnerGithubName
+  );
+  const balance = Number(tb.getBalance(account));
+
+  log.debug({ user }, "issue_comment > user");
+  log.info({ account }, "issue_comment > user account");
+
   // set the check to in progress
   await octokit.rest.checks.create({
     owner,
     repo: repoName,
-    name: "Gitkarma Tokens Check",
+    name: GITKARMA_CHECK_NAME,
     head_sha: pr.head_sha,
     status: "in_progress",
     output: {
-      title: "Tokens Check",
-      summary: `User has enough tokens to merge!`,
+      title: checks.title.inProgress,
+      summary: checks.summary.inProgress(user.github_username, balance),
     },
   });
 
   // If the admin emoji is used, verify if the sender is a repo admin:
+  const sender = await getOrDefaultGithubUser(
+    repo,
+    payload.sender.id,
+    payload.sender.login
+  );
   let isAdmin = false;
   if (isTriggeringAdminRecheck) {
     // Option 1: Try checking the repository permissions in the payload (if available)
@@ -143,8 +160,11 @@ export const handleIssueComment = async ({
       payload.repository.permissions.admin
     ) {
       isAdmin = true;
+      // Optoin 2: Check if the sender is an admin in the database
+    } else if (sender.userRepo.role === EUserRepoRole.ADMIN) {
+      isAdmin = true;
     } else {
-      // Option 2: Query the GitHub API to get the permission level.
+      // Option 3: Query the GitHub API to get the permission level.
       const { data: permissionData } =
         await octokit.rest.repos.getCollaboratorPermissionLevel({
           owner,
@@ -159,14 +179,17 @@ export const handleIssueComment = async ({
 
   // if admin approved check, then pass it
   if (isAdmin && isTriggeringAdminRecheck) {
+    const sender = payload.sender.login;
     // hard-code true to checks passing
-    await db.updatePullRequest(prNumber, repo.id, { checkPassed: true });
-    const message = `**Admin override.** **${payload.sender.login}** has manually approved the GitKarma Check, bypassing the funds verification.`;
+    await db.updatePullRequest(prNumber, repo.id, {
+      checkPassed: true,
+      adminApproved: true,
+    });
     await octokit.request(EGithubEndpoints.Comments, {
       owner,
       repo: repoName,
       issue_number: prNumber,
-      body: message,
+      body: comments.pullRequestAdminOverrideMessage(sender, prNumber),
       headers: githubHeaders,
     });
     await octokit.rest.checks.create({
@@ -177,8 +200,8 @@ export const handleIssueComment = async ({
       status: "completed",
       conclusion: "success",
       output: {
-        title: "GitKarma Tokens Check",
-        summary: `Auto-passed by admin ${payload.sender.login}.`,
+        title: checks.title.adminApproved,
+        summary: checks.summary.adminApproved(),
       },
     });
     return;
@@ -190,16 +213,6 @@ export const handleIssueComment = async ({
   }
 
   // triggering regular re-check...
-  const { user, account } = await getOrDefaultGithubUser(
-    repo,
-    prOwnerGithubId,
-    prOwnerGithubName
-  );
-
-  log.debug({ user }, "issue_comment > user");
-  log.info({ account }, "issue_comment > user account");
-
-  const balance = Number(tb.getBalance(account));
   const hasEnoughDebits = balance >= repo.merge_penalty;
 
   // set pull request check to passed / not passed based on balance
@@ -207,6 +220,7 @@ export const handleIssueComment = async ({
     checkPassed: hasEnoughDebits,
   });
 
+  // handle has enough debits to pass check
   if (hasEnoughDebits) {
     // remove funds from user
     await tb.repoChargesFundsToUser(
@@ -218,12 +232,16 @@ export const handleIssueComment = async ({
 
     // send comment to github user
     const newBalance = balance - repo.merge_penalty;
-    const message = `Pull Request funded. Current balance for **${prOwnerGithubName}** is ${newBalance}💰.`;
     await octokit.request(EGithubEndpoints.Comments, {
       owner,
       repo: payload.repository.name,
       issue_number: payload.issue.number,
-      body: message,
+      body: comments.pullRequestFundedMessage(
+        user.github_username,
+        newBalance,
+        repo.trigger_recheck_text,
+        repo.admin_trigger_recheck_text
+      ),
       headers: githubHeaders,
     });
 
@@ -231,38 +249,52 @@ export const handleIssueComment = async ({
     await octokit.rest.checks.create({
       owner,
       repo: repoName,
-      name: "Gitkarma Tokens Check",
+      name: GITKARMA_CHECK_NAME,
       head_sha: pr.head_sha,
       status: "completed",
       conclusion: "success",
       output: {
-        title: "Tokens Check",
-        summary: `User has enough tokens to merge!`,
+        title: checks.title.completed,
+        summary: checks.summary.completed(
+          user.github_username,
+          balance,
+          newBalance,
+          repo.merge_penalty
+        ),
       },
     });
     return;
   }
 
   // send error because not enough debits
-  const message = `Still not enough tokens! Balance for **${prOwnerGithubName}** is ${balance}💰. A minimum of **${repo.merge_penalty}** tokens are required! Review PRs to get more tokens!`;
   await octokit.request(EGithubEndpoints.Comments, {
     owner,
     repo: payload.repository.name,
     issue_number: prNumber,
-    body: message,
+    body: comments.pullRequestNotEnoughFundsMessage(
+      user.github_username,
+      balance,
+      repo.merge_penalty,
+      repo.trigger_recheck_text,
+      repo.admin_trigger_recheck_text
+    ),
     headers: githubHeaders,
   });
 
   await octokit.rest.checks.create({
     owner,
     repo: repoName,
-    name: "Gitkarma Tokens Check",
+    name: GITKARMA_CHECK_NAME,
     head_sha: pr.head_sha,
     status: "completed",
     conclusion: "failure",
     output: {
-      title: "Insufficient Tokens",
-      summary: `This PR cannot pass because user ${prOwnerGithubName} does not have enough tokens.`,
+      title: checks.title.failed,
+      summary: checks.summary.failed(
+        prOwnerGithubName,
+        balance,
+        repo.merge_penalty
+      ),
     },
   });
 };
