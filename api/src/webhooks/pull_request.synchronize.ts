@@ -8,6 +8,7 @@ import {
   githubHeaders,
   GITKARMA_CHECK_NAME,
 } from "./constants";
+import { checks, comments } from "./messages";
 import { getOrDefaultGithubRepo, getOrDefaultGithubUser } from "./utils";
 
 /**
@@ -50,6 +51,8 @@ export const handlePullRequestSynchronize = async ({
   const repoId = payload.repository.id;
   const headSha = payload.pull_request.head.sha;
 
+  const repo = await getOrDefaultGithubRepo(repoId, repoName, owner);
+
   // set remote pull request check to in progress
   await octokit.rest.checks.create({
     owner,
@@ -58,12 +61,11 @@ export const handlePullRequestSynchronize = async ({
     head_sha: headSha,
     status: "in_progress",
     output: {
-      title: "Tokens Check",
-      summary: `In order to pass gitkarma check user must have enough tokens. Checking ${prOwnerGithubName} balance.`,
+      title: checks.title.inProgress,
+      summary: checks.summary.inProgress(prOwnerGithubName, repo.merge_penalty),
     },
   });
 
-  const repo = await getOrDefaultGithubRepo(repoId, repoName, owner);
   const { user, account } = await getOrDefaultGithubUser(
     repo,
     prOwnerGithubId,
@@ -87,13 +89,18 @@ export const handlePullRequestSynchronize = async ({
     await octokit.rest.checks.create({
       owner,
       repo: repoName,
-      name: "Gitkarma Tokens Check",
+      name: GITKARMA_CHECK_NAME,
       head_sha: headSha,
       status: "completed",
       conclusion: "success",
       output: {
-        title: "Tokens Check",
-        summary: `User has enough tokens to merge!`,
+        title: checks.title.completed,
+        summary: checks.summary.completed(
+          prOwnerGithubName,
+          balance + repo.merge_penalty,
+          balance,
+          repo.merge_penalty
+        ),
       },
     });
     return;
@@ -118,50 +125,68 @@ export const handlePullRequestSynchronize = async ({
       repo.id
     );
     const newBalance = balance - repo.merge_penalty;
-    const message = `Pull Request funded. Current balance for **${prOwnerGithubName}** is ${newBalance}💰.`;
     await octokit.request(EGithubEndpoints.Comments, {
       owner,
       repo: repoName,
       issue_number: prNumber,
-      body: message,
+      body: comments.pullRequestFundedMessage(
+        prOwnerGithubName,
+        balance,
+        repo.trigger_recheck_text,
+        repo.admin_trigger_recheck_text
+      ),
       headers: githubHeaders,
     });
 
     await octokit.rest.checks.create({
       owner,
       repo: repoName,
-      name: "Gitkarma Tokens Check",
+      name: GITKARMA_CHECK_NAME,
       head_sha: headSha,
       status: "completed",
       conclusion: "success",
       output: {
-        title: "Tokens Check",
-        summary: `User has enough tokens to merge!`,
+        title: checks.title.completed,
+        summary: checks.summary.completed(
+          prOwnerGithubName,
+          balance,
+          newBalance,
+          repo.merge_penalty
+        ),
       },
     });
     return;
   }
 
   // send error because not enough debits
-  const message = `Unfortunatley, still not enough tokens! Balance for **${prOwnerGithubName}** is ${balance}💰. A minimum of **${repo.merge_penalty}** tokens are required! Review PRs to get more tokens! 🪙`;
   await octokit.request(EGithubEndpoints.Comments, {
     owner,
     repo: repoName,
     issue_number: prNumber,
-    body: message,
+    body: comments.pullRequestNotEnoughFundsMessage(
+      prOwnerGithubName,
+      balance,
+      repo.merge_penalty,
+      repo.trigger_recheck_text,
+      repo.admin_trigger_recheck_text
+    ),
     headers: githubHeaders,
   });
 
   await octokit.rest.checks.create({
     owner,
     repo: repoName,
-    name: "Gitkarma Tokens Check",
+    name: GITKARMA_CHECK_NAME,
     head_sha: headSha,
     status: "completed",
     conclusion: "failure",
     output: {
-      title: "Insufficient Tokens",
-      summary: `This PR cannot pass because user ${prOwnerGithubName} does not have enough tokens.`,
+      title: checks.title.failed,
+      summary: checks.summary.failed(
+        prOwnerGithubName,
+        balance,
+        repo.merge_penalty
+      ),
     },
   });
 };
