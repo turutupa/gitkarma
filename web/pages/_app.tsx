@@ -3,6 +3,7 @@ import Layout from '@/components/Layout';
 
 import '@mantine/core/styles.css';
 import '@mantine/notifications/styles.css';
+import './global.css';
 
 import type { AppProps } from 'next/app';
 import Head from 'next/head';

@@ -6,6 +6,7 @@ import Welcome from '@/modules/Homepage/Welcome';
 export default function HomePage() {
   return (
     <>
+      {/* <GitHubComment /> */}
       <Welcome />
       <Homepage />
       <GitkarmaCapabilities />
