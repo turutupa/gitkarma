@@ -1,5 +1,7 @@
 import Pricing from '@/modules/Pricing/Pricing';
 
-export default function PricingPage() {
+const PricingPage = () => {
   return <Pricing />;
-}
+};
+
+export default PricingPage;
