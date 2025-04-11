@@ -35,6 +35,7 @@ export type TRepo = {
   total_comments: number;
 
   // Configuration fields
+  disable_gitkarma: boolean;
   initial_debits: number;
   approval_bonus: number;
   comment_bonus: number;

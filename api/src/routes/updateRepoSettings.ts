@@ -20,6 +20,7 @@ export const updateRepoSettings = async (
     enable_review_quality_bonus,
     trigger_recheck_text,
     admin_trigger_recheck_text,
+    disable_gitkarma,
   } = req.body;
 
   log.info(
@@ -36,6 +37,7 @@ export const updateRepoSettings = async (
         enable_review_quality_bonus,
         trigger_recheck_text,
         admin_trigger_recheck_text,
+        disable_gitkarma,
       },
     },
     "Repo settings update"
@@ -55,6 +57,7 @@ export const updateRepoSettings = async (
       enable_review_quality_bonus,
       trigger_recheck_text,
       admin_trigger_recheck_text,
+      disable_gitkarma,
     });
 
     res.json(updatedRepo);

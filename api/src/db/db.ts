@@ -332,6 +332,7 @@ class DB {
       enable_review_quality_bonus?: boolean;
       trigger_recheck_text?: string;
       admin_trigger_recheck_text?: string;
+      disable_gitkarma?: boolean;
     }
   ): Promise<TRepo> {
     const setClauses: string[] = [];
@@ -372,6 +373,10 @@ class DB {
     if (settings.admin_trigger_recheck_text !== undefined) {
       params.push(settings.admin_trigger_recheck_text);
       setClauses.push(`admin_trigger_recheck_text = $${params.length}`);
+    }
+    if (settings.disable_gitkarma !== undefined) {
+      params.push(settings.disable_gitkarma);
+      setClauses.push(`disable_gitkarma = $${params.length}`);
     }
 
     if (setClauses.length === 0) {

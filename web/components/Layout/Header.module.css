@@ -36,7 +36,7 @@
   }
 
   [data-mantine-color-scheme] &[data-active] {
-    background-color: var(--mantine-color-primary-6);
+    background-color: var(--mantine-color-primary-8);
     color: var(--mantine-color-white);
   }
 }

@@ -1,4 +1,5 @@
 import db from "@/db/db";
+import type { TPullRequest, TRepo } from "@/db/models";
 import tb from "@/db/tigerbeetle";
 import log from "@/log";
 import type { Octokit } from "@octokit/rest";
@@ -10,7 +11,11 @@ import {
   GITKARMA_CHECK_NAME,
 } from "./constants";
 import { checks, comments } from "./messages";
-import { getOrDefaultGithubRepo, getOrDefaultGithubUser } from "./utils";
+import {
+  getOrDefaultGithubRepo,
+  getOrDefaultGithubUser,
+  gitkarmaEnabledOrThrow,
+} from "./utils";
 
 /**
  * handlePullRequestReopened:
@@ -50,8 +55,9 @@ export const handlePullRequestReopened = async ({
   const githubUserId = payload.pull_request.user.id; // GitHub user id
   const githubUsername = payload.pull_request.user.login; // GitHub user login name
 
-  const repo = await getOrDefaultGithubRepo(repoId, repoName, owner);
-  const pr = await db.getPullRequest(prNumber, repo.id);
+  const repo: TRepo = await getOrDefaultGithubRepo(repoId, repoName, owner);
+  gitkarmaEnabledOrThrow(repo);
+  const pr: TPullRequest | null = await db.getPullRequest(prNumber, repo.id);
 
   // if it was admin approved then do nothing
   if (pr?.admin_approved) {
@@ -83,11 +89,23 @@ export const handlePullRequestReopened = async ({
   const balance = Number(tb.getBalance(account));
   const hasEnoughDebits = balance >= repo.merge_penalty;
 
-  // Create pull request entry with user assigned as owner
-  await db.updatePullRequest(prNumber, repo.id, {
-    state: EPullRequestState.Open,
-    checkPassed: hasEnoughDebits,
-  });
+  // create pr if it doesn't exist for whatever reason
+  if (!pr) {
+    db.createPullRequest(
+      prNumber,
+      repo.id,
+      user.id,
+      headSha,
+      EPullRequestState.Open,
+      hasEnoughDebits // set PR to passed/not passed check
+    );
+  } else {
+    // Create pull request entry with user assigned as owner
+    await db.updatePullRequest(prNumber, repo.id, {
+      state: EPullRequestState.Open,
+      checkPassed: hasEnoughDebits,
+    });
+  }
 
   // handle pr payment and notify github
   if (hasEnoughDebits) {

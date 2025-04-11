@@ -1,4 +1,5 @@
 import db from "@/db/db";
+import type { TRepo } from "@/db/models";
 import tb from "@/db/tigerbeetle";
 import log from "@/log";
 import type { Octokit } from "@octokit/rest";
@@ -7,7 +8,7 @@ import type {
   PullRequestReview,
 } from "@octokit/webhooks-types";
 import { EPullRequestState } from "./constants";
-import { getOrDefaultGithubUser } from "./utils";
+import { getOrDefaultGithubUser, gitkarmaEnabledOrThrow } from "./utils";
 
 /**
  * handlePullRequestClosed:
@@ -37,7 +38,8 @@ export const handlePullRequestClosed = async ({
   const prOwnerId = payload.pull_request.user.id; // GitHub user id
   const merged = payload.pull_request.merged;
 
-  const repo = await db.getRepoByGithubRepoId(repoId);
+  const repo: TRepo = await db.getRepoByGithubRepoId(repoId);
+  gitkarmaEnabledOrThrow(repo);
 
   // Fetch first PR to know current state before closing it. To know if it was passing or not.
   const pr = await db.getPullRequest(prNumber, repo.id);

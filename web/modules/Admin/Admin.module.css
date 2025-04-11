@@ -5,7 +5,7 @@
 }
 
 .indicator {
-  background-color: light-dark(var(--mantine-color-primary-6), var(--mantine-color-primary-6));
+  background-color: light-dark(var(--mantine-color-primary-8), var(--mantine-color-primary-8));
 }
 
 .control {

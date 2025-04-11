@@ -2,6 +2,7 @@ import { useCallback, useState } from 'react';
 import { FaCheckCircle } from 'react-icons/fa';
 import {
   Badge,
+  Box,
   Button,
   Card,
   Group,
@@ -20,8 +21,9 @@ type Props = {
   description: string;
   price: React.ReactNode;
   features: string[];
-  action: string;
+  actionText: string;
   actionColor?: string;
+  actionRef?: string;
   hoverText?: string;
   isAvailable?: boolean;
 };
@@ -32,8 +34,9 @@ const Pricing: React.FC<Props> = ({
   description,
   price,
   features: featuresList,
-  action,
+  actionText,
   actionColor,
+  actionRef,
   isAvailable = true,
   hoverText = 'Coming soon!', // Default hover text
 }) => {
@@ -69,7 +72,7 @@ const Pricing: React.FC<Props> = ({
                 left: 0,
               }}
             >
-              {action}
+              {actionText}
             </span>
           )}
         </Transition>
@@ -95,31 +98,35 @@ const Pricing: React.FC<Props> = ({
         </Transition>
 
         {/* Invisible text to maintain button size */}
-        <span style={{ opacity: 0 }}>{action.length > hoverText.length ? action : hoverText}</span>
+        <span style={{ opacity: 0 }}>
+          {actionText.length > hoverText.length ? actionText : hoverText}
+        </span>
       </>
     );
-  }, [isHovered, action, hoverText]);
+  }, [isHovered, actionText, hoverText]);
 
   return (
     <Card withBorder radius="md" p="md" className={css.card}>
       <Paper
-        shadow="md"
+        shadow={theme.shadows.xl}
         p="md"
         bg={colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[3]}
       >
         <Group justify="space-between">
-          <Text fz={36} fw={500}>
-            {title}
-          </Text>
-          {titleBadge && <Badge bg="pink">Popular</Badge>}
+          {typeof title === 'string' ? (
+            <Text fz={36} fw={500}>
+              {title}
+            </Text>
+          ) : (
+            title
+          )}
+          {titleBadge && <Badge bg={theme.colors.pink[8]}>{titleBadge}</Badge>}
         </Group>
 
         <Text fz="sm" c="dimmed" lh="xs">
           {description}
         </Text>
-        <Text mt="lg" fz={36} fw={600}>
-          {price}
-        </Text>
+        <Box mt="lg">{price}</Box>
       </Paper>
 
       <Text mt="lg" className={css.label} c="dimmed">
@@ -138,8 +145,13 @@ const Pricing: React.FC<Props> = ({
           disabled={!isAvailable && isHovered}
           c="white"
           className={`${css.actionButton} ${isHovered && isAvailable ? css.actionButtonHovered : ''}`}
+          onClick={() => {
+            if (actionRef) {
+              window.open(actionRef, '_blank');
+            }
+          }}
         >
-          {isAvailable ? action : renderComingSoon()}
+          {isAvailable ? actionText : renderComingSoon()}
         </Button>
       </Group>
     </Card>

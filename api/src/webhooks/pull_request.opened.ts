@@ -1,4 +1,5 @@
 import db from "@/db/db";
+import type { TRepo } from "@/db/models";
 import tb from "@/db/tigerbeetle";
 import log from "@/log";
 import {
@@ -10,7 +11,11 @@ import {
 import { Octokit } from "@octokit/rest";
 import type { PullRequestOpenedEvent } from "@octokit/webhooks-types";
 import { checks, comments } from "./messages";
-import { getOrDefaultGithubRepo, getOrDefaultGithubUser } from "./utils";
+import {
+  getOrDefaultGithubRepo,
+  getOrDefaultGithubUser,
+  gitkarmaEnabledOrThrow,
+} from "./utils";
 
 /**
  * handlePullRequestOpened:
@@ -51,7 +56,8 @@ export const handlePullRequestOpened = async ({
   const githubUserId = payload.pull_request.user.id; // GitHub user id
   const githubUsername = payload.pull_request.user.login; // GitHub user login name
 
-  const repo = await getOrDefaultGithubRepo(repoId, repoName, owner);
+  const repo: TRepo = await getOrDefaultGithubRepo(repoId, repoName, owner);
+  gitkarmaEnabledOrThrow(repo);
 
   // set remote pull request check to in progress
   await octokit.rest.checks.create({
@@ -85,7 +91,7 @@ export const handlePullRequestOpened = async ({
     user.id,
     headSha,
     EPullRequestState.Open,
-    hasEnoughDebits // set PR to passed check
+    hasEnoughDebits // set PR to passed/not passed check
   );
 
   // handle pr payment and notify github

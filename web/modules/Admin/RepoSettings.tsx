@@ -35,6 +35,7 @@ type RepoSettingsProps = {
     enable_review_quality_bonus: boolean;
     trigger_recheck_text: string;
     admin_trigger_recheck_text: string;
+    disable_gitkarma: boolean;
   };
   mutateReposAndUsers?: (repoData: any) => void;
 };
@@ -58,6 +59,7 @@ const RepoSettings = ({ currentRepo, mutateReposAndUsers }: RepoSettingsProps) =
       enable_review_quality_bonus: currentRepo.enable_review_quality_bonus,
       trigger_recheck_text: currentRepo.trigger_recheck_text,
       admin_trigger_recheck_text: currentRepo.admin_trigger_recheck_text,
+      disable_gitkarma: currentRepo.disable_gitkarma || false,
     },
     validate: {
       initial_debits: (val: number) => (val < 0 ? 'Must be at least 0' : null),
@@ -142,7 +144,7 @@ const RepoSettings = ({ currentRepo, mutateReposAndUsers }: RepoSettingsProps) =
         <form onSubmit={form.onSubmit(handleSubmit)}>
           <Stack gap="md">
             {/* Funds */}
-            <Title order={4}>Financial Settings</Title>
+            <Title order={3}>Financial Settings</Title>
             <NumberInput
               label="Initial Debits"
               placeholder="400"
@@ -234,7 +236,7 @@ const RepoSettings = ({ currentRepo, mutateReposAndUsers }: RepoSettingsProps) =
             </Transition>
 
             {/* Trigger Recheck Settings */}
-            <Title mt="xl" order={4}>
+            <Title mt="xl" order={3}>
               Recheck Triggers
             </Title>
 
@@ -328,8 +330,33 @@ const RepoSettings = ({ currentRepo, mutateReposAndUsers }: RepoSettingsProps) =
               }
             />
 
+            {/* Danger Zone */}
+            <Title mt="xl" order={3} c="red">
+              Danger Zone
+            </Title>
+            <Group justify="space-between" wrap="nowrap" gap="xl" mt="md">
+              <div>
+                <Text>Disable GitKarma</Text>
+                <Text size="xs" c="dimmed">
+                  Temporarily pause GitKarma scoring for this repository. This will not uninstall
+                  GitKarma.
+                </Text>
+                <Text size="xs" c="dimmed">
+                  All actions will be paused including balance checks and re-triggering gitkarma
+                  checks
+                </Text>
+              </div>
+              <Switch
+                onLabel="ON"
+                offLabel="OFF"
+                size="lg"
+                color="red"
+                {...form.getInputProps('disable_gitkarma', { type: 'checkbox' })}
+              />
+            </Group>
+
             {/* ACTION BUTTONS */}
-            <Group justify="flex-end">
+            <Group justify="flex-end" mt="lg">
               <Button
                 variant="default"
                 color="dark"
@@ -343,7 +370,7 @@ const RepoSettings = ({ currentRepo, mutateReposAndUsers }: RepoSettingsProps) =
               <Button
                 type="submit"
                 mt="md"
-                color={theme.colors.primary[6]}
+                color={theme.colors.primary[8]}
                 loading={isSubmitting}
                 disabled={isSubmitting}
               >

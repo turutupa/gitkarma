@@ -183,7 +183,7 @@ export default function Admin() {
           />
         </Group>
         <SegmentedControl
-          radius="md"
+          radius="sm"
           size="sm"
           data={['Users', 'Settings', 'Stats']}
           classNames={css}

@@ -9,7 +9,11 @@ import {
   GITKARMA_CHECK_NAME,
 } from "./constants";
 import { checks, comments } from "./messages";
-import { getOrDefaultGithubRepo, getOrDefaultGithubUser } from "./utils";
+import {
+  getOrDefaultGithubRepo,
+  getOrDefaultGithubUser,
+  gitkarmaEnabledOrThrow,
+} from "./utils";
 
 /**
  * handlePullRequestSynchronize:
@@ -52,6 +56,7 @@ export const handlePullRequestSynchronize = async ({
   const headSha = payload.pull_request.head.sha;
 
   const repo = await getOrDefaultGithubRepo(repoId, repoName, owner);
+  gitkarmaEnabledOrThrow(repo);
 
   // set remote pull request check to in progress
   await octokit.rest.checks.create({

@@ -21,7 +21,8 @@ const Pricing = () => {
         </Group>
       ),
       features: ['1 Repositories', '10 Team Members', 'Basic AI Review Quality'],
-      action: 'Select plan',
+      actionText: 'Select plan',
+      actionRef: 'https://github.com/apps/gitkarma-dev',
       isAvailable: true,
     }),
     []
@@ -30,7 +31,7 @@ const Pricing = () => {
   const startup = useMemo(
     () => ({
       title: 'Startup',
-      titleBadge: 'Popular',
+      titleBadge: 'Coming soon',
       description:
         'Ideal for growing businesses. Unlock advanced features, priority support, and enhanced analytics to scale your operations with confidence.',
       price: (
@@ -51,7 +52,7 @@ const Pricing = () => {
         'Standard Reports',
         'Core Integrations',
       ],
-      action: 'Select plan',
+      actionText: 'Select plan',
       isAvailable: false,
     }),
     []
@@ -60,6 +61,7 @@ const Pricing = () => {
   const enterprise = useMemo(
     () => ({
       title: 'Enterprise',
+      titleBadge: 'Coming soon',
       description:
         'Tailored solutions for large organizations. Custom integrations, dedicated support team, and unlimited resources to meet your complex business needs.',
       price: (
@@ -80,7 +82,7 @@ const Pricing = () => {
         'Advanced Reports',
         'Custom Integrations',
       ],
-      action: 'Contact sales',
+      actionText: 'Contact sales',
       actionColor: theme.colors.indigo[6],
       isAvailable: false,
     }),

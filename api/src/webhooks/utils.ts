@@ -90,3 +90,15 @@ export const getOrDefaultGithubUser = async (
 
   return { user, userRepo, account: userTBAccount };
 };
+
+/**
+ * Checks if a repository is active and throws an error if it is not.
+ *
+ * @param repo - The repository object to check.
+ * @throws Will throw an error if the repository has GitKarma disabled.
+ */
+export const gitkarmaEnabledOrThrow = (repo: TRepo) => {
+  if (repo.disable_gitkarma) {
+    throw new Error("GitKarma is disabled for this repo");
+  }
+};

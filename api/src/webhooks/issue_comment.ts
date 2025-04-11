@@ -1,5 +1,6 @@
 import db from "@/db/db";
 import { EUserRepoRole } from "@/db/entities/UserRepo";
+import type { TRepo } from "@/db/models";
 import tb from "@/db/tigerbeetle";
 import log from "@/log";
 import type { Octokit } from "@octokit/rest";
@@ -12,7 +13,7 @@ import {
   GITKARMA_CHECK_NAME,
 } from "./constants";
 import { checks, comments } from "./messages";
-import { getOrDefaultGithubUser } from "./utils";
+import { getOrDefaultGithubUser, gitkarmaEnabledOrThrow } from "./utils";
 
 /**
  * handleIssueComment:
@@ -54,8 +55,10 @@ export const handleIssueComment = async ({
     return;
   }
 
-  const repo = await db.getRepoByGithubRepoId(repoId);
+  const repo: TRepo = await db.getRepoByGithubRepoId(repoId);
+  gitkarmaEnabledOrThrow(repo);
 
+  // Handle the user balance check emoji
   const isUserBalanceCheck = commentBody === BALANCE_CHECK_EMOJI;
   if (payload.action === "created" && isUserBalanceCheck) {
     const user = await db.getUserByGithubUserId(payload.sender.id);
@@ -73,7 +76,7 @@ export const handleIssueComment = async ({
     return;
   }
 
-  // Use the custom trigger texts from the repo settings
+  // Exit if the comment is not a re-trigger
   const isTriggeringRecheck = commentBody === repo.trigger_recheck_text;
   const isTriggeringAdminRecheck =
     commentBody === repo.admin_trigger_recheck_text;

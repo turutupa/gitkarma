@@ -40,6 +40,9 @@ export class Repo {
   pullRequests: PullRequest[];
 
   // Configuration fields
+  @Column({ default: false })
+  disable_gitkarma: boolean;
+
   @Column({ default: 400 })
   initial_debits: number;
 
