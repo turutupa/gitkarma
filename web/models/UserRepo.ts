@@ -61,7 +61,7 @@ export type TRepo = {
   enable_review_quality_bonus: boolean; // enable review quality bonus
   trigger_recheck_text: string; // text for PR recheck trigger
   admin_trigger_recheck_text: string; // text for admin PR recheck trigger
-  gitkarma_gitkarma: boolean;
+  disable_gitkarma: boolean;
 };
 
 export type TJsonAccount = {
