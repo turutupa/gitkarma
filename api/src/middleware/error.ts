@@ -1,6 +1,6 @@
 import log from "@/log";
 
-export const errorHandler = (err, req, res, next) => {
+export const errorHandler = (err, _, res, __) => {
   const error = {
     error: {
       message: err.message,
