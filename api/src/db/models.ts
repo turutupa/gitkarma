@@ -41,6 +41,7 @@ export type TRepo = {
   comment_bonus: number;
   complexity_bonus: number;
   merge_penalty: number;
+  review_bonus: number;
   enable_complexity_bonus: boolean;
   enable_review_quality_bonus: boolean;
   trigger_recheck_text: string;
@@ -72,6 +73,31 @@ export type TPullRequest = {
   created_at: Date;
   updated_at: Date;
   // Add additional fields here if needed.
+};
+
+export type TReview = {
+  id: number;
+  review_id: string;
+  pull_request_id: number;
+  repo_id: number;
+  reviewer_id: number;
+  state: string;
+  body: string | null;
+  commit_id: string | null;
+  created_at: Date;
+  updated_at: Date;
+};
+
+export type TReviewComment = {
+  id: number;
+  comment_id: string;
+  review_id: number;
+  body: string | null;
+  path: string | null;
+  position: number | null;
+  line: number | null;
+  created_at: Date;
+  updated_at: Date;
 };
 
 export type TUserRepoAccount = {

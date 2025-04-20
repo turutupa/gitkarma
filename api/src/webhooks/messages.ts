@@ -1,5 +1,6 @@
 /*************************** */
 /*          CHECKS           */
+
 /*************************** */
 const completedCheckTitle = "GitKarma Funds Check Completed";
 const inProgressCheckTitle = "GitKarma Funds Check in Progress";
@@ -74,17 +75,12 @@ Thank you for using GitKarma!`;
 };
 
 export const checks = {
-  title: {
-    completed: completedCheckTitle,
-    inProgress: inProgressCheckTitle,
-    failed: failedCheckTitle,
-    adminApproved: adminApprovedCheckTitle,
-  },
-  summary: {
-    completed: completedCheckSummary,
-    inProgress: inProgressCheckSummary,
-    failed: failedCheckSummary,
-    adminApproved: adminApprovedCheckSummary,
+  inProgress: { title: inProgressCheckTitle, summary: inProgressCheckSummary },
+  completed: { title: completedCheckTitle, summary: completedCheckSummary },
+  failed: { title: failedCheckTitle, summary: failedCheckSummary },
+  adminApproved: {
+    title: adminApprovedCheckTitle,
+    summary: adminApprovedCheckSummary,
   },
 };
 
@@ -166,10 +162,27 @@ Hi @${username}! Your pull request could not be approved due to insufficient fun
 Need help? Contact your repository administrator.`;
 };
 
+const pullRequestReviewSubmitted = (
+  username: string,
+  debitsAwarded: number
+) => {
+  return `## 🎉 Review Submitted - Debits Awarded!
+
+Thank you @${username} for submitting your review!
+
+### Reward Details:
+- **${debitsAwarded} debits** have been added to your balance
+- These debits can be used to fund your future pull requests
+- Quality reviews help maintain code quality while building your balance
+
+Keep up the great work and thank you for contributing to the project!`;
+};
+
 export const comments = {
   pullRequestAdminOverrideMessage,
   pullRequestAlreadyFundedMessage,
   balanceCheckMessage,
   pullRequestFundedMessage,
   pullRequestNotEnoughFundsMessage,
+  pullRequestReviewSubmitted,
 };

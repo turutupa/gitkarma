@@ -15,7 +15,7 @@ export class PullRequest {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ type: "int" })
   pr_number: number; // GitHub PR number (unique per repo)
 
   @ManyToOne("Repo", "pullRequests", { nullable: false })
@@ -26,16 +26,16 @@ export class PullRequest {
   @JoinColumn({ name: "user_id" })
   user: User;
 
-  @Column({ length: 255 })
+  @Column({ length: 255, type: "varchar" })
   head_sha: string;
 
-  @Column({ length: 50 })
+  @Column({ length: 50, type: "varchar" })
   state: string; // e.g., 'open', 'closed', 'merged'
 
-  @Column({ default: false })
+  @Column({ default: false, type: "boolean" })
   check_passed: boolean;
 
-  @Column({ default: false })
+  @Column({ default: false, type: "boolean" })
   admin_approved: boolean;
 
   @CreateDateColumn({ type: "timestamp" })

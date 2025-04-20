@@ -13,6 +13,7 @@ export const updateRepoSettings = async (
   const {
     initial_debits,
     approval_bonus,
+    review_bonus,
     comment_bonus,
     complexity_bonus,
     merge_penalty,
@@ -30,6 +31,7 @@ export const updateRepoSettings = async (
       settings: {
         initial_debits,
         approval_bonus,
+        review_bonus,
         comment_bonus,
         complexity_bonus,
         merge_penalty,
@@ -50,6 +52,7 @@ export const updateRepoSettings = async (
     const updatedRepo = await DB.updateRepoSettings(repo!.id, {
       initial_debits,
       approval_bonus,
+      review_bonus,
       comment_bonus,
       complexity_bonus,
       merge_penalty,

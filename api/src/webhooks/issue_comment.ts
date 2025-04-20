@@ -61,8 +61,11 @@ export const handleIssueComment = async ({
   // Handle the user balance check emoji
   const isUserBalanceCheck = commentBody === BALANCE_CHECK_EMOJI;
   if (payload.action === "created" && isUserBalanceCheck) {
-    const user = await db.getUserByGithubUserId(payload.sender.id);
-    const account = await tb.getUserAccount(BigInt(user.id), BigInt(repo.id));
+    const { account } = await getOrDefaultGithubUser(
+      repo,
+      payload.sender.id,
+      payload.sender.login
+    );
     const balance = tb.getBalance(account);
 
     const sender = payload.sender.login;
@@ -144,8 +147,8 @@ export const handleIssueComment = async ({
     head_sha: pr.head_sha,
     status: "in_progress",
     output: {
-      title: checks.title.inProgress,
-      summary: checks.summary.inProgress(user.github_username, balance),
+      title: checks.inProgress.title,
+      summary: checks.inProgress.summary(user.github_username, balance),
     },
   });
 
@@ -203,8 +206,8 @@ export const handleIssueComment = async ({
       status: "completed",
       conclusion: "success",
       output: {
-        title: checks.title.adminApproved,
-        summary: checks.summary.adminApproved(),
+        title: checks.adminApproved.title,
+        summary: checks.adminApproved.summary(),
       },
     });
     return;
@@ -257,8 +260,8 @@ export const handleIssueComment = async ({
       status: "completed",
       conclusion: "success",
       output: {
-        title: checks.title.completed,
-        summary: checks.summary.completed(
+        title: checks.completed.title,
+        summary: checks.completed.summary(
           user.github_username,
           balance,
           newBalance,
@@ -292,8 +295,8 @@ export const handleIssueComment = async ({
     status: "completed",
     conclusion: "failure",
     output: {
-      title: checks.title.failed,
-      summary: checks.summary.failed(
+      title: checks.failed.title,
+      summary: checks.failed.summary(
         prOwnerGithubName,
         balance,
         repo.merge_penalty

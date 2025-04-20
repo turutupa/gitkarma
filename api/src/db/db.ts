@@ -2,6 +2,7 @@ import log from "@/log";
 import type { EPullRequestState } from "@/webhooks/constants";
 import dotenv from "dotenv";
 import pgk from "pg";
+import { EReviewState } from "./entities/Review";
 import { EUserRepoRole } from "./entities/UserRepo";
 import type {
   TPullRequest,
@@ -325,6 +326,7 @@ class DB {
     settings: {
       initial_debits?: number;
       approval_bonus?: number;
+      review_bonus?: number;
       comment_bonus?: number;
       complexity_bonus?: number;
       merge_penalty?: number;
@@ -345,6 +347,10 @@ class DB {
     if (settings.approval_bonus !== undefined) {
       params.push(settings.approval_bonus);
       setClauses.push(`approval_bonus = $${params.length}`);
+    }
+    if (settings.review_bonus !== undefined) {
+      params.push(settings.review_bonus);
+      setClauses.push(`review_bonus = $${params.length}`);
     }
     if (settings.comment_bonus !== undefined) {
       params.push(settings.comment_bonus);
@@ -513,6 +519,70 @@ class DB {
 
     const { rows } = await this.pg.query<TPullRequest>(query, params);
     return rows.length > 0 ? rows[0] : null;
+  }
+
+  /**
+   * createPullRequestReview:
+   * Inserts a new pull request review record in a single query
+   * Assumes the referenced pull request exists in the database
+   *
+   * @param reviewData - Object containing review data
+   * @returns A Promise that resolves to the created review record
+   */
+  public async createPullRequestReview(reviewData: {
+    pr_number: number;
+    repoId: number;
+    reviewerId: number;
+    state: string;
+    reviewId?: string;
+    body?: string;
+    commitId?: string;
+  }): Promise<any> {
+    // Convert GitHub review state to our enum
+    const reviewState = this.mapGitHubReviewStateToEnum(reviewData.state);
+
+    // Insert the review with a direct subquery to find the pull_request_id
+    const reviewQuery = `
+      INSERT INTO reviews 
+        (review_id, pull_request_id, reviewer_id, state, body, commit_id)
+      VALUES (
+        $1, 
+        (SELECT id FROM pull_requests WHERE pr_number = $2 AND repo_id = $3), 
+        $4, 
+        $5, 
+        $6, 
+        $7
+      )
+      RETURNING *
+    `;
+
+    const reviewParams = [
+      reviewData.reviewId || null,
+      reviewData.pr_number,
+      reviewData.repoId,
+      reviewData.reviewerId,
+      reviewState,
+      reviewData.body,
+      reviewData.commitId,
+    ];
+
+    const { rows } = await this.pg.query(reviewQuery, reviewParams);
+    return rows.length > 0 ? rows[0] : null;
+  }
+
+  /**
+   * Maps GitHub review state strings to our EReviewState enum
+   */
+  private mapGitHubReviewStateToEnum(state: string): EReviewState {
+    const stateMap: Record<string, EReviewState> = {
+      PENDING: EReviewState.PENDING,
+      APPROVED: EReviewState.APPROVED,
+      CHANGES_REQUESTED: EReviewState.CHANGES_REQUESTED,
+      COMMENTED: EReviewState.COMMENTED,
+      DISMISSED: EReviewState.DISMISSED,
+    };
+
+    return stateMap[state.toUpperCase()] || EReviewState.COMMENTED;
   }
 }
 

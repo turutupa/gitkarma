@@ -10,6 +10,7 @@ import fs from "fs";
 import { App } from "octokit";
 import log from "./log";
 import { handleInstallationRepositoriesAdded } from "./webhooks/installation_repositories.added";
+import { handlePullRequestReview } from "./webhooks/pull_request_review";
 
 dotenv.config();
 
@@ -80,6 +81,10 @@ export const startGithubApp = () => {
     withCatch(handlePullRequestReopened)
   );
   app.webhooks.on("issue_comment", withCatch(handleIssueComment));
+  app.webhooks.on(
+    "pull_request_review.submitted",
+    withCatch(handlePullRequestReview)
+  );
 
   // This logs any errors that occur.
   app.webhooks.onError((error: WebhookEventHandlerError) => {

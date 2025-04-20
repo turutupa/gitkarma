@@ -13,10 +13,10 @@ export class User {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ unique: true })
+  @Column({ unique: true, type: "int" })
   github_id: number;
 
-  @Column({ length: 255 })
+  @Column({ length: 255, type: "varchar" })
   github_username: string;
 
   @CreateDateColumn({ type: "timestamp" })

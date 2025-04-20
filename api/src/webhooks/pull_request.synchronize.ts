@@ -66,8 +66,8 @@ export const handlePullRequestSynchronize = async ({
     head_sha: headSha,
     status: "in_progress",
     output: {
-      title: checks.title.inProgress,
-      summary: checks.summary.inProgress(prOwnerGithubName, repo.merge_penalty),
+      title: checks.inProgress.title,
+      summary: checks.inProgress.summary(prOwnerGithubName, repo.merge_penalty),
     },
   });
 
@@ -99,8 +99,8 @@ export const handlePullRequestSynchronize = async ({
       status: "completed",
       conclusion: "success",
       output: {
-        title: checks.title.completed,
-        summary: checks.summary.completed(
+        title: checks.completed.title,
+        summary: checks.completed.summary(
           prOwnerGithubName,
           balance + repo.merge_penalty,
           balance,
@@ -151,8 +151,8 @@ export const handlePullRequestSynchronize = async ({
       status: "completed",
       conclusion: "success",
       output: {
-        title: checks.title.completed,
-        summary: checks.summary.completed(
+        title: checks.completed.title,
+        summary: checks.completed.summary(
           prOwnerGithubName,
           balance,
           newBalance,
@@ -186,8 +186,8 @@ export const handlePullRequestSynchronize = async ({
     status: "completed",
     conclusion: "failure",
     output: {
-      title: checks.title.failed,
-      summary: checks.summary.failed(
+      title: checks.failed.title,
+      summary: checks.failed.summary(
         prOwnerGithubName,
         balance,
         repo.merge_penalty
