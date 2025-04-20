@@ -167,21 +167,21 @@ const RepoSettings = ({ currentRepo, mutateReposAndUsers }: RepoSettingsProps) =
                   {...form.getInputProps('initial_debits')}
                 />
                 <NumberInput
-                  label="Merge Penalty"
+                  label="Pull Request Funding"
                   placeholder="100"
                   leftSection={moneyIcon}
-                  description="Debits deducted from the PR author upon merge."
+                  description="Debits deducted from the PR author upon creating PR."
                   {...form.getInputProps('merge_penalty')}
                 />
                 <NumberInput
-                  label="Review Bonus"
+                  label="Pull Request Review Bonus"
                   placeholder="50"
                   leftSection={moneyIcon}
                   description="Debits awarded to a PR reviewer upon reviewing PR."
                   {...form.getInputProps('review_bonus')}
                 />
                 <NumberInput
-                  label="Merge Bonus"
+                  label="Pull Request Merge Bonus"
                   placeholder="50"
                   leftSection={moneyIcon}
                   description="Debits awarded to a PR approver upon PR merge."
