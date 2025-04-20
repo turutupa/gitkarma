@@ -11,6 +11,7 @@ import express from "express";
 import "express-async-errors";
 import { startGithubApp } from "./githubApp";
 import log from "./log";
+import { errorHandler } from "./middleware/error";
 
 dotenv.config();
 
@@ -44,21 +45,22 @@ const startApp = async () => {
 
   // Create a router for routes
   const routes = express.Router();
+  // inject middlewares
   routes.use(express.json());
   routes.use(jwtMiddleware);
   routes.use(injectUserRepoMiddleware);
   routes.use(injectOctokit);
 
+  // set routes
   routes.get("/api/repos", getUserRepos);
   routes.put("/api/repos/settings", updateRepoSettings);
   routes.put("/api/repos/roles", updateUserRepoRole);
   routes.post("/api/funds", transferFunds);
 
-  // routes.use((err, req, res, next) => {
-  //   log.error({ err, url: req.url }, "Unhandled error in route");
-  //   res.status(500).json({ error: err ?? "Internal server error" });
-  // });
+  // error handling middleware
+  routes.use(errorHandler);
 
+  // register routes
   app.use(routes);
 
   // Start the server

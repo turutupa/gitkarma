@@ -1,6 +1,7 @@
 import { EUserRepoRole } from "@/db/entities/UserRepo";
 import type { TRepo, TUserRepoAccount } from "@/db/models";
 import log from "@/log";
+import { HttpException } from "@/types/Exception";
 import { Octokit } from "@octokit/rest";
 
 /**
@@ -38,8 +39,11 @@ export async function verifyUserIsRepoAdmin(
 
   const isAdmin = permissionData.permission === "admin";
   if (!isAdmin) {
-    log.error({ user, repo }, "Forbidden: Insufficient permissions");
-    throw new Error("Forbidden: Insufficient permissions");
+    throw new HttpException(
+      403,
+      "Forbidden: Insufficient permissions",
+      "Restricted"
+    );
   }
 
   return true;
