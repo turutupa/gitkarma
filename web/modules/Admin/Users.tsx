@@ -8,11 +8,14 @@ import {
   Group,
   Loader,
   NumberInput,
+  Paper,
   Select,
   Table,
   Text,
   Title,
   Tooltip,
+  useMantineColorScheme,
+  useMantineTheme,
 } from '@mantine/core';
 import { showNotification } from '@mantine/notifications';
 import { EUserRepoRole, TUserData } from '@/models/UserRepo';
@@ -38,6 +41,9 @@ type Props = {
 };
 
 const Users: React.FC<Props> = ({ users, repoId }) => {
+  const theme = useMantineTheme();
+  const { colorScheme } = useMantineColorScheme();
+
   const [transferAmounts, setTransferAmounts] = useState<{ [key: string]: number }>({});
   const [isTransferring, setIsTransferring] = useState<{ [key: string]: boolean }>({});
   const [isUpdatingRole, setIsUpdatingRole] = useState<{ [key: string]: boolean }>({});
@@ -299,45 +305,57 @@ const Users: React.FC<Props> = ({ users, repoId }) => {
       <Title mb="lg" order={2}>
         Users
       </Title>
-      <Table.ScrollContainer minWidth={800} title="Users">
-        <Table verticalSpacing="sm">
-          <Table.Thead>
-            <Table.Tr>
-              <Table.Th>Users</Table.Th>
-              <Table.Th>
-                Gitkarma Role
-                <Tooltip
-                  withArrow
-                  multiline
-                  offset={10}
-                  position="bottom-start"
-                  transitionProps={{ transition: 'scale-y', duration: 300 }}
-                  label={
-                    <>
-                      <Text size="xs">
-                        <b>Admin</b>: Full control over repository settings and users
-                      </Text>
-                      <Text size="xs">
-                        <b>Collaborator</b>: Contributes to the repository
-                      </Text>
-                      <Text size="xs">
-                        <b>Organization Member</b>: Hidden from the dashboard
-                      </Text>
-                    </>
-                  }
-                >
-                  <ActionIcon mx={5} variant="subtle" radius="xl" size="xs" color="gray">
-                    <IconInfoCircle size={16} />
-                  </ActionIcon>
-                </Tooltip>
-              </Table.Th>
-              <Table.Th ta="center">Balance</Table.Th>
-              <Table.Th>Transfer funds</Table.Th>
-            </Table.Tr>
-          </Table.Thead>
-          <Table.Tbody>{rows}</Table.Tbody>
-        </Table>
-      </Table.ScrollContainer>
+
+      <Paper
+        shadow="sm"
+        p="lg"
+        bg={colorScheme === 'dark' ? 'dark.7' : 'gray.1'}
+        style={{
+          border: `1px solid ${
+            colorScheme === 'dark' ? theme.colors.gray[8] : theme.colors.gray[3]
+          }`,
+        }}
+      >
+        <Table.ScrollContainer minWidth={800} title="Users">
+          <Table verticalSpacing="sm">
+            <Table.Thead>
+              <Table.Tr>
+                <Table.Th>Users</Table.Th>
+                <Table.Th>
+                  Gitkarma Role
+                  <Tooltip
+                    withArrow
+                    multiline
+                    offset={10}
+                    position="bottom-start"
+                    transitionProps={{ transition: 'scale-y', duration: 300 }}
+                    label={
+                      <>
+                        <Text size="xs">
+                          <b>Admin</b>: Full control over repository settings and users
+                        </Text>
+                        <Text size="xs">
+                          <b>Collaborator</b>: Contributes to the repository
+                        </Text>
+                        <Text size="xs">
+                          <b>Organization Member</b>: Hidden from the dashboard
+                        </Text>
+                      </>
+                    }
+                  >
+                    <ActionIcon mx={5} variant="subtle" radius="xl" size="xs" color="gray">
+                      <IconInfoCircle size={16} />
+                    </ActionIcon>
+                  </Tooltip>
+                </Table.Th>
+                <Table.Th ta="center">Balance</Table.Th>
+                <Table.Th>Transfer funds</Table.Th>
+              </Table.Tr>
+            </Table.Thead>
+            <Table.Tbody>{rows}</Table.Tbody>
+          </Table>
+        </Table.ScrollContainer>
+      </Paper>
     </>
   );
 };

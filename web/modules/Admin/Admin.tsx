@@ -158,7 +158,7 @@ export default function Admin() {
 
   if (!reposAndUsers || !reposAndUsers.length) {
     return (
-      <Center style={{ width: '100vw', height: '100vh' }}>
+      <Center pt="xl">
         <Alert icon={<IconAlertCircle size={16} />} title="No Data Found" color="red">
           We couldn't find any repositories or users associated with your account.
         </Alert>
@@ -170,10 +170,12 @@ export default function Admin() {
     <Container p={0}>
       <Group align="center" justify="space-between" mb="xl">
         <Group>
-          {isDesktop && <Title order={2}>Git Repository</Title>}
+          {isDesktop && <Title order={2}>Repository</Title>}
           <Select
             w={isMobile ? '150px' : '200px'}
-            data={reposAndUsers.map((rau) => rau.repo_name)}
+            data={[...reposAndUsers]
+              ?.sort((a, b) => a.repo_name.localeCompare(b.repo_name))
+              .map((rau) => rau.repo_name)}
             value={currentRepo?.repo_name}
             onChange={(val) => {
               const targetRepo = reposAndUsers.find((rau) => rau.repo_name === val);

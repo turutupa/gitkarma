@@ -5,6 +5,7 @@ import { IconMoneybag, IconMoodSmile } from '@tabler/icons-react';
 import axios from 'axios';
 import {
   ActionIcon,
+  Badge,
   Button,
   Group,
   NumberInput,
@@ -28,6 +29,7 @@ type RepoSettingsProps = {
   currentRepo: {
     initial_debits: number;
     approval_bonus: number;
+    review_bonus: number;
     comment_bonus: number;
     complexity_bonus: number;
     merge_penalty: number;
@@ -52,6 +54,7 @@ const RepoSettings = ({ currentRepo, mutateReposAndUsers }: RepoSettingsProps) =
     initialValues: {
       initial_debits: currentRepo.initial_debits,
       approval_bonus: currentRepo.approval_bonus,
+      review_bonus: currentRepo.review_bonus,
       comment_bonus: currentRepo.comment_bonus,
       complexity_bonus: currentRepo.complexity_bonus,
       merge_penalty: currentRepo.merge_penalty,
@@ -138,222 +141,279 @@ const RepoSettings = ({ currentRepo, mutateReposAndUsers }: RepoSettingsProps) =
   return (
     <>
       <Title mb="lg" order={2}>
-        Repository Settings
+        Settings
       </Title>
       <Paper shadow="none" p="md">
         <form onSubmit={form.onSubmit(handleSubmit)}>
           <Stack gap="md">
             {/* Funds */}
             <Title order={3}>Financial Settings</Title>
-            <NumberInput
-              label="Initial Debits"
-              placeholder="400"
-              leftSection={moneyIcon}
-              description="Initial debits assigned when a user is added to a repository."
-              {...form.getInputProps('initial_debits')}
-            />
-            <NumberInput
-              label="Merge Penalty"
-              placeholder="100"
-              leftSection={moneyIcon}
-              description="Debits deducted from the PR author upon merge."
-              {...form.getInputProps('merge_penalty')}
-            />
-            <NumberInput
-              label="Approval Bonus"
-              placeholder="50"
-              leftSection={moneyIcon}
-              description="Debits awarded to a PR approver upon review approval."
-              {...form.getInputProps('approval_bonus')}
-            />
-
-            {/* ENABLE COMPLEXITY BONUS + CONDITIONAL RENDERING */}
-            <Group justify="space-between" wrap="nowrap" gap="xl">
-              <div>
-                <Text>Enable Complexity Bonus</Text>
-                <Text size="xs" c="dimmed">
-                  Enable bonus for complex pull requests.
-                </Text>
-              </div>
-              <Switch
-                onLabel="ON"
-                offLabel="OFF"
-                size="lg"
-                {...form.getInputProps('enable_complexity_bonus', { type: 'checkbox' })}
-              />
-            </Group>
-            <Transition
-              mounted={form.values.enable_complexity_bonus}
-              transition="scale-y"
-              duration={200}
-              timingFunction="linear"
+            <Paper
+              shadow="sm"
+              p="lg"
+              bg={colorScheme === 'dark' ? 'dark.7' : 'gray.1'}
+              style={{
+                border: `1px solid ${
+                  colorScheme === 'dark' ? theme.colors.gray[8] : theme.colors.gray[3]
+                }`,
+              }}
             >
-              {(styles) => (
-                <div style={styles}>
-                  <NumberInput
-                    label="Complexity Bonus"
-                    placeholder="20"
-                    leftSection={moneyIcon}
-                    description="Bonus debits for complex pull requests."
-                    {...form.getInputProps('complexity_bonus')}
-                  />
-                </div>
-              )}
-            </Transition>
+              <Stack gap="lg">
+                <NumberInput
+                  label="Initial Debits"
+                  placeholder="400"
+                  leftSection={moneyIcon}
+                  description="Initial debits assigned when a user is added to a repository."
+                  {...form.getInputProps('initial_debits')}
+                />
+                <NumberInput
+                  label="Merge Penalty"
+                  placeholder="100"
+                  leftSection={moneyIcon}
+                  description="Debits deducted from the PR author upon merge."
+                  {...form.getInputProps('merge_penalty')}
+                />
+                <NumberInput
+                  label="Review Bonus"
+                  placeholder="50"
+                  leftSection={moneyIcon}
+                  description="Debits awarded to a PR reviewer upon reviewing PR."
+                  {...form.getInputProps('review_bonus')}
+                />
+                <NumberInput
+                  label="Merge Bonus"
+                  placeholder="50"
+                  leftSection={moneyIcon}
+                  description="Debits awarded to a PR approver upon PR merge."
+                  {...form.getInputProps('approval_bonus')}
+                />
 
-            {/* ENABLE REVIEW BONUS + CONDITIONAL RENDERING */}
-            <Group justify="space-between" wrap="nowrap" gap="xl" mt="md">
-              <div>
-                <Text>Enable Review Bonus</Text>
-                <Text size="xs" c="dimmed">
-                  Enable bonus for review quality.
-                </Text>
-              </div>
-              <Switch
-                onLabel="ON"
-                offLabel="OFF"
-                size="lg"
-                {...form.getInputProps('enable_review_quality_bonus', { type: 'checkbox' })}
-              />
-            </Group>
-            <Transition
-              mounted={form.values.enable_review_quality_bonus}
-              transition="scale-y"
-              duration={200}
-              timingFunction="ease"
-            >
-              {(styles) => (
-                <div style={styles}>
-                  <NumberInput
-                    label="Review Bonus"
-                    placeholder="5"
-                    leftSection={moneyIcon}
-                    description="Debits given for high-quality PR comments."
-                    {...form.getInputProps('comment_bonus')}
+                {/* ENABLE COMPLEXITY BONUS + CONDITIONAL RENDERING */}
+                <Group justify="space-between" wrap="nowrap" gap="xl">
+                  <div>
+                    <Text>
+                      Enable Complexity Bonus
+                      <Badge ml="sm" size="xs">
+                        Coming soon
+                      </Badge>
+                    </Text>
+                    <Text size="xs" c="dimmed">
+                      Enable bonus for complex pull requests.
+                    </Text>
+                  </div>
+                  <Switch
+                    onLabel="ON"
+                    offLabel="OFF"
+                    size="lg"
+                    {...form.getInputProps('enable_complexity_bonus', { type: 'checkbox' })}
+                    disabled
                   />
-                </div>
-              )}
-            </Transition>
+                </Group>
+                <Transition
+                  mounted={form.values.enable_complexity_bonus}
+                  transition="scale-y"
+                  duration={200}
+                  timingFunction="linear"
+                >
+                  {(styles) => (
+                    <div style={styles}>
+                      <NumberInput
+                        label="Complexity Bonus"
+                        placeholder="20"
+                        leftSection={moneyIcon}
+                        description="Bonus debits for complex pull requests."
+                        {...form.getInputProps('complexity_bonus')}
+                      />
+                    </div>
+                  )}
+                </Transition>
+
+                {/* ENABLE REVIEW BONUS + CONDITIONAL RENDERING */}
+                <Group justify="space-between" wrap="nowrap" gap="xl" mt="md">
+                  <div>
+                    <Text>
+                      Enable Review Bonus
+                      <Badge ml="sm" size="xs">
+                        Coming soon
+                      </Badge>
+                    </Text>
+                    <Text size="xs" c="dimmed">
+                      Enable bonus for review quality.
+                    </Text>
+                  </div>
+                  <Switch
+                    onLabel="ON"
+                    offLabel="OFF"
+                    size="lg"
+                    {...form.getInputProps('enable_review_quality_bonus', { type: 'checkbox' })}
+                    disabled
+                  />
+                </Group>
+                <Transition
+                  mounted={form.values.enable_review_quality_bonus}
+                  transition="scale-y"
+                  duration={200}
+                  timingFunction="ease"
+                >
+                  {(styles) => (
+                    <div style={styles}>
+                      <NumberInput
+                        label="Review Bonus"
+                        placeholder="5"
+                        leftSection={moneyIcon}
+                        description="Debits given for high-quality PR comments."
+                        {...form.getInputProps('comment_bonus')}
+                      />
+                    </div>
+                  )}
+                </Transition>
+              </Stack>
+            </Paper>
 
             {/* Trigger Recheck Settings */}
             <Title mt="xl" order={3}>
-              Recheck Triggers
+              Re-check Triggers
             </Title>
 
-            {/* user trigger recheck text */}
-            <TextInput
-              label="User Trigger Recheck Text"
-              placeholder=":sparkles:"
-              description="Text/emoji that users can comment to trigger a PR recheck."
-              {...form.getInputProps('trigger_recheck_text')}
-              rightSection={
-                <Popover
-                  trapFocus
-                  position="top-end"
-                  width="auto"
-                  opened={activeEmojiField === 'trigger_recheck_text'}
-                  onChange={(opened) => {
-                    if (!opened) {
-                      setActiveEmojiField(null);
-                    }
-                  }}
-                >
-                  <Popover.Target>
-                    <ActionIcon
-                      variant="subtle"
-                      color="gray"
-                      onClick={() =>
-                        setActiveEmojiField(
-                          activeEmojiField === 'trigger_recheck_text'
-                            ? null
-                            : 'trigger_recheck_text'
-                        )
-                      }
+            <Paper
+              shadow="sm"
+              p="lg"
+              bg={colorScheme === 'dark' ? 'dark.7' : 'gray.1'}
+              style={{
+                border: `1px solid ${
+                  colorScheme === 'dark' ? theme.colors.gray[8] : theme.colors.gray[3]
+                }`,
+              }}
+            >
+              <Stack gap="lg">
+                {/* user trigger recheck text */}
+                <TextInput
+                  label="User Trigger Recheck Text"
+                  placeholder=":sparkles:"
+                  description="Text/emoji that users can comment to trigger a PR recheck."
+                  {...form.getInputProps('trigger_recheck_text')}
+                  rightSection={
+                    <Popover
+                      trapFocus
+                      position="top-end"
+                      width="auto"
+                      opened={activeEmojiField === 'trigger_recheck_text'}
+                      onChange={(opened) => {
+                        if (!opened) {
+                          setActiveEmojiField(null);
+                        }
+                      }}
                     >
-                      <IconMoodSmile size={18} />
-                    </ActionIcon>
-                  </Popover.Target>
-                  <Popover.Dropdown p={0} m={0} bg="transparent" bd="none">
-                    <Picker
-                      title="Pick your emoji"
-                      data={data}
-                      theme={colorScheme}
-                      onEmojiSelect={handleEmojiSelect}
-                    />
-                  </Popover.Dropdown>
-                </Popover>
-              }
-            />
+                      <Popover.Target>
+                        <ActionIcon
+                          variant="subtle"
+                          color="gray"
+                          onClick={() =>
+                            setActiveEmojiField(
+                              activeEmojiField === 'trigger_recheck_text'
+                                ? null
+                                : 'trigger_recheck_text'
+                            )
+                          }
+                        >
+                          <IconMoodSmile size={18} />
+                        </ActionIcon>
+                      </Popover.Target>
+                      <Popover.Dropdown p={0} m={0} bg="transparent" bd="none">
+                        <Picker
+                          title="Pick your emoji"
+                          data={data}
+                          theme={colorScheme}
+                          onEmojiSelect={handleEmojiSelect}
+                        />
+                      </Popover.Dropdown>
+                    </Popover>
+                  }
+                />
 
-            {/* admin trigger recheck text */}
-            <TextInput
-              label="Admin Trigger Recheck Text"
-              placeholder=":rocket:"
-              description="Text/emoji that admins can comment to trigger a PR recheck."
-              {...form.getInputProps('admin_trigger_recheck_text')}
-              rightSection={
-                <Popover
-                  trapFocus
-                  position="top-end"
-                  width="auto"
-                  opened={activeEmojiField === 'admin_trigger_recheck_text'}
-                  onChange={(opened) => {
-                    if (!opened) {
-                      setActiveEmojiField(null);
-                    }
-                  }}
-                >
-                  <Popover.Target>
-                    <ActionIcon
-                      variant="subtle"
-                      color="gray"
-                      onClick={() =>
-                        setActiveEmojiField(
-                          activeEmojiField === 'admin_trigger_recheck_text'
-                            ? null
-                            : 'admin_trigger_recheck_text'
-                        )
-                      }
+                {/* admin trigger recheck text */}
+                <TextInput
+                  label="Admin Trigger Recheck Text"
+                  placeholder=":rocket:"
+                  description="Text/emoji that admins can comment to trigger a PR recheck."
+                  {...form.getInputProps('admin_trigger_recheck_text')}
+                  rightSection={
+                    <Popover
+                      trapFocus
+                      position="top-end"
+                      width="auto"
+                      opened={activeEmojiField === 'admin_trigger_recheck_text'}
+                      onChange={(opened) => {
+                        if (!opened) {
+                          setActiveEmojiField(null);
+                        }
+                      }}
                     >
-                      <IconMoodSmile size={18} />
-                    </ActionIcon>
-                  </Popover.Target>
-                  <Popover.Dropdown p={0} m={0} bg="transparent" bd="none">
-                    <Picker
-                      theme={colorScheme}
-                      data={data}
-                      onEmojiSelect={handleEmojiSelect}
-                      title="Pick your emoji"
-                    />
-                  </Popover.Dropdown>
-                </Popover>
-              }
-            />
+                      <Popover.Target>
+                        <ActionIcon
+                          variant="subtle"
+                          color="gray"
+                          onClick={() =>
+                            setActiveEmojiField(
+                              activeEmojiField === 'admin_trigger_recheck_text'
+                                ? null
+                                : 'admin_trigger_recheck_text'
+                            )
+                          }
+                        >
+                          <IconMoodSmile size={18} />
+                        </ActionIcon>
+                      </Popover.Target>
+                      <Popover.Dropdown p={0} m={0} bg="transparent" bd="none">
+                        <Picker
+                          theme={colorScheme}
+                          data={data}
+                          onEmojiSelect={handleEmojiSelect}
+                          title="Pick your emoji"
+                        />
+                      </Popover.Dropdown>
+                    </Popover>
+                  }
+                />
+              </Stack>
+            </Paper>
 
             {/* Danger Zone */}
-            <Title mt="xl" order={3} c="red">
-              Danger Zone
-            </Title>
-            <Group justify="space-between" wrap="nowrap" gap="xl" mt="md">
-              <div>
-                <Text>Disable GitKarma</Text>
-                <Text size="xs" c="dimmed">
-                  Temporarily pause GitKarma scoring for this repository. This will not uninstall
-                  GitKarma.
-                </Text>
-                <Text size="xs" c="dimmed">
-                  All actions will be paused including balance checks and re-triggering gitkarma
-                  checks
-                </Text>
-              </div>
-              <Switch
-                onLabel="ON"
-                offLabel="OFF"
-                size="lg"
-                color="red"
-                {...form.getInputProps('disable_gitkarma', { type: 'checkbox' })}
-              />
-            </Group>
+            <Paper
+              shadow="sm"
+              mt="xl"
+              p="xl"
+              bg={colorScheme === 'dark' ? 'dark.7' : 'red.0'}
+              style={{
+                border: `1px solid ${
+                  colorScheme === 'dark' ? theme.colors.red[7] : theme.colors.red[5]
+                }`,
+              }}
+            >
+              <Title order={3} c="red">
+                Danger Zone
+              </Title>
+              <Group justify="space-between" wrap="nowrap" gap="xl" mt="md">
+                <div>
+                  <Text>Disable GitKarma</Text>
+                  <Text size="xs" c="dimmed">
+                    Temporarily pause GitKarma scoring for this repository. This will not uninstall
+                    GitKarma.
+                  </Text>
+                  <Text size="xs" c="dimmed">
+                    All actions will be paused including balance checks and re-triggering gitkarma
+                    checks
+                  </Text>
+                </div>
+                <Switch
+                  onLabel="ON"
+                  offLabel="OFF"
+                  size="lg"
+                  color="red"
+                  {...form.getInputProps('disable_gitkarma', { type: 'checkbox' })}
+                />
+              </Group>
+            </Paper>
 
             {/* ACTION BUTTONS */}
             <Group justify="flex-end" mt="lg">
