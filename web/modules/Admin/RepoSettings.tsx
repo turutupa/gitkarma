@@ -218,7 +218,7 @@ const RepoSettings = ({ currentRepo, mutateReposAndUsers }: RepoSettingsProps) =
                   {(styles) => (
                     <Stack gap="md" style={styles}>
                       <NumberInput
-                        label="Timely Review Bonus"
+                        label="Timely Pull Request Review Bonus"
                         placeholder="10"
                         leftSection={moneyIcon}
                         description="Bonus debits for timely pull request reviews."
@@ -228,7 +228,7 @@ const RepoSettings = ({ currentRepo, mutateReposAndUsers }: RepoSettingsProps) =
                         label="Timely Review Bonus Hours"
                         placeholder="24"
                         leftSection={moneyIcon}
-                        description="Number of hours after PR creation for the bonus to be granted."
+                        description="Number of hours after PR creation for the timely pull request review bonus to be granted."
                         {...form.getInputProps('timely_review_bonus_hours')}
                       />
                     </Stack>
