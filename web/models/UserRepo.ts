@@ -54,6 +54,9 @@ export type TRepo = {
   // Configuration fields using snake_case
   initial_debits: number; // initial debits assigned when a user is added
   review_bonus: number; // debits awarded to a PR reviwer for submitting a review
+  timely_review_bonus_enabled: boolean; // enable timely review bonus
+  timely_review_bonus: number; // bonus debits for timely review
+  timely_review_bonus_hours: number; // hours for timely review
   approval_bonus: number; // debits awarded to a PR approver upon review approval
   comment_bonus: number; // bonus debits for high-quality PR comments
   complexity_bonus: number; // extra debits for high complexity PR

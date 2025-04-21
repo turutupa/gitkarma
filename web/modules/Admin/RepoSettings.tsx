@@ -30,6 +30,9 @@ type RepoSettingsProps = {
     initial_debits: number;
     approval_bonus: number;
     review_bonus: number;
+    timely_review_bonus_enabled: boolean;
+    timely_review_bonus: number;
+    timely_review_bonus_hours: number;
     comment_bonus: number;
     complexity_bonus: number;
     merge_penalty: number;
@@ -55,6 +58,9 @@ const RepoSettings = ({ currentRepo, mutateReposAndUsers }: RepoSettingsProps) =
       initial_debits: currentRepo.initial_debits,
       approval_bonus: currentRepo.approval_bonus,
       review_bonus: currentRepo.review_bonus,
+      timely_review_bonus_enabled: currentRepo.timely_review_bonus_enabled,
+      timely_review_bonus: currentRepo.timely_review_bonus,
+      timely_review_bonus_hours: currentRepo.timely_review_bonus_hours,
       comment_bonus: currentRepo.comment_bonus,
       complexity_bonus: currentRepo.complexity_bonus,
       merge_penalty: currentRepo.merge_penalty,
@@ -187,6 +193,47 @@ const RepoSettings = ({ currentRepo, mutateReposAndUsers }: RepoSettingsProps) =
                   description="Debits awarded to a PR approver upon PR merge."
                   {...form.getInputProps('approval_bonus')}
                 />
+
+                {/* ENABLE TIMELY REVIEW BONUS + CONDITIONAL RENDERING */}
+                <Group justify="space-between" wrap="nowrap" gap="xl">
+                  <div>
+                    <Text>Enable Timely Review Bonus</Text>
+                    <Text size="xs" c="dimmed">
+                      Enable bonus for timely pull request reviews.
+                    </Text>
+                  </div>
+                  <Switch
+                    onLabel="ON"
+                    offLabel="OFF"
+                    size="lg"
+                    {...form.getInputProps('timely_review_bonus_enabled', { type: 'checkbox' })}
+                  />
+                </Group>
+                <Transition
+                  mounted={form.values.timely_review_bonus_enabled}
+                  transition="scale-y"
+                  duration={200}
+                  timingFunction="linear"
+                >
+                  {(styles) => (
+                    <Stack gap="md" style={styles}>
+                      <NumberInput
+                        label="Timely Review Bonus"
+                        placeholder="10"
+                        leftSection={moneyIcon}
+                        description="Bonus debits for timely pull request reviews."
+                        {...form.getInputProps('timely_review_bonus')}
+                      />
+                      <NumberInput
+                        label="Timely Review Bonus Hours"
+                        placeholder="24"
+                        leftSection={moneyIcon}
+                        description="Number of hours after PR creation for the bonus to be granted."
+                        {...form.getInputProps('timely_review_bonus_hours')}
+                      />
+                    </Stack>
+                  )}
+                </Transition>
 
                 {/* ENABLE COMPLEXITY BONUS + CONDITIONAL RENDERING */}
                 <Group justify="space-between" wrap="nowrap" gap="xl">
