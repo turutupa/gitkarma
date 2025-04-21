@@ -164,14 +164,21 @@ Need help? Contact your repository administrator.`;
 
 const pullRequestReviewSubmitted = (
   username: string,
-  debitsAwarded: number
+  totalDebitsAwarded: number,
+  timelyBonus: number
 ) => {
+  const timelyBonusMessage =
+    timelyBonus > 0
+      ? `This includes a timely review bonus of **${timelyBonus} debits** for submitting your review within the configured time frame.`
+      : `No timely review bonus was awarded as the review was submitted outside the configured time frame.`;
+
   return `## 🎉 Review Submitted - Debits Awarded!
 
 Thank you @${username} for submitting your review!
 
 ### Reward Details:
-- **${debitsAwarded} debits** have been added to your balance
+- **${totalDebitsAwarded} debits** have been added to your balance
+- ${timelyBonusMessage}
 - These debits can be used to fund your future pull requests
 - Quality reviews help maintain code quality while building your balance
 

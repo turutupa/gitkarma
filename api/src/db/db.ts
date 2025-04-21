@@ -54,6 +54,13 @@ class DB {
     return db;
   }
 
+  /**
+   * getAllGithubReposDataForUser
+   * Fetches all the data of all repos associated with a user.
+   *
+   * @param githubUserId
+   * @returns
+   */
   public async getAllGithubReposDataForUser(
     githubUserId: string
   ): Promise<TRepoAndUsers[]> {
@@ -327,6 +334,9 @@ class DB {
       initial_debits?: number;
       approval_bonus?: number;
       review_bonus?: number;
+      timely_review_bonus_enabled?: boolean;
+      timely_review_bonus?: number;
+      timely_review_bonus_hours?: number;
       comment_bonus?: number;
       complexity_bonus?: number;
       merge_penalty?: number;
@@ -351,6 +361,18 @@ class DB {
     if (settings.review_bonus !== undefined) {
       params.push(settings.review_bonus);
       setClauses.push(`review_bonus = $${params.length}`);
+    }
+    if (settings.timely_review_bonus_enabled !== undefined) {
+      params.push(settings.timely_review_bonus_enabled);
+      setClauses.push(`timely_review_bonus_enabled = $${params.length}`);
+    }
+    if (settings.timely_review_bonus !== undefined) {
+      params.push(settings.timely_review_bonus);
+      setClauses.push(`timely_review_bonus = $${params.length}`);
+    }
+    if (settings.timely_review_bonus_hours !== undefined) {
+      params.push(settings.timely_review_bonus_hours);
+      setClauses.push(`timely_review_bonus_hours = $${params.length}`);
     }
     if (settings.comment_bonus !== undefined) {
       params.push(settings.comment_bonus);

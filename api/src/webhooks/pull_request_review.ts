@@ -74,32 +74,54 @@ export const handlePullRequestReview = async ({
     commitId: payload.review.commit_id,
   });
 
-  log.debug(
+  let totalBonus = repo.review_bonus;
+  let timelyReviewBonus = 0;
+
+  const reviewSubmittedAtStr = payload.review.submitted_at;
+  const prCreatedAtStr = payload.pull_request.created_at;
+  if (reviewSubmittedAtStr && prCreatedAtStr) {
+    const prReviewSubmittedAt = new Date(reviewSubmittedAtStr);
+    const prCreatedAt = new Date(prCreatedAtStr);
+    const hourInMs = 60 * 60 * 1000;
+    const timeSincePrCreated =
+      prReviewSubmittedAt.getTime() - prCreatedAt.getTime();
+    if (
+      repo.timely_review_bonus_enabled &&
+      timeSincePrCreated <= repo.timely_review_bonus_hours * hourInMs
+    ) {
+      totalBonus += repo.timely_review_bonus;
+      timelyReviewBonus = repo.timely_review_bonus;
+    }
+  }
+
+  log.info(
     {
       repo,
       pr: prNumber,
       reviewer: { id: reviewerGithubId, name: reviewerGithubName },
       state: reviewState,
+      totalBonus,
     },
     "Persisted pull request review, transferring funds to reviewer"
   );
 
-  // Transfer review bonus to the reviewer
+  // Transfer review bonus (including timely review bonus if applicable) to the reviewer
   await tb.repoTransfersFundsToUser(
     BigInt(repo.tigerbeetle_account_id),
     BigInt(account.id),
-    BigInt(repo.review_bonus),
+    BigInt(totalBonus),
     repo.id
   );
 
-  // Send com ment to the PR
+  // Send comment to the PR
   await octokit.request(EGithubEndpoints.Comments, {
     owner,
     repo: repoName,
     issue_number: prNumber,
     body: comments.pullRequestReviewSubmitted(
       user.github_username,
-      repo.review_bonus
+      totalBonus,
+      timelyReviewBonus
     ),
     headers: githubHeaders,
   });

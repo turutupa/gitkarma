@@ -49,6 +49,15 @@ export class Repo {
   @Column({ default: 50, type: "int" })
   review_bonus: number;
 
+  @Column({ default: 25, type: "int" })
+  timely_review_bonus: number;
+
+  @Column({ default: 24, type: "int" })
+  timely_review_bonus_hours: number;
+
+  @Column({ default: false, type: "boolean" })
+  timely_review_bonus_enabled: boolean;
+
   @Column({ default: 50, type: "int" })
   approval_bonus: number;
 

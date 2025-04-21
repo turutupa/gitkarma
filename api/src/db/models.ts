@@ -42,6 +42,9 @@ export type TRepo = {
   complexity_bonus: number;
   merge_penalty: number;
   review_bonus: number;
+  timely_review_bonus_enabled: boolean;
+  timely_review_bonus: number;
+  timely_review_bonus_hours: number;
   enable_complexity_bonus: boolean;
   enable_review_quality_bonus: boolean;
   trigger_recheck_text: string;
