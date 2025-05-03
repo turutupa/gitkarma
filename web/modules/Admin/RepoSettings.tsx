@@ -147,7 +147,7 @@ const RepoSettings = ({ currentRepo, mutateReposAndUsers }: RepoSettingsProps) =
 
   return (
     <Container size="sm">
-      <Title mb="lg" order={2}>
+      <Title mb={0} order={2}>
         Settings
       </Title>
       <Paper p="md">
@@ -238,17 +238,15 @@ const RepoSettings = ({ currentRepo, mutateReposAndUsers }: RepoSettingsProps) =
 
                 {/* ENABLE COMPLEXITY BONUS + CONDITIONAL RENDERING */}
                 <Group justify="space-between" wrap="nowrap" gap="xl">
-                  <div>
-                    <Text>
-                      Enable Complexity Bonus
-                      <Badge ml="sm" size="xs">
-                        Coming soon
-                      </Badge>
-                    </Text>
+                  <Stack gap={0}>
+                    <Group gap="xs">
+                      <Text>Enable Complexity Bonus</Text>
+                      <Badge size="xs">Coming soon</Badge>
+                    </Group>
                     <Text size="xs" c="dimmed">
                       Enable bonus for complex pull requests.
                     </Text>
-                  </div>
+                  </Stack>
                   <Switch
                     onLabel="ON"
                     offLabel="OFF"
@@ -278,17 +276,15 @@ const RepoSettings = ({ currentRepo, mutateReposAndUsers }: RepoSettingsProps) =
 
                 {/* ENABLE REVIEW BONUS + CONDITIONAL RENDERING */}
                 <Group justify="space-between" wrap="nowrap" gap="xl" mt="md">
-                  <div>
-                    <Text>
-                      Enable Review Bonus
-                      <Badge ml="sm" size="xs">
-                        Coming soon
-                      </Badge>
-                    </Text>
+                  <Stack gap={0}>
+                    <Group gap="xs">
+                      <Text>Enable Review Bonus</Text>
+                      <Badge size="xs">Coming soon</Badge>
+                    </Group>
                     <Text size="xs" c="dimmed">
                       Enable bonus for review quality.
                     </Text>
-                  </div>
+                  </Stack>
                   <Switch
                     onLabel="ON"
                     offLabel="OFF"
