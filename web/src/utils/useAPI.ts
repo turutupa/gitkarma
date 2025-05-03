@@ -1,4 +1,4 @@
-import axios, { AxiosError } from 'axios';
+import axios, { AxiosError, AxiosRequestConfig } from 'axios';
 import useSWR, { KeyedMutator } from 'swr';
 
 // Helper function to create a delay
@@ -16,13 +16,13 @@ type TResponse<T> = {
   mutate: KeyedMutator<any>;
 };
 
-export function useAPI<T>(url: string | null): TResponse<T> {
-  const { data, error, mutate } = useSWR(url, async (url) => {
+export function useAPI<T>(url: string | null, params?: AxiosRequestConfig['params']): TResponse<T> {
+  const { data, error, mutate } = useSWR(url ? [url, params] : null, async ([url, params]) => {
     // Only add delay in development
     if (process.env.NODE_ENV === 'development') {
       await delay(500);
     }
-    const response = await useApiInstance.get(url);
+    const response = await useApiInstance.get(url, { params });
     return response.data;
   });
 

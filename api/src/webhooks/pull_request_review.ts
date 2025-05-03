@@ -4,7 +4,12 @@ import tb from "@/db/tigerbeetle";
 import log from "@/log";
 import type { Octokit } from "@octokit/rest";
 import type { PullRequestReviewEvent } from "@octokit/webhooks-types";
-import { EGithubEndpoints, githubHeaders } from "./constants";
+import {
+  EActivityLogAction,
+  EActivityLogEvent,
+  EGithubEndpoints,
+  githubHeaders,
+} from "./constants";
 import { comments } from "./messages";
 import { getOrDefaultGithubUser, gitkarmaEnabledOrThrow } from "./utils";
 
@@ -28,6 +33,41 @@ export const handlePullRequestReview = async ({
   octokit: Octokit;
   payload: PullRequestReviewEvent;
 }) => {
+  const owner = payload.repository.owner.login; // GitHub repo owner
+  const prNumber = payload.pull_request.number;
+  const repoId = payload.repository.id;
+  const repoName = payload.repository.name;
+  const reviewerGithubId = payload.review.user.id;
+  const reviewerGithubName = payload.review.user.login;
+  const reviewerGithubUrl = payload.review.user.html_url;
+  const reviewState = payload.review.state;
+  const reviewUrl = payload.review.html_url;
+
+  const repo: TRepo = await db.getRepoByGithubRepoId(repoId);
+  gitkarmaEnabledOrThrow(repo);
+
+  // Get reviewer account
+  const { account, user } = await getOrDefaultGithubUser(
+    repo,
+    reviewerGithubId,
+    reviewerGithubName,
+    reviewerGithubUrl
+  );
+
+  const pr = await db.getPullRequest(prNumber, repo.id);
+  if (!pr) {
+    log.error(
+      { pr: prNumber, repoId },
+      "Pull request not found in the database"
+    );
+    return;
+  }
+
+  const state = payload.review.state;
+  if (state === "dismissed") {
+    log.info("Ignoring pull request review, review dismissed");
+  }
+
   // Only process when a review is submitted, not when edited or dismissed
   if (payload.action !== "submitted") {
     log.debug(
@@ -37,37 +77,11 @@ export const handlePullRequestReview = async ({
     return;
   }
 
-  const owner = payload.repository.owner.login; // GitHub repo owner
-  const prNumber = payload.pull_request.number;
-  const repoId = payload.repository.id; // GitHub ID
-  const repoName = payload.repository.name; // GitHub repo name
-  const reviewerGithubId = payload.review.user.id; // GitHub user id
-  const reviewerGithubName = payload.review.user.login; // GitHub username
-  const reviewState = payload.review.state;
-
-  const repo: TRepo = await db.getRepoByGithubRepoId(repoId);
-  gitkarmaEnabledOrThrow(repo);
-
-  // Get reviewer account
-  const { account, user } = await getOrDefaultGithubUser(
-    repo,
-    reviewerGithubId,
-    reviewerGithubName
-  );
-
-  // Persist the PR review in the database
-  const pr = await db.getPullRequest(prNumber, repo.id);
-  if (!pr) {
-    log.error(
-      { pr: prNumber, repoId },
-      "Pull request not found in the database"
-    );
-    return;
-  }
   await db.createPullRequestReview({
     pr_number: prNumber,
     repoId: repo.id,
     reviewerId: user.id,
+    url: reviewUrl,
     state: reviewState,
     reviewId: payload.review.id?.toString(),
     body: payload.review.body || "",
@@ -114,15 +128,30 @@ export const handlePullRequestReview = async ({
   );
 
   // Send comment to the PR
-  await octokit.request(EGithubEndpoints.Comments, {
-    owner,
-    repo: repoName,
-    issue_number: prNumber,
-    body: comments.pullRequestReviewSubmitted(
-      user.github_username,
-      totalBonus,
-      timelyReviewBonus
-    ),
-    headers: githubHeaders,
-  });
+  const submittedReviewComment = await octokit.request(
+    EGithubEndpoints.Comments,
+    {
+      owner,
+      repo: repoName,
+      issue_number: prNumber,
+      body: comments.pullRequestReviewSubmittedMessage(
+        user.github_username,
+        totalBonus,
+        timelyReviewBonus
+      ),
+      headers: githubHeaders,
+    }
+  );
+
+  // activity log - transfer funds to reviewer
+  await db.createActivityLog(
+    repo.id,
+    pr.id,
+    user.id,
+    EActivityLogEvent.Review,
+    reviewState,
+    submittedReviewComment.data.html_url,
+    EActivityLogAction.Received,
+    totalBonus
+  );
 };

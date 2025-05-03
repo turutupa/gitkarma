@@ -44,18 +44,18 @@ export function GitHubComment() {
             Balance Details:
           </Text>
           <ul className={css.ul}>
-            <li>Current balance: 0 debits</li>
-            <li>Required balance: 100 debits</li>
-            <li>Shortfall: 100 debits</li>
+            <li>Current balance: 0 karma points</li>
+            <li>Required balance: 100 karma points</li>
+            <li>Shortfall: 100 karma points</li>
           </ul>
 
           <Text fz="sm" fw={600} mt="sm">
             What to do next:
           </Text>
           <ul className={css.ul}>
-            <li>Earn more debits by reviewing and approving other PRs</li>
+            <li>Earn more karma points by reviewing and approving other PRs</li>
             <li>Add helpful comments to other PRs</li>
-            <li>✨ – after you’ve earned more debits to re-trigger gitkarma check</li>
+            <li>✨ – after you’ve earned more karma points to re-trigger gitkarma check</li>
             <li>🚀 – for bypassing rules and directly passing gitkarma check (admin only)</li>
             <li>💰 – to view your current balance</li>
           </ul>

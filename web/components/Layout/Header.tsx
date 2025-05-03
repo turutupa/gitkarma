@@ -1,9 +1,12 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
+import { useSession } from 'next-auth/react';
 import { FaSun } from 'react-icons/fa';
 import { MdOutlineDarkMode } from 'react-icons/md';
 import {
+  Box,
   Burger,
   Container,
   Drawer,
@@ -17,27 +20,39 @@ import { useDisclosure } from '@mantine/hooks';
 import AuthButton from '../AuthButton';
 import css from './Header.module.css';
 
-// import { MantineLogo } from '@mantinex/mantine-logo';
+type TLink = {
+  link: string;
+  label: string;
+};
 
-const links = [
+const defaultLinks: TLink[] = [
   { link: '/', label: 'About' },
   { link: '/docs', label: 'Docs' },
   { link: '/pricing', label: 'Pricing' },
   { link: '/contact', label: 'Contact' },
-  { link: '/admin', label: 'Admin' },
 ];
+const authLinks: TLink[] = [{ link: '/admin', label: 'Admin' }];
 
 const Header = () => {
   const router = useRouter();
   const [opened, { toggle, close }] = useDisclosure(false);
-  const [active, setActive] = useState(router.asPath || links[0].link);
+  const [active, setActive] = useState(router.asPath || defaultLinks[0].link);
   const { setColorScheme, colorScheme } = useMantineColorScheme();
+
+  const { data: session } = useSession();
 
   useEffect(() => {
     if (active !== router.asPath) {
       setActive(router.asPath);
     }
   }, [router]);
+
+  const links: TLink[] = useMemo(() => {
+    if (session) {
+      return [...defaultLinks, ...authLinks];
+    }
+    return defaultLinks;
+  }, [session]);
 
   const items = links.map((link) => (
     <Link
@@ -74,7 +89,20 @@ const Header = () => {
       <Drawer
         opened={opened}
         onClose={close}
-        title={<Title order={3}>Navigation</Title>}
+        title={
+          <Group flex={1} wrap="nowrap">
+            <Title order={3}>
+              <Image
+                src="/favicon.png"
+                alt="Logo"
+                width={38}
+                height={38}
+                className={css.mobileLogo}
+              />
+              Navigation
+            </Title>
+          </Group>
+        }
         padding="sm"
         size="100%"
         position="bottom"
@@ -87,11 +115,12 @@ const Header = () => {
             <AuthButton />
             <ThemeIcon
               variant="light"
-              radius="lg"
+              radius="xl"
               onClick={() => setColorScheme(colorScheme === 'light' ? 'dark' : 'light')}
               className={css.pointer}
+              size={38}
             >
-              {colorScheme === 'light' ? <MdOutlineDarkMode /> : <FaSun />}
+              {colorScheme === 'light' ? <MdOutlineDarkMode size={18} /> : <FaSun size={18} />}
             </ThemeIcon>
           </Group>
         </Stack>
@@ -99,18 +128,24 @@ const Header = () => {
 
       <Container className={css.inner}>
         <Group gap={8} visibleFrom="xs">
-          <ThemeIcon
-            variant="light"
-            radius="lg"
-            onClick={() => setColorScheme(colorScheme === 'light' ? 'dark' : 'light')}
-            className={css.pointer}
-          >
-            {colorScheme === 'light' ? <MdOutlineDarkMode /> : <FaSun />}
-          </ThemeIcon>
+          <Box mr={6} mt={6}>
+            <Image src="/favicon.png" alt="Logo" width={38} height={38} />
+          </Box>
           {items}
         </Group>
 
-        <AuthButton />
+        <Group gap={16} visibleFrom="xs">
+          <ThemeIcon
+            size={38}
+            variant="light"
+            radius="xl"
+            onClick={() => setColorScheme(colorScheme === 'light' ? 'dark' : 'light')}
+            className={css.pointer}
+          >
+            {colorScheme === 'light' ? <MdOutlineDarkMode size={18} /> : <FaSun size={18} />}
+          </ThemeIcon>
+          <AuthButton />
+        </Group>
 
         <Burger opened={opened} onClick={toggle} hiddenFrom="xs" size="sm" />
       </Container>

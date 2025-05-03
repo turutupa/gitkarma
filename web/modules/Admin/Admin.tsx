@@ -4,7 +4,6 @@ import { useSession } from 'next-auth/react';
 import {
   Alert,
   Center,
-  Container,
   Group,
   SegmentedControl,
   Select,
@@ -15,8 +14,9 @@ import {
 import { useMediaQuery } from '@mantine/hooks';
 import { useRepoContext } from '@/context/RepoContext';
 import { TRepoAndUsers } from '@/models/UserRepo';
-import { useAPI } from '@/utils/useAPI';
-import { useSessionStorage } from '@/utils/useSessionStorage';
+import { useAPI } from '@/src/utils/useAPI';
+import { useSessionStorage } from '@/src/utils/useSessionStorage';
+import Analytics from './Analytics/Analytics';
 import RepoSettings from './RepoSettings';
 import Users from './Users';
 import css from './Admin.module.css';
@@ -98,14 +98,8 @@ export default function Admin() {
           return (
             <RepoSettings currentRepo={currentRepo} mutateReposAndUsers={mutateReposAndUsers} />
           );
-        case 'Stats':
-          return (
-            <Center>
-              <Title mt="xl" order={2}>
-                🏗️ Stats page under construction 🚧
-              </Title>
-            </Center>
-          );
+        case 'Dashboard':
+          return <Analytics repo={currentRepo.repo_name} />;
         default:
           return null;
       }
@@ -167,7 +161,7 @@ export default function Admin() {
   }
 
   return (
-    <Container p={0}>
+    <>
       <Group align="center" justify="space-between" mb="xl">
         <Group>
           {isDesktop && <Title order={2}>Repository</Title>}
@@ -187,13 +181,13 @@ export default function Admin() {
         <SegmentedControl
           radius="sm"
           size="sm"
-          data={['Users', 'Settings', 'Stats']}
+          data={['Users', 'Settings', 'Dashboard']}
           classNames={css}
           value={currentTab}
           onChange={(value) => setCurrentTab(value)}
         />
       </Group>
       {renderTabContent()}
-    </Container>
+    </>
   );
 }

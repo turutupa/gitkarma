@@ -10,7 +10,7 @@ const Layout: React.FC<Props> = ({ children }) => {
   return (
     <Container fluid mih="100vh" pos="relative" p={0} style={{ overflow: 'hidden' }}>
       <Header />
-      <Container mt="100px" pb="150px" size="lg">
+      <Container mt="100px" pb="150px" size="xl">
         {children}
       </Container>
       <Container fluid w="100%" pos="absolute" bottom={0}>

@@ -5,11 +5,15 @@ import pgk from "pg";
 import { EReviewState } from "./entities/Review";
 import { EUserRepoRole } from "./entities/UserRepo";
 import type {
+  TActivityLog,
   TPullRequest,
+  TPullRequestsByRepoId,
   TRepo,
   TRepoAndUsers,
+  TTransfer,
   TUser,
   TUserRepo,
+  TUsersGlobalStats,
 } from "./models";
 const { Pool } = pgk;
 
@@ -110,6 +114,7 @@ class DB {
         id, 
         github_id, 
         github_username, 
+        github_url,
         created_at 
       FROM users u
       WHERE github_id = $1
@@ -119,7 +124,28 @@ class DB {
   }
 
   /**
-   * createUser:
+   * updateUserGithubUrl:
+   *
+   * @param githubId - Internal user ID.
+   * @param githubUrl - The GitHub
+   * @returns A Promise that resolves to the newly created user.
+   */
+  public async updateUserGithubUrl(
+    userId: number,
+    githubUrl: string
+  ): Promise<TUser> {
+    const query = `
+      UPDATE users  
+      SET github_url = $2
+      WHERE id = $1
+      RETURNING *
+    `;
+    const { rows } = await this.pg.query<TUser>(query, [userId, githubUrl]);
+    return rows[0];
+  }
+
+  /**
+   * updateUserGithubUrl:
    * Inserts a new user into the `users` table with the provided GitHub ID and username.
    *
    * @param githubId - The GitHub user ID.
@@ -128,16 +154,18 @@ class DB {
    */
   public async createUser(
     githubId: number,
-    githubUsername: string
+    githubUsername: string,
+    githubUrl?: string
   ): Promise<TUser> {
     const query = `
-      INSERT INTO users (github_id, github_username) 
-      VALUES ($1, $2) 
+      INSERT INTO users (github_id, github_username, github_url) 
+      VALUES ($1, $2, $3) 
       RETURNING *
     `;
     const { rows } = await this.pg.query<TUser>(query, [
       githubId,
       githubUsername,
+      githubUrl,
     ]);
     return rows[0];
   }
@@ -191,6 +219,40 @@ class DB {
     return rows[0];
   }
 
+  /**
+   * getUsersInRepo:
+   * Fetches all users in a specific repository.
+   *
+   * @param repoId - The internal repository ID.
+   * @returns A Promise that resolves to an array of user IDs and TigerBeetle account IDs.
+   */
+  public async getUsersInRepo(repoId: number) {
+    const query = `
+      SELECT 
+        user_id as id, 
+        tigerbeetle_account_id as tbAccountId 
+      FROM 
+        user_repo
+      WHERE repo_id = $1
+    `;
+    const params = [repoId];
+    const { rows } = await this.pg.query(query, params);
+    return rows;
+  }
+
+  /**
+   * createUserRepo:
+   * Creates a new user-repo relationship in the `user_repo` table.
+   *
+   * @param userId - The internal user ID.
+   * @param repoId - The internal repository ID.
+   * @param tigerbeetleAccountId - The TigerBeetle account ID associated with the user.
+   * @param role - The role of the user in the repository (default: COLLABORATOR).
+   * @param prs_opened - The number of pull requests opened by the user (default: 0).
+   * @param prs_approved - The number of pull requests approved by the user (default: 0).
+   * @param comments_count - The number of comments made by the user (default: 0).
+   * @returns A Promise that resolves to the newly created user-repo record.
+   */
   public async createUserRepo(
     userId: number,
     repoId: number,
@@ -255,6 +317,8 @@ class DB {
     return rows[0];
   }
 
+  public async;
+
   /**
    * createRepo:
    * Inserts a new repository into the `repos` table with the provided GitHub repository ID, name, and owner.
@@ -262,6 +326,7 @@ class DB {
    * @param repoId - The GitHub repository ID.
    * @param repoName - The repository name.
    * @param repoOwner - The repository owner.
+   * @param installationId - The installation ID.
    * @returns A Promise that resolves to the newly created repository.
    */
   public async createRepo(
@@ -311,7 +376,7 @@ class DB {
   }
 
   /**
-   * getRepoByGitServiceRepoId:
+   * getRepoByGithubRepoId:
    * Fetches a repository from the `repos` table using the provided GitHub/GitLab/etc repository ID.
    *
    * @param githubRepoId - The GitHub repository ID.
@@ -319,7 +384,28 @@ class DB {
    */
   public async getRepoByGithubRepoId(githubRepoId: number): Promise<TRepo> {
     const query = `
-      SELECT * 
+      SELECT 
+        id, 
+        installation_id, 
+        repo_id, 
+        repo_name, 
+        repo_owner,
+        tigerbeetle_account_id,
+        created_at,
+        initial_debits,
+        review_bonus,
+        approval_bonus,
+        comment_bonus,
+        complexity_bonus,
+        merge_penalty,
+        timely_review_bonus,
+        timely_review_bonus_hours,
+        timely_review_bonus_enabled,
+        enable_complexity_bonus,
+        enable_review_quality_bonus,
+        trigger_recheck_text,
+        admin_trigger_recheck_text,
+        disable_gitkarma
       FROM repos 
       WHERE repo_id = $1
     `;
@@ -435,24 +521,43 @@ class DB {
    * @returns A Promise that resolves to the newly created pull request record.
    */
   public async createPullRequest(
-    prNumber: number,
     repoId: number,
     userId: number,
+    prNumber: number,
+    prTitle: string,
+    prUrl: string,
+    prDescription: string,
+    prNumChangedFiles: number,
     headSha: string,
     state: string,
     checkPassed: boolean = false
   ): Promise<TPullRequest> {
     const query = `
       INSERT INTO 
-        pull_requests (pr_number, repo_id, user_id, head_sha, state, check_passed)
+        pull_requests (
+          repo_id, 
+          user_id, 
+          pr_number, 
+          pr_title, 
+          pr_url, 
+          pr_description, 
+          pr_num_changed_files, 
+          head_sha, 
+          state, 
+          check_passed
+        )
       VALUES 
-        ($1, $2, $3, $4, $5, $6)
+        ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
       RETURNING *
     `;
     const { rows } = await this.pg.query<TPullRequest>(query, [
-      prNumber,
       repoId,
       userId,
+      prNumber,
+      prTitle,
+      prUrl,
+      prDescription,
+      prNumChangedFiles,
       headSha,
       state,
       checkPassed,
@@ -545,16 +650,23 @@ class DB {
 
   /**
    * createPullRequestReview:
-   * Inserts a new pull request review record in a single query
-   * Assumes the referenced pull request exists in the database
+   * Inserts a new pull request review record into the `reviews` table.
    *
-   * @param reviewData - Object containing review data
-   * @returns A Promise that resolves to the created review record
+   * @param reviewData - An object containing the review data.
+   * @param reviewData.pr_number - The pull request number.
+   * @param reviewData.repoId - The internal repository ID.
+   * @param reviewData.reviewerId - The internal user ID of the reviewer.
+   * @param reviewData.state - The state of the review (e.g., 'APPROVED', 'CHANGES_REQUESTED').
+   * @param reviewData.reviewId - (Optional) The GitHub review ID.
+   * @param reviewData.body - (Optional) The body of the review.
+   * @param reviewData.commitId - (Optional) The commit ID associated with the review.
+   * @returns A Promise that resolves to the created review record.
    */
   public async createPullRequestReview(reviewData: {
     pr_number: number;
     repoId: number;
     reviewerId: number;
+    url: string;
     state: string;
     reviewId?: string;
     body?: string;
@@ -566,14 +678,15 @@ class DB {
     // Insert the review with a direct subquery to find the pull_request_id
     const reviewQuery = `
       INSERT INTO reviews 
-        (review_id, pull_request_id, reviewer_id, state, body, commit_id)
+        (review_id, pull_request_id, reviewer_id, url, state, body, commit_id)
       VALUES (
         $1, 
         (SELECT id FROM pull_requests WHERE pr_number = $2 AND repo_id = $3), 
         $4, 
         $5, 
         $6, 
-        $7
+        $7,
+        $8
       )
       RETURNING *
     `;
@@ -583,6 +696,7 @@ class DB {
       reviewData.pr_number,
       reviewData.repoId,
       reviewData.reviewerId,
+      reviewData.url,
       reviewState,
       reviewData.body,
       reviewData.commitId,
@@ -593,7 +707,551 @@ class DB {
   }
 
   /**
-   * Maps GitHub review state strings to our EReviewState enum
+   * createPullRequestReviewComment:
+   * Inserts a new review comment into the `review_comments` table.
+   *
+   * @param commentData - An object containing the review comment data.
+   * @param commentData.reviewId - The internal review ID.
+   * @param commentData.commentId - The GitHub comment ID.
+   * @param commentData.url - The URL of the comment.
+   * @param commentData.body - The body of the comment.
+   * @param commentData.path - The file path the comment was made on.
+   * @param commentData.position - The line position in the diff.
+   * @param commentData.line - The line number in the file.
+   * @returns A Promise that resolves to the created review comment record.
+   */
+  public async createPullRequestReviewComment(commentData: {
+    reviewId: number;
+    commentId: string;
+    url: string;
+    body: string;
+    path: string;
+    position: number;
+    line: number;
+  }): Promise<any> {
+    const query = `
+      INSERT INTO review_comments 
+        (review_id, comment_id, url, body, path, position, line)
+      VALUES 
+        ($1, $2, $3, $4, $5, $6, $7)
+      RETURNING *
+    `;
+    const params = [
+      commentData.reviewId,
+      commentData.commentId,
+      commentData.url,
+      commentData.body,
+      commentData.path,
+      commentData.position,
+      commentData.line,
+    ];
+    const { rows } = await this.pg.query(query, params);
+    return rows[0];
+  }
+
+  /**
+   * updatePullRequestReviewComment:
+   * Updates an existing review comment in the `review_comments` table.
+   *
+   * @param commentId - The GitHub comment ID.
+   * @param updates - An object containing the fields to update.
+   * @param updates.body - (Optional) The updated body of the comment.
+   * @param updates.path - (Optional) The updated file path the comment was made on.
+   * @param updates.position - (Optional) The updated line position in the diff.
+   * @param updates.line - (Optional) The updated line number in the file.
+   * @returns A Promise that resolves to the updated review comment record.
+   */
+  public async updatePullRequestReviewComment(
+    commentId: string,
+    updates: {
+      body?: string;
+      path?: string;
+      position?: number;
+      line?: number;
+    }
+  ): Promise<any> {
+    const setClauses: string[] = [];
+    const params: any[] = [];
+
+    if (updates.body !== undefined) {
+      params.push(updates.body);
+      setClauses.push(`body = $${params.length}`);
+    }
+    if (updates.path !== undefined) {
+      params.push(updates.path);
+      setClauses.push(`path = $${params.length}`);
+    }
+    if (updates.position !== undefined) {
+      params.push(updates.position);
+      setClauses.push(`position = $${params.length}`);
+    }
+    if (updates.line !== undefined) {
+      params.push(updates.line);
+      setClauses.push(`line = $${params.length}`);
+    }
+
+    if (setClauses.length === 0) {
+      throw new Error("No fields provided to update");
+    }
+
+    params.push(commentId);
+    const query = `
+      UPDATE review_comments
+      SET ${setClauses.join(", ")}
+      WHERE comment_id = $${params.length}
+      RETURNING *
+    `;
+    const { rows } = await this.pg.query(query, params);
+    return rows[0];
+  }
+
+  /**
+   * deletePullRequestReviewComment:
+   * Deletes a review comment from the `review_comments` table.
+   *
+   * @param commentId - The GitHub comment ID.
+   * @returns A Promise that resolves to a boolean indicating whether the deletion was successful.
+   */
+  public async deletePullRequestReviewComment(
+    commentId: string
+  ): Promise<boolean> {
+    const query = `
+      DELETE FROM review_comments
+      WHERE comment_id = $1
+    `;
+    const { rowCount } = await this.pg.query(query, [commentId]);
+    return rowCount !== null && rowCount > 0;
+  }
+
+  /**
+   * && rowCount alStats:
+   * Inserts a new activity log into the `activity_logs` table.
+   *
+   * @param repoId - The internal repository ID.
+   * @param userId - The internal user ID.
+   * @returns A Promise that resolves to the newly created activity log record.
+   */
+  public async getUsersGlobalStats(
+    repoId: number
+  ): Promise<TUsersGlobalStats[]> {
+    const query = `
+      SELECT
+        u.id AS user_id,
+        u.github_id,
+        u.github_username,
+        u.github_url,
+        (
+          SELECT COUNT(*)
+          FROM pull_requests pr
+          WHERE pr.repo_id = $1 AND pr.user_id = u.id
+        ) AS pull_request_count,
+        (
+          SELECT COUNT(*)
+          FROM reviews r
+          JOIN pull_requests pr ON r.pull_request_id = pr.id
+          WHERE pr.repo_id = $1 AND r.reviewer_id = u.id
+        ) AS review_count
+      FROM user_repo ur
+      JOIN users u ON ur.user_id = u.id
+      WHERE ur.repo_id = $1;
+    `;
+    const { rows } = await this.pg.query(query, [repoId]);
+    return rows;
+  }
+
+  /**
+   * getRepoActivity:
+   * Fetches all pull requests and reviews for a repository with minimal data for UI rendering.
+   *
+   * @param repoId - The internal repository ID.
+   * @returns A Promise that resolves to an array of activity records containing user avatar, username, action, and date.
+   */
+  public async getRepoActivity(repoId: number): Promise<
+    Array<{
+      user_avatar: string;
+      user_name: string;
+      action: string;
+      date: Date;
+    }>
+  > {
+    const query = `
+      SELECT
+        u.github_avatar AS user_avatar,
+        u.github_username AS user_name,
+        (select pr.pr_number from pull_requests pr where al.pull_request_id = pr.id),
+        al.event,
+        al.description,
+        al.description_url,
+        al.created_at 
+      FROM activity_logs al
+      JOIN users u ON al.user_id = u.id
+      WHERE al.repo_id = $1
+      ORDER BY al.created_at DESC
+    `;
+
+    const { rows } = await this.pg.query(query, [repoId]);
+    return rows;
+  }
+
+  /**
+   * createActivityLog:
+   * Inserts a new activity log into the `activity_logs` table.
+   *
+   * @param repoId - The internal repository ID.
+   * @param prId - The internal pull request ID.
+   * @param userId - The internal user ID.
+   * @param description - e.g., (pr) merged/closed/open, re-check triggered, admin override
+   * @param description_url - link to gitkarma comment on the PR
+   * @param action - spent / received funds
+   * @param debits - number of debits spent/received
+   * @returns A Promise that resolves to the newly created activity log record.
+   */
+  public async createActivityLog(
+    repoId: number,
+    prId: number,
+    userId: number,
+    event: string,
+    description: string = "",
+    descriptionUrl: string = "",
+    action: string = "",
+    debits: number = 0
+  ): Promise<TActivityLog> {
+    const query = `
+      INSERT INTO activity_logs 
+        (
+          repo_id, 
+          pull_request_id, 
+          user_id, 
+          event, 
+          description, 
+          description_url, 
+          action, 
+          debits
+        )
+      VALUES 
+        ($1, $2, $3, $4, $5, $6, $7, $8)
+      RETURNING *
+    `;
+    const { rows }: { rows: TActivityLog[] } = await this.pg.query(query, [
+      repoId,
+      prId,
+      userId,
+      event,
+      description,
+      descriptionUrl,
+      action,
+      debits,
+    ]);
+    return rows[0];
+  }
+
+  /**
+   * getActivityLogs:
+   * Fetches activity logs for a specific repository with optional filters.
+   *
+   * @param repoId - The internal repository ID (mandatory).
+   * @param filters - Optional filters for the query.
+   * @param filters.userId - Filter by user ID.
+   * @param filters.entityType - Filter by entity type (e.g., 'pull_request', 'review').
+   * @param filters.startDate - Filter logs created after this date (defaults to 7 days ago).
+   * @param filters.endDate - Filter logs created before this date (defaults to now).
+   * @returns A Promise that resolves to an array of activity logs.
+   */
+  public async getActivityLogs(
+    repoId: number,
+    filters?: {
+      userId?: number | undefined;
+      event?: string | undefined;
+      startDate?: Date | undefined;
+      endDate?: Date | undefined;
+    }
+  ): Promise<TActivityLog[]> {
+    const whereClauses: string[] = ["al.repo_id = $1"];
+    const params: any[] = [repoId];
+
+    const now = new Date();
+    const lastWeek = new Date();
+    lastWeek.setDate(now.getDate() - 7);
+    const startDate = filters?.startDate || lastWeek;
+    const endDate = filters?.endDate || now;
+
+    // Convert dates to ISO strings
+    const startDateISO = startDate.toISOString();
+    const endDateISO = endDate.toISOString();
+
+    // Use BETWEEN for date range
+    params.push(startDateISO);
+    params.push(endDateISO);
+    whereClauses.push(
+      `al.created_at BETWEEN $${params.length - 1} AND $${params.length}`
+    );
+
+    if (filters?.userId !== undefined) {
+      params.push(filters.userId);
+      whereClauses.push(`al.user_id = $${params.length}`);
+    }
+    if (filters?.event !== undefined) {
+      params.push(filters.event);
+      whereClauses.push(`event = $${params.length}`);
+    }
+
+    const query = `
+      SELECT 
+        u.github_id as github_user_id,
+        u.github_username,
+        pr.pr_number,
+        pr.pr_title,
+        pr.pr_url,
+        al.event,
+        al.description,
+        al.description_url,
+        al.action,
+        al.debits,
+        al.created_at
+      FROM activity_logs al
+      JOIN users u ON al.user_id = u.id
+      JOIN pull_requests pr ON al.pull_request_id = pr.id
+      WHERE ${whereClauses.join(" AND ")}
+      ORDER BY al.created_at DESC;
+    `;
+
+    const { rows }: { rows: TActivityLog[] } = await this.pg.query(
+      query,
+      params
+    );
+    return rows;
+  }
+
+  /**
+   * getPullRequestsByRepoId:
+   * Fetches pull requests for a specific repository.
+   *
+   * @param repoId - The internal repository ID.
+   * @param startDate - Optional start date to filter pull requests.
+   * @param endDate - Optional end date to filter pull requests.
+   * @returns A Promise that resolves to an array of pull request records.
+   */
+  public async getPullRequestsByRepoId(
+    repoId: number,
+    startDate?: Date,
+    endDate?: Date
+  ): Promise<TPullRequestsByRepoId[]> {
+    let query = `
+      SELECT 
+        id, 
+        (SELECT github_username FROM users u WHERE u.id = pr.user_id) as github_username, 
+        created_at 
+      FROM 
+        pull_requests pr
+      WHERE 
+        repo_id = $1 
+    `;
+
+    const params: (number | string)[] = [repoId];
+
+    // Add date filtering if provided
+    if (startDate) {
+      params.push(startDate.toISOString());
+      query += ` AND created_at >= $${params.length}`;
+    }
+
+    if (endDate) {
+      params.push(endDate.toISOString());
+      query += ` AND created_at <= $${params.length}`;
+    }
+
+    const { rows } = await this.pg.query(query, params);
+    return rows;
+  }
+
+  /**
+   * getReviewsByRepoId:
+   * Fetches reviews for pull requests in a specific repository.
+   *
+   * @param repoId - The internal repository ID.
+   * @returns A Promise that resolves to an array of review records.
+   */
+  public async getReviewsByRepoId(
+    repoId: number,
+    startDate?: Date,
+    endDate?: Date
+  ): Promise<TPullRequestsByRepoId[]> {
+    let query = `
+      SELECT 
+        id, 
+        (SELECT github_username FROM users u WHERE u.id = r.reviewer_id) as github_username, 
+        created_at 
+      FROM 
+        reviews r
+      WHERE 
+        pull_request_id in (SELECT prs.id FROM pull_requests prs WHERE prs.repo_id = $1) 
+    `;
+
+    const params: (number | string)[] = [repoId];
+
+    // Add date filtering if provided
+    if (startDate) {
+      params.push(startDate.toISOString());
+      query += ` AND created_at >= $${params.length}`;
+    }
+
+    if (endDate) {
+      params.push(endDate.toISOString());
+      query += ` AND created_at <= $${params.length}`;
+    }
+
+    const { rows } = await this.pg.query(query, params);
+    return rows;
+  }
+
+  /**
+   * getCommentsByRepoId:
+   * Fetches review comments for a specific repository.
+   *
+   * @param repoId - The internal repository ID.
+   * @returns A Promise that resolves to an array of comment records.
+   */
+  public async getCommentsByRepoId(
+    repoId: number,
+    startDate?: Date,
+    endDate?: Date
+  ): Promise<TPullRequestsByRepoId[]> {
+    let query = `
+        SELECT 
+          rc.id, 
+          rc.created_at,
+          (SELECT github_username FROM users u WHERE r.reviewer_id = u.id)
+        FROM 
+          review_comments rc
+        JOIN reviews r ON rc.review_id = r.review_id
+        JOIN pull_requests pr ON r.pull_request_id = pr.id
+        WHERE 
+          pr.repo_id = $1 
+    `;
+    const params: (number | string)[] = [repoId];
+    // Add date filtering if provided
+    if (startDate) {
+      params.push(startDate.toISOString());
+      query += ` AND rc.created_at >= $${params.length}`;
+    }
+
+    if (endDate) {
+      params.push(endDate.toISOString());
+      query += ` AND rc.created_at <= $${params.length}`;
+    }
+    const { rows } = await this.pg.query(query, params);
+    return rows;
+  }
+
+  /**
+   * getTransfersByRepoId:
+   * Fetches transfer logs for a specific repository.
+   *
+   * @param repoId - The internal repository ID.
+   * @returns A Promise that resolves to an array of transfer records.
+   */
+  public async getTransfersByRepoId(
+    repoId: number,
+    startDate?: Date,
+    endDate?: Date
+  ): Promise<TTransfer[]> {
+    const whereClauses: string[] = [
+      "al.repo_id = $1",
+      "al.action = 'received'",
+    ];
+    const params: (number | string)[] = [repoId];
+
+    if (startDate) {
+      params.push(startDate.toISOString());
+      whereClauses.push(`al.created_at >= $${params.length}`);
+    }
+
+    if (endDate) {
+      params.push(endDate.toISOString());
+      whereClauses.push(`al.created_at <= $${params.length}`);
+    }
+
+    const query = `
+      SELECT
+        (SELECT github_username FROM users u WHERE u.id = al.user_id) as github_username, 
+        action, 
+        debits, 
+        created_at 
+      FROM
+        activity_logs al
+      WHERE
+        ${whereClauses.join(" AND ")}
+      ORDER BY created_at ASC
+    `;
+
+    const { rows } = await this.pg.query(query, params);
+    return rows;
+  }
+
+  /**
+   * getRepoSummaryStats:
+   * Fetches summary statistics for a specific repository.
+   *
+   * @param repoId - The internal repository ID.
+   * @returns A Promise that resolves to an object containing the summary statistics.
+   */
+  public async getRepoSummaryStats(repoId: number): Promise<{
+    commentsThisMonth: number;
+    commentsLastMonth: number;
+    pullRequestsThisMonth: number;
+    pullRequestsLastMonth: number;
+    reviewsThisMonth: number;
+    reviewsLastMonth: number;
+    debitsThisMonth: number;
+    debitsLastMonth: number;
+  }> {
+    const query = `
+      WITH date_ranges AS (
+        SELECT
+          date_trunc('month', CURRENT_DATE) AS this_month_start,
+          date_trunc('month', CURRENT_DATE) - INTERVAL '1 month' AS last_month_start,
+          date_trunc('month', CURRENT_DATE) - INTERVAL '2 months' AS two_months_ago_start
+      )
+      SELECT
+        -- Pull requests count
+        (SELECT COUNT(*) FROM pull_requests pr
+          WHERE pr.repo_id = $1 AND pr.created_at >= dr.this_month_start) AS pull_requests_this_month,
+        (SELECT COUNT(*) FROM pull_requests pr
+          WHERE pr.repo_id = $1 AND pr.created_at >= dr.last_month_start AND pr.created_at < dr.this_month_start) AS pull_requests_last_month,
+
+        -- Reviews count
+        (SELECT COUNT(*) FROM reviews r
+          JOIN pull_requests pr ON r.pull_request_id = pr.id
+          WHERE pr.repo_id = $1 AND r.created_at >= dr.this_month_start) AS reviews_this_month,
+        (SELECT COUNT(*) FROM reviews r
+          JOIN pull_requests pr ON r.pull_request_id = pr.id
+          WHERE pr.repo_id = $1 AND r.created_at >= dr.last_month_start AND r.created_at < dr.this_month_start) AS reviews_last_month,
+
+        -- Comments count
+        (SELECT COUNT(*) FROM review_comments rc
+          JOIN reviews r ON rc.review_id = r.review_id
+          JOIN pull_requests pr ON r.pull_request_id = pr.id
+          WHERE pr.repo_id = $1 AND rc.created_at >= dr.this_month_start) AS comments_this_month,
+        (SELECT COUNT(*) FROM review_comments rc
+          JOIN reviews r ON rc.review_id = r.review_id
+          JOIN pull_requests pr ON r.pull_request_id = pr.id
+          WHERE pr.repo_id = $1 AND rc.created_at >= dr.last_month_start AND rc.created_at < dr.this_month_start) AS comments_last_month,
+
+        -- Debits count
+        (SELECT COALESCE(SUM(al.debits), 0) FROM activity_logs al
+          WHERE al.repo_id = $1 AND al.action = 'received' AND al.created_at >= dr.this_month_start) AS debits_this_month,
+        (SELECT COALESCE(SUM(al.debits), 0) FROM activity_logs al
+          WHERE al.repo_id = $1 AND al.action = 'received' AND al.created_at >= dr.last_month_start AND al.created_at < dr.this_month_start) AS debits_last_month
+      FROM date_ranges dr;
+    `;
+
+    const { rows } = await this.pg.query(query, [repoId]);
+    return rows[0];
+  }
+
+  /**
+   * Maps GitHub review state strings to our EReviewState enumxport default await DB.connect();
+
    */
   private mapGitHubReviewStateToEnum(state: string): EReviewState {
     const stateMap: Record<string, EReviewState> = {

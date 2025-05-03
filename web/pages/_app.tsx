@@ -1,16 +1,19 @@
-import { MantineProvider } from '@mantine/core';
 import Layout from '@/components/Layout';
 
 import '@mantine/core/styles.css';
+import '@mantine/charts/styles.css';
+import '@mantine/dates/styles.css';
 import '@mantine/notifications/styles.css';
-import './global.css';
 
 import type { AppProps } from 'next/app';
 import Head from 'next/head';
 import { SessionProvider } from 'next-auth/react';
+import { MantineProvider } from '@mantine/core';
 import { Notifications } from '@mantine/notifications';
 import { RepoProvider } from '../context/RepoContext';
 import { theme } from '../theme';
+
+import './global.css';
 
 export default function App({ Component, pageProps: { session, ...pageProps } }: AppProps) {
   return (

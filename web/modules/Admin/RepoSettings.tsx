@@ -7,6 +7,7 @@ import {
   ActionIcon,
   Badge,
   Button,
+  Container,
   Group,
   NumberInput,
   Paper,
@@ -22,7 +23,7 @@ import {
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { showNotification } from '@mantine/notifications';
-import { http } from '@/utils/http';
+import { http } from '@/src/utils/http';
 
 // Update prop type with new fields
 type RepoSettingsProps = {
@@ -145,11 +146,11 @@ const RepoSettings = ({ currentRepo, mutateReposAndUsers }: RepoSettingsProps) =
   };
 
   return (
-    <>
+    <Container size="sm">
       <Title mb="lg" order={2}>
         Settings
       </Title>
-      <Paper shadow="none" p="md">
+      <Paper p="md">
         <form onSubmit={form.onSubmit(handleSubmit)}>
           <Stack gap="md">
             {/* Funds */}
@@ -166,31 +167,31 @@ const RepoSettings = ({ currentRepo, mutateReposAndUsers }: RepoSettingsProps) =
             >
               <Stack gap="lg">
                 <NumberInput
-                  label="Initial Debits"
+                  label="Initial Karma Points"
                   placeholder="400"
                   leftSection={moneyIcon}
-                  description="Initial debits assigned when a user is added to a repository."
+                  description="Initial karma points assigned when a user is added to a repository."
                   {...form.getInputProps('initial_debits')}
                 />
                 <NumberInput
                   label="Pull Request Funding"
                   placeholder="100"
                   leftSection={moneyIcon}
-                  description="Debits deducted from the PR author upon creating PR."
+                  description="Karma points deducted from the PR author upon creating PR."
                   {...form.getInputProps('merge_penalty')}
                 />
                 <NumberInput
                   label="Pull Request Review Bonus"
                   placeholder="50"
                   leftSection={moneyIcon}
-                  description="Debits awarded to a PR reviewer upon reviewing PR."
+                  description="Karma points awarded to a PR reviewer upon reviewing PR."
                   {...form.getInputProps('review_bonus')}
                 />
                 <NumberInput
                   label="Pull Request Merge Bonus"
                   placeholder="50"
                   leftSection={moneyIcon}
-                  description="Debits awarded to a PR approver upon PR merge."
+                  description="Karma points awarded to a PR approver upon PR merge."
                   {...form.getInputProps('approval_bonus')}
                 />
 
@@ -221,7 +222,7 @@ const RepoSettings = ({ currentRepo, mutateReposAndUsers }: RepoSettingsProps) =
                         label="Timely Pull Request Review Bonus"
                         placeholder="10"
                         leftSection={moneyIcon}
-                        description="Bonus debits for timely pull request reviews."
+                        description="Bonus karma points for timely pull request reviews."
                         {...form.getInputProps('timely_review_bonus')}
                       />
                       <NumberInput
@@ -268,7 +269,7 @@ const RepoSettings = ({ currentRepo, mutateReposAndUsers }: RepoSettingsProps) =
                         label="Complexity Bonus"
                         placeholder="20"
                         leftSection={moneyIcon}
-                        description="Bonus debits for complex pull requests."
+                        description="Bonus karma points for complex pull requests."
                         {...form.getInputProps('complexity_bonus')}
                       />
                     </div>
@@ -308,7 +309,7 @@ const RepoSettings = ({ currentRepo, mutateReposAndUsers }: RepoSettingsProps) =
                         label="Review Bonus"
                         placeholder="5"
                         leftSection={moneyIcon}
-                        description="Debits given for high-quality PR comments."
+                        description="Karma points given for high-quality PR comments."
                         {...form.getInputProps('comment_bonus')}
                       />
                     </div>
@@ -487,7 +488,7 @@ const RepoSettings = ({ currentRepo, mutateReposAndUsers }: RepoSettingsProps) =
           </Stack>
         </form>
       </Paper>
-    </>
+    </Container>
   );
 };
 

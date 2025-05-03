@@ -169,8 +169,8 @@ const Docs = () => {
               <List.Item>
                 <Text fw={600}>Step 3: Start Using GitKarma</Text>
                 <Text>
-                  Once installed, you're ready to go! Create pull requests and start earning tokens
-                  through reviews.
+                  Once installed, you're ready to go! Create pull requests and start earning karma
+                  points through reviews.
                 </Text>
               </List.Item>
             </List>
@@ -233,12 +233,12 @@ const Docs = () => {
             <List>
               <List.Item mb="md">
                 <Text>
-                  <b>Send debits</b> to team members to reward exceptional contributions
+                  <b>Send karma points</b> to team members to reward exceptional contributions
                 </Text>
               </List.Item>
               <List.Item mb="md">
                 <Text>
-                  <b>Deduct debits</b> when necessary
+                  <b>Deduct karma points</b> when necessary
                 </Text>
               </List.Item>
               <List.Item mb="md">

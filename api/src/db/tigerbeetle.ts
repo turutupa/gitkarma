@@ -2,11 +2,14 @@ import log from "@/log";
 import crypto from "crypto";
 import dotenv from "dotenv";
 import {
+  AccountFilterFlags,
   AccountFlags,
   CreateAccountError,
   createClient,
   id as uuid,
   type Account,
+  type AccountBalance,
+  type AccountFilter,
   type Client,
   type CreateTransfersError,
   type Transfer,
@@ -82,7 +85,7 @@ class TigerBeetle {
       accountId,
       Number(repoId),
       EAccountType.Repo,
-      AccountFlags.none
+      AccountFlags.none | AccountFlags.history
     );
   }
 
@@ -231,6 +234,36 @@ class TigerBeetle {
     if (transferErrors.length > 0) {
       throw new Error(`Transfer error: ${JSON.stringify(transferErrors)}`);
     }
+  }
+
+  /**
+   * WIP
+   *
+   * Only works for accounts that have the history flag enabled. Currently
+   * none of the users have it.
+   * @param accounts
+   * @returns
+   */
+  public async getTransfersForAccounts(accounts: number[]) {
+    const filter = (accountId: number): AccountFilter => ({
+      account_id: 0n,
+      user_data_128: 0n,
+      user_data_64: 0n,
+      user_data_32: 0,
+      code: 0,
+      timestamp_min: 0n,
+      timestamp_max: 0n,
+      limit: 0,
+      flags: AccountFilterFlags.credits | AccountFilterFlags.debits,
+    });
+    const balances: Promise<AccountBalance[]>[] = [];
+    for (const accountId of accounts) {
+      const balance: Promise<AccountBalance[]> = this.tb.getAccountBalances(
+        filter(accountId)
+      );
+      balances.push(balance);
+    }
+    return await Promise.all(balances);
   }
 
   /**

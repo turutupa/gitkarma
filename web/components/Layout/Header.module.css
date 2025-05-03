@@ -62,3 +62,8 @@
     color: var(--mantine-color-white);
   }
 }
+
+.mobileLogo {
+  margin-right: 16px;
+  margin-bottom: -10px;
+}

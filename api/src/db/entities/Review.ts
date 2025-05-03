@@ -36,6 +36,9 @@ export class Review {
   @JoinColumn({ name: "reviewer_id" })
   reviewer: User;
 
+  @Column({ type: "varchar", nullable: true, length: 255 })
+  url: string;
+
   @Column({
     type: "enum",
     enum: EReviewState,

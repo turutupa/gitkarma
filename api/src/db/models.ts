@@ -5,7 +5,13 @@ export type TUser = {
   id: number;
   github_id: number;
   github_username: string;
+  github_url: string;
   created_at: Date;
+};
+
+export type TUserAccount = {
+  id: number;
+  tbAccountId: number;
 };
 
 export type TUserRepo = {
@@ -66,9 +72,13 @@ export type TRepoAndUsers = {
 
 export type TPullRequest = {
   id: number;
-  pr_number: number;
   repo_id: number;
   user_id: number;
+  pr_number: number;
+  pr_title: string;
+  pr_desription: string;
+  pr_url: string;
+  pr_num_changed_files: number;
   head_sha: string;
   state: string;
   check_passed: boolean;
@@ -107,4 +117,57 @@ export type TUserRepoAccount = {
   user: TUser;
   userRepo: TUserRepo;
   account: Account;
+};
+
+export type TActivityLog = {
+  id: number;
+  repo_id: number;
+  pull_request_id: number;
+  user_id: number;
+  event: string;
+  description: string;
+  descriptionUrl: string;
+  action: string;
+  debits: number;
+  created_at: Date;
+};
+
+export type TUsersGlobalStats = {
+  user_id: number;
+  github_id: number;
+  github_username: string;
+  github_url: string;
+  pull_request_count: number;
+  review_count: number;
+  debits: number;
+};
+
+export type TAnalytics = {
+  data: {
+    date: string;
+    [username: string]: number | string;
+  }[];
+  series: {
+    name: string;
+  }[];
+};
+
+export type TProcessData = {
+  github_username: string;
+  created_at: string;
+  debits?: number;
+  action?: string;
+}[];
+
+export type TPullRequestsByRepoId = {
+  id: number;
+  github_username: string;
+  created_at: string;
+};
+
+export type TTransfer = {
+  github_username: string;
+  created_at: string;
+  debits: number;
+  action: string;
 };

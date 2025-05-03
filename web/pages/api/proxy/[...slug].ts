@@ -26,7 +26,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     res.status(500).json({ error: 'API_BASE_URL is not defined' });
     return;
   }
-  const targetUrl = `${targetBase}/api/${targetPath}`;
+
+  // Append query parameters to the target URL
+  const queryParams = new URLSearchParams(req.query as Record<string, string>).toString();
+  const targetUrl = `${targetBase}/api/${targetPath}${queryParams ? `?${queryParams}` : ''}`;
 
   try {
     const axiosResponse = await axios.request({

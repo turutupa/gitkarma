@@ -25,6 +25,22 @@ export enum EPullRequestState {
   Merged = "merged",
 }
 
+export enum EActivityLogEvent {
+  Repository = "repository",
+  User = "user",
+  PullRequest = "pull_request",
+  CheckTrigger = "check_trigger",
+  AdminOverride = "admin_override",
+  ApprovalBonus = "approval_bonus",
+  Comment = "comment",
+  Review = "review",
+}
+
+export enum EActivityLogAction {
+  Spent = "spent",
+  Received = "received",
+}
+
 export const githubHeaders = {
   "x-github-api-version": "2022-11-28",
 };

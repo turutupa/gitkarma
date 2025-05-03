@@ -67,23 +67,23 @@ export default function GitkarmaCapabilities() {
   const features = [
     {
       icon: <IconCoin size={20} />,
-      title: 'Token Economy',
+      title: 'Karma Economy',
       description:
-        'Incentivize collaboration with our token system. Pay to create PRs, earn by reviewing them.',
+        'Incentivize collaboration with our karma system. Pay to create PRs, earn by reviewing them.',
       color: theme.colors.green[6],
     },
     {
       icon: <IconBrain size={20} />,
       title: 'AI Code Analysis',
       description:
-        'Our AI evaluates PR complexity to assign fair token values based on code changes.',
+        'Our AI evaluates PR complexity to assign fair karma points values based on code changes.',
       color: theme.colors.blue[6],
     },
     {
       icon: <IconRobot size={20} />,
       title: 'Review Quality AI',
       description:
-        'AI assesses review quality and awards bonus tokens for meaningful contributions.',
+        'AI assesses review quality and awards bonus karma points for meaningful contributions.',
       color: theme.colors.violet[6],
     },
     {
@@ -95,7 +95,7 @@ export default function GitkarmaCapabilities() {
     {
       icon: <IconDashboard size={20} />,
       title: 'Team Dashboard',
-      description: 'Visualize team performance, token economy health, and review engagement.',
+      description: 'Visualize team performance, karma economy health, and review engagement.',
       color: theme.colors.indigo[6],
     },
     {

@@ -4,6 +4,8 @@ import log from "@/log";
 import type { Octokit } from "@octokit/rest";
 import type { PullRequestSynchronizeEvent } from "@octokit/webhooks-types";
 import {
+  EActivityLogAction,
+  EActivityLogEvent,
   EGithubEndpoints,
   githubHeaders,
   GITKARMA_CHECK_NAME,
@@ -52,6 +54,7 @@ export const handlePullRequestSynchronize = async ({
   const prNumber = payload.pull_request.number;
   const prOwnerGithubId = payload.pull_request.user.id;
   const prOwnerGithubName = payload.pull_request.user.login;
+  const prOwnerGithubUrl = payload.pull_request.user.html_url;
   const repoId = payload.repository.id;
   const headSha = payload.pull_request.head.sha;
 
@@ -74,7 +77,8 @@ export const handlePullRequestSynchronize = async ({
   const { user, account } = await getOrDefaultGithubUser(
     repo,
     prOwnerGithubId,
-    prOwnerGithubName
+    prOwnerGithubName,
+    prOwnerGithubUrl
   );
 
   log.debug({ user }, "pull_request.reopened > user");
@@ -130,7 +134,7 @@ export const handlePullRequestSynchronize = async ({
       repo.id
     );
     const newBalance = balance - repo.merge_penalty;
-    await octokit.request(EGithubEndpoints.Comments, {
+    const fundedPrComment = await octokit.request(EGithubEndpoints.Comments, {
       owner,
       repo: repoName,
       issue_number: prNumber,
@@ -160,11 +164,24 @@ export const handlePullRequestSynchronize = async ({
         ),
       },
     });
+
+    // activity log - pr funded
+    await db.createActivityLog(
+      repo.id,
+      pr!.id,
+      user.id,
+      EActivityLogEvent.PullRequest,
+      "Funded",
+      fundedPrComment.data.html_url,
+      EActivityLogAction.Spent,
+      repo.merge_penalty
+    );
+
     return;
   }
 
   // send error because not enough debits
-  await octokit.request(EGithubEndpoints.Comments, {
+  const unfundedPrComment = await octokit.request(EGithubEndpoints.Comments, {
     owner,
     repo: repoName,
     issue_number: prNumber,
@@ -194,4 +211,14 @@ export const handlePullRequestSynchronize = async ({
       ),
     },
   });
+
+  // activity log - failed to fund pr
+  await db.createActivityLog(
+    repo.id,
+    pr!.id,
+    user.id,
+    EActivityLogEvent.PullRequest,
+    "Not enough funds",
+    unfundedPrComment.data.html_url
+  );
 };

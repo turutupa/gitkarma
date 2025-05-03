@@ -24,6 +24,7 @@ const Pricing = () => {
       actionText: 'Select plan',
       actionRef: 'https://github.com/apps/gitkarma-dev',
       isAvailable: true,
+      backgroundGradient: 'linear-gradient(135deg, #b8c6db 0%, #f5f7fa 100%)', // More modest, subtle gradient
     }),
     []
   );
@@ -54,6 +55,7 @@ const Pricing = () => {
       ],
       actionText: 'Select plan',
       isAvailable: false,
+      backgroundGradient: 'linear-gradient(135deg, #8E2DE2 0%, #4A00E0 100%)', // Vibrant purple gradient
     }),
     []
   );
@@ -85,6 +87,7 @@ const Pricing = () => {
       actionText: 'Contact sales',
       actionColor: theme.colors.indigo[6],
       isAvailable: false,
+      backgroundGradient: 'linear-gradient(135deg, #000428 0%, #004e92 100%)', // Deep blue corporate gradient
     }),
     [theme.colors.indigo]
   );

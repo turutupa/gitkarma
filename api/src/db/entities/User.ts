@@ -19,6 +19,9 @@ export class User {
   @Column({ length: 255, type: "varchar" })
   github_username: string;
 
+  @Column({ length: 255, type: "varchar", nullable: true })
+  github_url: string;
+
   @Column({ default: false, type: "boolean" })
   is_super: boolean;
 

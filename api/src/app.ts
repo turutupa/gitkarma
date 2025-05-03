@@ -1,17 +1,10 @@
-import { jwtMiddleware } from "@/middleware/jwt";
-import { injectOctokit } from "@/middleware/octokit";
-import { createInjectUserRepoMiddleware as injectUserRepoMiddleware } from "@/middleware/userRepo";
-import { getUserRepos } from "@/routes/getUserRepos";
-import { transferFunds } from "@/routes/transferFunds";
-import { updateRepoSettings } from "@/routes/updateRepoSettings";
-import { updateUserRepoRole } from "@/routes/updateUserRepoRole";
 import { createNodeMiddleware } from "@octokit/webhooks";
 import dotenv from "dotenv";
 import express from "express";
 import "express-async-errors";
 import { startGithubApp } from "./githubApp";
 import log from "./log";
-import { errorHandler } from "./middleware/error";
+import routes from "./routes";
 
 dotenv.config();
 
@@ -38,30 +31,19 @@ const startApp = async () => {
   // @ts-ignore
   app.use(octokitMiddleware);
 
+  // dummy health check endpoint
   app.get("/api/health", (req, res) => {
     console.log(`Health check from ${req.ip} - ${req.get("User-Agent")}`);
-    res.json({ status: "ok", message: "Server is running" });
+    const uptimeInMinutes = Math.floor(process.uptime() / 60);
+    const hours = Math.floor(uptimeInMinutes / 60);
+    const minutes = uptimeInMinutes % 60;
+    const seconds = Math.floor(process.uptime() % 60);
+    const uptime = `${hours}:${minutes}:${seconds}`;
+    res.json({ status: "ok", message: "Server is running", uptime });
   });
 
-  // Create a router for routes
-  const routes = express.Router();
-  // inject middlewares
-  routes.use(express.json());
-  routes.use(jwtMiddleware);
-  routes.use(injectUserRepoMiddleware);
-  routes.use(injectOctokit);
-
-  // set routes
-  routes.get("/api/repos", getUserRepos);
-  routes.put("/api/repos/settings", updateRepoSettings);
-  routes.put("/api/repos/roles", updateUserRepoRole);
-  routes.post("/api/funds", transferFunds);
-
-  // error handling middleware
-  routes.use(errorHandler);
-
   // register routes
-  app.use(routes);
+  app.use(routes("/api"));
 
   // Start the server
   app.listen(port, () => {

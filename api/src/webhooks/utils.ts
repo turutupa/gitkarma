@@ -1,7 +1,8 @@
 import db from "@/db/db";
 import { EUserRepoRole } from "@/db/entities/UserRepo";
-import type { TRepo } from "@/db/models";
+import type { TRepo, TUser, TUserRepo } from "@/db/models";
 import tb from "@/db/tigerbeetle";
+import type { Account } from "tigerbeetle-node";
 import { DEFAULT_REPO_CONFIG } from "./constants";
 
 /**
@@ -51,16 +52,24 @@ export const getOrDefaultGithubUser = async (
   repo: TRepo,
   githubUserId: number,
   githubUsername: string,
+  githubUrl?: string,
   role = EUserRepoRole.COLLABORATOR
 ) => {
   // get user
-  let user = await db.getUserByGithubUserId(githubUserId);
+  let user: TUser = await db.getUserByGithubUserId(githubUserId);
   if (!user) {
-    user = await db.createUser(githubUserId, githubUsername);
+    user = await db.createUser(githubUserId, githubUsername, githubUrl);
+  }
+  // insert github url if missing
+  if (githubUrl && !user.github_url) {
+    await db.updateUserGithubUrl(user.id, githubUrl);
   }
 
   // get user tb account
-  let userTBAccount = await tb.getUserAccount(BigInt(user.id), BigInt(repo.id));
+  let userTBAccount: Account = await tb.getUserAccount(
+    BigInt(user.id),
+    BigInt(repo.id)
+  );
   if (!userTBAccount) {
     const defaultDebits = BigInt(DEFAULT_REPO_CONFIG.defaultDebits);
     userTBAccount = await tb.createUserAccount(
@@ -78,7 +87,7 @@ export const getOrDefaultGithubUser = async (
   }
 
   // get user repo
-  let userRepo = await db.getUserRepo(user.id, repo.id);
+  let userRepo: TUserRepo = await db.getUserRepo(user.id, repo.id);
   if (!userRepo) {
     userRepo = await db.createUserRepo(
       user.id,

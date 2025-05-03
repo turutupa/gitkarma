@@ -27,12 +27,12 @@ export default function Homepage() {
           }
         >
           <List.Item>
-            <b>Token-based incentives</b> – Developers earn tokens for reviewing PRs and spend them
-            to create their own
+            <b>Karma economy</b> – Developers earn karma points for reviewing PRs and spend them to
+            create their own
           </List.Item>
           <List.Item>
             <b>AI-powered code analysis</b> – Automatic evaluation of PR complexity and review
-            quality for fair token distribution
+            quality for fair karma distribution
           </List.Item>
           <List.Item>
             <b>Team metrics dashboard</b> – Track development velocity, code quality trends, and

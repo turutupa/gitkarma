@@ -16,7 +16,7 @@ export default function ProtectedRoute({ children }: { children: React.ReactNode
   if (status === 'unauthenticated') {
     return (
       <Center px="xl">
-        <Stack align="center" gap="md">
+        <Stack align="center" gap="md" mt="xl">
           <Text size="xl" fw={700}>
             You need to sign in to view this page.
           </Text>

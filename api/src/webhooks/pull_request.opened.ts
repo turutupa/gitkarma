@@ -3,6 +3,8 @@ import type { TRepo } from "@/db/models";
 import tb from "@/db/tigerbeetle";
 import log from "@/log";
 import {
+  EActivityLogAction,
+  EActivityLogEvent,
   EGithubEndpoints,
   EPullRequestState,
   githubHeaders,
@@ -48,13 +50,18 @@ export const handlePullRequestOpened = async ({
   octokit: Octokit;
   payload: PullRequestOpenedEvent;
 }) => {
-  const prNumber = payload.number;
   const headSha = payload.pull_request.head.sha;
   const owner = payload.repository.owner.login; // GitHub repo owner
   const repoName = payload.repository.name; // GitHub repo name
   const repoId = payload.repository.id; // GitHub ID
   const githubUserId = payload.pull_request.user.id; // GitHub user id
   const githubUsername = payload.pull_request.user.login; // GitHub user login name
+  const githubUserUrl = payload.pull_request.user.html_url;
+  const prNumber = payload.number;
+  const prTitle = payload.pull_request.title;
+  const prDescription = payload.pull_request.body;
+  const prUrl = payload.pull_request.html_url;
+  const prNumChangedFiles = payload.pull_request.changed_files;
 
   const repo: TRepo = await getOrDefaultGithubRepo(repoId, repoName, owner);
   gitkarmaEnabledOrThrow(repo);
@@ -75,7 +82,8 @@ export const handlePullRequestOpened = async ({
   const { user, account } = await getOrDefaultGithubUser(
     repo,
     githubUserId,
-    githubUsername
+    githubUsername,
+    githubUserUrl
   );
 
   log.info({ user }, "pull_request.opened > user");
@@ -85,10 +93,14 @@ export const handlePullRequestOpened = async ({
   const hasEnoughDebits = balance >= repo.merge_penalty;
 
   // Create pull request entry with user assigned as owner
-  await db.createPullRequest(
-    prNumber,
+  const pr = await db.createPullRequest(
     repo.id,
     user.id,
+    prNumber,
+    prTitle,
+    prUrl,
+    prDescription || "",
+    prNumChangedFiles,
     headSha,
     EPullRequestState.Open,
     hasEnoughDebits // set PR to passed/not passed check
@@ -103,7 +115,7 @@ export const handlePullRequestOpened = async ({
       repo.id
     );
     const newBalance = balance - repo.merge_penalty;
-    await octokit.request(EGithubEndpoints.Comments, {
+    const fundedPrComment = await octokit.request(EGithubEndpoints.Comments, {
       owner,
       repo: repoName,
       issue_number: prNumber,
@@ -133,11 +145,24 @@ export const handlePullRequestOpened = async ({
         ),
       },
     });
+
+    // activity log - pr funded
+    await db.createActivityLog(
+      repo.id,
+      pr!.id,
+      user.id,
+      EActivityLogEvent.PullRequest,
+      "Funded",
+      fundedPrComment.data.html_url,
+      EActivityLogAction.Spent,
+      repo.merge_penalty
+    );
+
     return;
   }
 
   // send error comment because not enough debits
-  await octokit.request(EGithubEndpoints.Comments, {
+  const unfundedPrComment = await octokit.request(EGithubEndpoints.Comments, {
     owner,
     repo: repoName,
     issue_number: prNumber,
@@ -168,4 +193,14 @@ export const handlePullRequestOpened = async ({
       ),
     },
   });
+
+  // activity log - failed to fund pr
+  await db.createActivityLog(
+    repo.id,
+    pr!.id,
+    user.id,
+    EActivityLogEvent.PullRequest,
+    "Not enough funds",
+    unfundedPrComment.data.html_url
+  );
 };

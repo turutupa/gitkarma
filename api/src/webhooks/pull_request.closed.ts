@@ -7,7 +7,14 @@ import type {
   PullRequestClosedEvent,
   PullRequestReview,
 } from "@octokit/webhooks-types";
-import { EPullRequestState } from "./constants";
+import {
+  EActivityLogAction,
+  EActivityLogEvent,
+  EGithubEndpoints,
+  EPullRequestState,
+  githubHeaders,
+} from "./constants";
+import { comments } from "./messages";
 import { getOrDefaultGithubUser, gitkarmaEnabledOrThrow } from "./utils";
 
 /**
@@ -35,11 +42,15 @@ export const handlePullRequestClosed = async ({
   const owner = payload.repository.owner.login; // GitHub repo owner
   const repoName = payload.repository.name; // GitHub repo name
   const repoId = payload.repository.id; // GitHub ID
+  const prOwner = payload.pull_request.user.login; // GitHub user id
   const prOwnerId = payload.pull_request.user.id; // GitHub user id
   const merged = payload.pull_request.merged;
 
   const repo: TRepo = await db.getRepoByGithubRepoId(repoId);
   gitkarmaEnabledOrThrow(repo);
+
+  const user = await db.getUserByGithubUserId(prOwnerId);
+  const userRepo = await db.getUserRepo(user.id, repo.id);
 
   // Fetch first PR to know current state before closing it. To know if it was passing or not.
   const pr = await db.getPullRequest(prNumber, repo.id);
@@ -70,12 +81,28 @@ export const handlePullRequestClosed = async ({
       },
       []
     );
+    const approversNames = approvers.map((a) => a.login);
+
+    // Send pr merged comment
+    const prMergedComment = await octokit.request(EGithubEndpoints.Comments, {
+      owner,
+      repo: repoName,
+      issue_number: prNumber,
+      body: comments.pullRequestMergedMessage(
+        prOwner,
+        prNumber,
+        approversNames,
+        repo.approval_bonus
+      ),
+      headers: githubHeaders,
+    });
 
     for (const approver of approvers) {
-      const { account } = await getOrDefaultGithubUser(
+      const { user: approverUser, account } = await getOrDefaultGithubUser(
         repo,
         approver.id,
-        approver.name!
+        approver.name!,
+        approver.html_url
       );
       log.debug(
         { repo, approver },
@@ -87,11 +114,39 @@ export const handlePullRequestClosed = async ({
         BigInt(repo.approval_bonus),
         repo.id
       );
+
+      // activity log - transfer funds to approvers
+      await db.createActivityLog(
+        repo.id,
+        pr!.id,
+        approverUser.id,
+        EActivityLogEvent.ApprovalBonus,
+        "PR Merge Bonus",
+        prMergedComment.data.html_url,
+        EActivityLogAction.Received,
+        repo.approval_bonus
+      );
     }
+
     return;
   }
 
   // Handle pull request was closed but not merged
+
+  // closed message
+  const prClosedComment = await octokit.request(EGithubEndpoints.Comments, {
+    owner,
+    repo: repoName,
+    issue_number: prNumber,
+    body: comments.pullRequestClosedMessage(
+      prOwner,
+      prNumber,
+      pr?.check_passed && !pr.admin_approved ? repo.merge_penalty : 0,
+      pr?.admin_approved || false
+    ),
+    headers: githubHeaders,
+  });
+
   // Case where pull request was NOT passing gitkarma check -> no refund
   if (!pr?.check_passed) {
     log.info(
@@ -111,8 +166,6 @@ export const handlePullRequestClosed = async ({
   }
 
   // Case where pull request was passing gitkarma check -> refund-user
-  const user = await db.getUserByGithubUserId(prOwnerId);
-  const userRepo = await db.getUserRepo(user.id, repo.id);
   log.info(
     { repo, user: userRepo },
     "Pull Request closed but not merged. Transfering funds back to PR Owner."
@@ -122,5 +175,17 @@ export const handlePullRequestClosed = async ({
     BigInt(userRepo.tigerbeetle_account_id),
     BigInt(repo.merge_penalty),
     repo.id
+  );
+
+  // activity log - refund pr owner
+  await db.createActivityLog(
+    repo.id,
+    pr!.id,
+    user.id,
+    EActivityLogEvent.PullRequest,
+    prState,
+    prClosedComment.data.html_url,
+    EActivityLogAction.Received,
+    repo.merge_penalty
   );
 };

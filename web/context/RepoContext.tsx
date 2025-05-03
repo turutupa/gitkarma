@@ -1,7 +1,7 @@
 import { createContext, ReactNode, useContext, useEffect } from 'react';
-import { useApiInstance } from '@/utils/useAPI';
-import { useSessionStorage } from '@/utils/useSessionStorage';
-import { http } from '../utils/http';
+import { useApiInstance } from '@/src/utils/useAPI';
+import { useSessionStorage } from '@/src/utils/useSessionStorage';
+import { http } from '../src/utils/http';
 
 type RepoContextType = {
   currentRepoGithubId: number | null;

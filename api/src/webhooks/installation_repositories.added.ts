@@ -33,49 +33,77 @@ export const handleInstallationRepositoriesAdded = async ({
     return;
   }
 
+  // may bring back if decided to start logging on repo added
+  // let baseUrl = "https://github.com"; // fallback default
+  // if (payload.installation?.account?.html_url) {
+  //   const url = new URL(payload.installation.account.html_url);
+  //   baseUrl = `${url.protocol}//${url.hostname}`;
+  // }
+
   log.info("GitKarma app installed. Processing installation event...");
   const repositories = payload.repositories_added || [];
   // Create repo && collabs entries
   for (const repository of repositories) {
     log.info(`Processing repository: ${repository.full_name}`);
-    const repoOwner = payload.installation.account.login;
-    const repoOwnerId = payload.installation.account.id;
-    const senderId = payload.sender.id;
+    const ownerIsUser = payload.installation.account.type === "User";
+    const githubRepoOwnerName = payload.installation.account.login;
+    const githubRepoOwnerId = payload.installation.account.id;
+    const githubRepoOwnerUrl = payload.installation.account.html_url;
+    const githubSenderName = payload.sender.login;
+    const githubSenderId = payload.sender.id;
+    const githubSenderUrl = payload.sender.html_url;
     const installationId = payload.installation.id;
+    // const repoUrl = `${baseUrl}/${repository.full_name}`;
+
     const repo = await getOrDefaultGithubRepo(
       repository.id,
       repository.name,
-      repoOwner,
+      githubRepoOwnerName,
       installationId
     );
 
-    // add repo owner as admin
-    await getOrDefaultGithubUser(
-      repo,
-      repoOwnerId,
-      repoOwner,
-      EUserRepoRole.ADMIN
-    );
-
     // add sender as admin if it's not the repo owner
-    if (senderId !== repoOwnerId) {
-      await getOrDefaultGithubUser;
+    if (githubSenderId !== githubRepoOwnerId) {
+      await getOrDefaultGithubUser(
+        repo,
+        githubSenderId,
+        githubSenderName,
+        githubSenderUrl,
+        EUserRepoRole.ADMIN
+      );
+    }
+
+    // add repo owner as admin
+    if (ownerIsUser) {
+      await getOrDefaultGithubUser(
+        repo,
+        githubRepoOwnerId,
+        githubRepoOwnerName,
+        githubRepoOwnerUrl,
+        EUserRepoRole.ADMIN
+      );
     }
 
     // 1. Get direct collaborators
     const { data: collaborators } = await octokit.rest.repos.listCollaborators({
-      owner: repoOwner,
+      owner: githubRepoOwnerName,
       repo: repository.name,
     });
 
     for (const collaborator of collaborators) {
-      const { id, login } = collaborator;
-      await getOrDefaultGithubUser(repo, id, login, EUserRepoRole.COLLABORATOR);
+      const { id, login, html_url } = collaborator;
+      await getOrDefaultGithubUser(
+        repo,
+        id,
+        login,
+        html_url,
+        EUserRepoRole.COLLABORATOR
+      );
     }
 
     // 2. Check if repository is in an organization
     const { data: repoData } = await octokit.rest.repos.get({
-      owner: repoOwner,
+      owner: githubRepoOwnerName,
       repo: repository.name,
     });
 
@@ -85,7 +113,7 @@ export const handleInstallationRepositoriesAdded = async ({
     }
     try {
       const { data: teams } = await octokit.rest.repos.listTeams({
-        owner: repoOwner,
+        owner: githubRepoOwnerName,
         repo: repository.name,
       });
 
@@ -96,11 +124,12 @@ export const handleInstallationRepositoriesAdded = async ({
           team_slug: team.slug,
         });
         for (const member of members) {
-          const { id, login } = member;
+          const { id, login, html_url } = member;
           await getOrDefaultGithubUser(
             repo,
             id,
             login,
+            html_url,
             EUserRepoRole.ORGANIZATION_MEMBER
           );
         }

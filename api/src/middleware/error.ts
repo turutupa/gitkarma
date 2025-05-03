@@ -6,6 +6,7 @@ export const errorHandler = (err, _, res, __) => {
       message: err.message,
       name: err.name,
       statusCode: err.statusCode,
+      ...err,
     },
   };
   log.error(error);

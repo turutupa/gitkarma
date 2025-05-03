@@ -2,12 +2,9 @@ import {
   Column,
   CreateDateColumn,
   Entity,
-  JoinColumn,
-  ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
-import { Review } from "./Review";
 
 @Entity({ name: "review_comments" })
 export class ReviewComment {
@@ -17,9 +14,11 @@ export class ReviewComment {
   @Column({ type: "varchar", length: 255, nullable: true })
   comment_id: string; // GitHub comment ID
 
-  @ManyToOne("Review", "comments", { nullable: false })
-  @JoinColumn({ name: "review_id" })
-  review: Review;
+  @Column({ type: "varchar", length: 255, nullable: true })
+  review_id: string; // GitHub review ID
+
+  @Column({ type: "text", nullable: true })
+  url: string;
 
   @Column({ type: "text", nullable: true })
   body: string;

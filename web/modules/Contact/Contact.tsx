@@ -1,5 +1,6 @@
 import {
   Button,
+  Center,
   Container,
   Group,
   SimpleGrid,
@@ -41,6 +42,7 @@ const Contact = () => {
             placeholder="Your name"
             name="name"
             variant="filled"
+            disabled
             {...form.getInputProps('name')}
           />
           <TextInput
@@ -48,6 +50,7 @@ const Contact = () => {
             placeholder="Your email"
             name="email"
             variant="filled"
+            disabled
             {...form.getInputProps('email')}
           />
         </SimpleGrid>
@@ -58,6 +61,7 @@ const Contact = () => {
           mt="md"
           name="subject"
           variant="filled"
+          disabled
           {...form.getInputProps('subject')}
         />
         <Textarea
@@ -69,13 +73,15 @@ const Contact = () => {
           autosize
           name="message"
           variant="filled"
+          disabled
           {...form.getInputProps('message')}
         />
         <Group justify="center" mt="xl">
-          <Button type="submit" size="md">
+          <Button type="submit" size="md" disabled>
             Send message
           </Button>
         </Group>
+        <Center mt="xl">Temporarily disabled. Sorry for the inconvenience.</Center>
       </form>
     </Container>
   );

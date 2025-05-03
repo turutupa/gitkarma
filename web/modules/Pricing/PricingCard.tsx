@@ -26,6 +26,7 @@ type Props = {
   actionRef?: string;
   hoverText?: string;
   isAvailable?: boolean;
+  backgroundGradient?: string;
 };
 
 const Pricing: React.FC<Props> = ({
@@ -38,7 +39,7 @@ const Pricing: React.FC<Props> = ({
   actionColor,
   actionRef,
   isAvailable = true,
-  hoverText = 'Coming soon!', // Default hover text
+  hoverText = 'Coming soon!',
 }) => {
   const theme = useMantineTheme();
   const { colorScheme } = useMantineColorScheme();
@@ -106,20 +107,20 @@ const Pricing: React.FC<Props> = ({
   }, [isHovered, actionText, hoverText]);
 
   return (
-    <Card withBorder radius="md" p="md" className={css.card}>
+    <Card withBorder radius="md" p="md" className={css.card} shadow="sm">
       <Paper
-        shadow={theme.shadows.xl}
+        shadow="xl"
         p="md"
-        bg={colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[3]}
+        style={{
+          background:
+            // backgroundGradient ||
+            colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[3],
+        }}
       >
         <Group justify="space-between">
-          {typeof title === 'string' ? (
-            <Text fz={36} fw={500}>
-              {title}
-            </Text>
-          ) : (
-            title
-          )}
+          <Text fz={36} fw={500}>
+            {title}
+          </Text>
           {titleBadge && <Badge bg={theme.colors.pink[8]}>{titleBadge}</Badge>}
         </Group>
 
@@ -129,10 +130,10 @@ const Pricing: React.FC<Props> = ({
         <Box mt="lg">{price}</Box>
       </Paper>
 
-      <Text mt="lg" className={css.label} c="dimmed">
+      <Text mt="lg" pl="sm" className={css.label} c="dimmed">
         Features
       </Text>
-      <Stack gap="xs" mt="xs">
+      <Stack gap="xs" mt="xs" pl="sm">
         {features}
       </Stack>
 

@@ -7,6 +7,8 @@ import type { Octokit } from "@octokit/rest";
 import type { IssueCommentEvent } from "@octokit/webhooks-types";
 import {
   BALANCE_CHECK_EMOJI,
+  EActivityLogAction,
+  EActivityLogEvent,
   EGithubEndpoints,
   EPullRequestState,
   githubHeaders,
@@ -45,7 +47,10 @@ export const handleIssueComment = async ({
   const repoName = payload.repository.name; // GitHub repo name
   const prOwnerGithubId = payload.issue.user.id; // GitHub user id
   const prOwnerGithubName = payload.issue.user.login; // GitHub user id
+  const prOwnerGithubUrl = payload.issue.user.html_url; // GitHub user id
   const commentBody: string = payload.comment.body.trim();
+  const commentUrl = payload.comment.html_url;
+  const prUrl = payload.comment.html_url;
 
   log.info("Processing issue comment event");
 
@@ -64,7 +69,8 @@ export const handleIssueComment = async ({
     const { account } = await getOrDefaultGithubUser(
       repo,
       payload.sender.id,
-      payload.sender.login
+      payload.sender.login,
+      payload.sender.html_url
     );
     const balance = tb.getBalance(account);
 
@@ -103,13 +109,12 @@ export const handleIssueComment = async ({
   }
 
   const pr = await db.getPullRequest(prNumber, repo.id);
-
+  // if pr doesn't exist exit
   if (!pr) {
     throw new Error(
       `Could not find pull request record for PR #${prNumber} and repo id ${repoId}`
     );
   }
-
   // if pr is closed do nothing
   if (pr?.state === EPullRequestState.Closed) {
     return;
@@ -132,7 +137,8 @@ export const handleIssueComment = async ({
   const { user, account } = await getOrDefaultGithubUser(
     repo,
     prOwnerGithubId,
-    prOwnerGithubName
+    prOwnerGithubName,
+    prOwnerGithubUrl
   );
   const balance = Number(tb.getBalance(account));
 
@@ -156,8 +162,11 @@ export const handleIssueComment = async ({
   const sender = await getOrDefaultGithubUser(
     repo,
     payload.sender.id,
-    payload.sender.login
+    payload.sender.login,
+    payload.sender.html_url
   );
+
+  // verify if the sender is an admin
   let isAdmin = false;
   if (isTriggeringAdminRecheck) {
     // Option 1: Try checking the repository permissions in the payload (if available)
@@ -183,19 +192,19 @@ export const handleIssueComment = async ({
     }
   }
 
-  // if admin approved check, then pass it
+  // if its admin override, then pass check
   if (isAdmin && isTriggeringAdminRecheck) {
-    const sender = payload.sender.login;
+    const admin = payload.sender.login;
     // hard-code true to checks passing
     await db.updatePullRequest(prNumber, repo.id, {
       checkPassed: true,
       adminApproved: true,
     });
-    await octokit.request(EGithubEndpoints.Comments, {
+    const successComment = await octokit.request(EGithubEndpoints.Comments, {
       owner,
       repo: repoName,
       issue_number: prNumber,
-      body: comments.pullRequestAdminOverrideMessage(sender, prNumber),
+      body: comments.pullRequestAdminOverrideMessage(admin, prNumber),
       headers: githubHeaders,
     });
     await octokit.rest.checks.create({
@@ -210,6 +219,15 @@ export const handleIssueComment = async ({
         summary: checks.adminApproved.summary(),
       },
     });
+    // activity log - admin override
+    await db.createActivityLog(
+      repo.id,
+      pr.id,
+      sender.user.id,
+      EActivityLogEvent.AdminOverride,
+      "pull request funded",
+      successComment.data.html_url
+    );
     return;
   } else if (!isAdmin && isTriggeringAdminRecheck) {
     log.info(
@@ -238,7 +256,7 @@ export const handleIssueComment = async ({
 
     // send comment to github user
     const newBalance = balance - repo.merge_penalty;
-    await octokit.request(EGithubEndpoints.Comments, {
+    const successComment = await octokit.request(EGithubEndpoints.Comments, {
       owner,
       repo: payload.repository.name,
       issue_number: payload.issue.number,
@@ -269,11 +287,23 @@ export const handleIssueComment = async ({
         ),
       },
     });
+
+    // activity log - re-check successfull, pr funded
+    await db.createActivityLog(
+      repo.id,
+      pr.id,
+      user.id,
+      EActivityLogEvent.CheckTrigger,
+      "Re-check success",
+      successComment.data.html_url,
+      EActivityLogAction.Spent,
+      repo.merge_penalty
+    );
     return;
   }
 
   // send error because not enough debits
-  await octokit.request(EGithubEndpoints.Comments, {
+  const failedComment = await octokit.request(EGithubEndpoints.Comments, {
     owner,
     repo: payload.repository.name,
     issue_number: prNumber,
@@ -303,4 +333,14 @@ export const handleIssueComment = async ({
       ),
     },
   });
+
+  // activity log - re-check failed, not enough funds
+  await db.createActivityLog(
+    repo.id,
+    pr.id,
+    user.id,
+    EActivityLogEvent.CheckTrigger,
+    "Not enough funds",
+    failedComment.data.html_url
+  );
 };

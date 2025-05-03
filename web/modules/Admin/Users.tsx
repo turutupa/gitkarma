@@ -10,6 +10,7 @@ import {
   NumberInput,
   Paper,
   Select,
+  Stack,
   Table,
   Text,
   Title,
@@ -19,7 +20,8 @@ import {
 } from '@mantine/core';
 import { showNotification } from '@mantine/notifications';
 import { EUserRepoRole, TUserData } from '@/models/UserRepo';
-import { http } from '@/utils/http';
+import { GITHUB_AVATAR_URL } from '@/src/endpoints';
+import { http } from '@/src/utils/http';
 
 const rolesData = ['Admin', 'Collaborator', 'Organization Member'];
 const rolesMap = {
@@ -32,8 +34,6 @@ const reverseRolesMap: Record<EUserRepoRole, string> = {
   [EUserRepoRole.COLLABORATOR]: 'Collaborator',
   [EUserRepoRole.ORGANIZATION_MEMBER]: 'Organization Member',
 };
-
-const GITHUB_AVATAR_URL = 'https://avatars.githubusercontent.com/u';
 
 type Props = {
   users: TUserData[];
@@ -320,7 +320,7 @@ const Users: React.FC<Props> = ({ users, repoId }) => {
           <Table verticalSpacing="sm">
             <Table.Thead>
               <Table.Tr>
-                <Table.Th>Users</Table.Th>
+                <Table.Th>Github Username</Table.Th>
                 <Table.Th>
                   Gitkarma Role
                   <Tooltip
@@ -330,17 +330,17 @@ const Users: React.FC<Props> = ({ users, repoId }) => {
                     position="bottom-start"
                     transitionProps={{ transition: 'scale-y', duration: 300 }}
                     label={
-                      <>
-                        <Text size="xs">
+                      <Stack gap="xs" p="xs">
+                        <Text size="13px" m={0}>
                           <b>Admin</b>: Full control over repository settings and users
                         </Text>
-                        <Text size="xs">
+                        <Text size="13px" m={0}>
                           <b>Collaborator</b>: Contributes to the repository
                         </Text>
-                        <Text size="xs">
+                        <Text size="13px" m={0}>
                           <b>Organization Member</b>: Hidden from the dashboard
                         </Text>
-                      </>
+                      </Stack>
                     }
                   >
                     <ActionIcon mx={5} variant="subtle" radius="xl" size="xs" color="gray">
