@@ -97,12 +97,12 @@ const ChartTile: React.FC<Props> = ({
       return [];
     }
 
-    // Filter series based on selectedFilters
+    // Map series with consistent colors based on their original index
     return res.series
       .filter((serie: any) => selectedFilters.includes(serie.name))
-      .map((serie: any, i: number) => ({
+      .map((serie: any) => ({
         ...serie,
-        color: getColorFromPalette(i),
+        color: getColorFromPalette(res.series.findIndex((s: any) => s.name === serie.name)),
       }));
   }, [res, selectedFilters]);
 
