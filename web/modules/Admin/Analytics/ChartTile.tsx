@@ -146,6 +146,9 @@ const ChartTile: React.FC<Props> = ({
 
   // Check if filter is active (not all series are selected)
   const isFilterActive = useMemo(() => {
+    if (res?.data.length === 0) {
+      return false;
+    }
     if (!res?.series) {
       return false;
     }
@@ -165,34 +168,36 @@ const ChartTile: React.FC<Props> = ({
       <Box pos="absolute" top={10} right={10}>
         <Group gap="xs">
           {/* filter by key */}
-          <Popover opened={filterOpened} onChange={setFilterOpened} position="bottom-end">
-            <Popover.Target>
-              <FaSlidersH
-                size={22}
-                color={isFilterActive ? colors.dark[4] : 'gray'}
-                style={{
-                  cursor: 'pointer',
-                  backgroundColor: isFilterActive ? colors.primary[4] : 'transparent',
-                  borderRadius: '100%',
-                  padding: '5px',
-                }}
-                onClick={() => setFilterOpened((o) => !o)}
-              />
-            </Popover.Target>
-            <Popover.Dropdown>
-              <Stack gap="xs">
-                {res?.series?.map((serie: any, index: number) => (
-                  <Checkbox
-                    key={index}
-                    label={serie.name}
-                    checked={selectedFilters.includes(serie.name)}
-                    onChange={() => handleFilterToggle(serie.name)}
-                    styles={{ label: { color: getColorFromPalette(index) } }}
-                  />
-                ))}
-              </Stack>
-            </Popover.Dropdown>
-          </Popover>
+          {res?.data?.length > 0 && (
+            <Popover opened={filterOpened} onChange={setFilterOpened} position="bottom-end">
+              <Popover.Target>
+                <FaSlidersH
+                  size={22}
+                  color={isFilterActive ? colors.dark[4] : 'gray'}
+                  style={{
+                    cursor: 'pointer',
+                    backgroundColor: isFilterActive ? colors.primary[4] : 'transparent',
+                    borderRadius: '100%',
+                    padding: '5px',
+                  }}
+                  onClick={() => setFilterOpened((o) => !o)}
+                />
+              </Popover.Target>
+              <Popover.Dropdown>
+                <Stack gap="xs">
+                  {res?.series?.map((serie: any, index: number) => (
+                    <Checkbox
+                      key={index}
+                      label={serie.name}
+                      checked={selectedFilters.includes(serie.name)}
+                      onChange={() => handleFilterToggle(serie.name)}
+                      styles={{ label: { color: getColorFromPalette(index) } }}
+                    />
+                  ))}
+                </Stack>
+              </Popover.Dropdown>
+            </Popover>
+          )}
 
           {/* date picker */}
           <Popover opened={datePickerOpened} onChange={setDatePickerOpened} position="bottom-end">
