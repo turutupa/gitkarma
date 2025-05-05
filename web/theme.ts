@@ -1,4 +1,14 @@
-import { createTheme, MantineColorsTuple } from '@mantine/core';
+import { Container, createTheme, MantineColorsTuple, rem } from '@mantine/core';
+
+const CONTAINER_SIZES: Record<string, number> = {
+  xxs: 470,
+  xs: 570,
+  sm: 770,
+  md: 970,
+  lg: 1170,
+  xl: 1370,
+  xxl: 1570,
+};
 
 const primary: MantineColorsTuple = [
   '#e6ffee',
@@ -16,4 +26,24 @@ const primary: MantineColorsTuple = [
 export const theme = createTheme({
   colors: { primary },
   primaryColor: 'primary',
+  breakpoints: {
+    xs: '36em',
+    sm: '48em',
+    md: '62em',
+    lg: '75em',
+    xl: '200em',
+  },
+  components: {
+    Container: Container.extend({
+      vars: (_, { size, fluid }) => ({
+        root: {
+          '--container-size': fluid
+            ? '100%'
+            : size !== undefined && size in CONTAINER_SIZES
+              ? rem(CONTAINER_SIZES[size])
+              : rem(size),
+        },
+      }),
+    }),
+  },
 });

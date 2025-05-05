@@ -7,6 +7,11 @@ type Props = {
 };
 
 const Layout: React.FC<Props> = ({ children }) => {
+  // use this for different container width for dashboard page
+  // const router = useRouter();
+  // const [adminTab] = useSessionStorage('adminCurrentTab', 'Users');
+  // const isDashboardRoute = router.asPath === '/admin' && adminTab === 'Dashboard';
+
   return (
     <Container fluid mih="100vh" pos="relative" p={0} style={{ overflow: 'hidden' }}>
       <Header />

@@ -1,18 +1,60 @@
 .card {
   background-color: light-dark(var(--mantine-color-white), var(--mantine-color-dark-7));
+  perspective: 1000px; /* sets a 3D space for children */
+  transition: transform 0.3s ease;
 }
 
-.section {
-  border-bottom: 1px solid light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-4));
-  padding-left: var(--mantine-spacing-md);
-  padding-right: var(--mantine-spacing-md);
-  padding-bottom: var(--mantine-spacing-md);
+.card:hover {
+  border-color: light-dark(var(--mantine-color-primary-6), var(--mantine-color-pink-6));
+  box-shadow: 0px 3px 0px 2px light-dark(rgba(27, 196, 84, 0.4), rgba(193, 37, 91, 0.4));
 }
 
-.like {
-  color: var(--mantine-color-red-6);
-  width: 20px;
-  height: 20px;
+.card:hover > .paper {
+  transform: translateY(-10px) scale(1.03) rotateX(5deg);
+  box-shadow: 0 15px 40px light-dark(rgba(0, 0, 0, 0.25), rgba(193, 37, 91, 0.15));
+  background-color: light-dark(var(--mantine-color-gray-4), var(--mantine-color-dark-7));
+}
+
+.card:hover > p {
+  color: light-dark(black, white) !important;
+}
+
+.card:hover > .paper > p {
+  color: light-dark(black, white) !important;
+}
+
+.card:hover > .paper > div > div > :nth-child(1) {
+  color: light-dark(var(--mantine-color-primary-8), var(--mantine-color-pink-6)) !important;
+}
+
+.card:hover > .paper > div > div > :nth-child(2) {
+  color: light-dark(black, white) !important;
+}
+
+.feature {
+  transition: all 0.5s ease;
+}
+
+.card:hover .feature {
+  color: var(--mantine-color-primary-7);
+}
+
+.card:hover .feature svg {
+  transform: scale(1.2);
+  transition: transform 0.5s ease;
+}
+
+.paper {
+  transition:
+    background-color 0.5s ease,
+    transform 0.5s ease,
+    box-shadow 0.5s ease;
+  will-change: transform, box-shadow;
+  background-color: light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-6));
+}
+
+.feature svg {
+  transition: transform 0.3s ease;
 }
 
 .label {
@@ -25,4 +67,51 @@
   flex: 1;
   position: relative;
   overflow: hidden;
+}
+
+/* Radial Out */
+.hvrRadialOut {
+  position: relative;
+  vertical-align: middle;
+  -webkit-transform: perspective(1px) translateZ(0);
+  transform: perspective(1px) translateZ(0);
+  box-shadow: 0 0 1px rgba(0, 0, 0, 0);
+  overflow: hidden;
+  -webkit-transition-property: color;
+  transition-property: color;
+  -webkit-transition-duration: 0.3s;
+  transition-duration: 0.3s;
+}
+
+.hvrRadialOut:before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: light-dark(var(--mantine-color-primary-1), var(--mantine-color-dark-9));
+  border-radius: 100%;
+  -webkit-transform: scale(0);
+  transform: scale(0);
+  -webkit-transition-property: transform;
+  transition-property: transform;
+  -webkit-transition-duration: 0.3s;
+  transition-duration: 0.3s;
+  -webkit-transition-timing-function: ease-out;
+  transition-timing-function: ease-out;
+}
+
+.hvrRadialOut:hover,
+.hvrRadialOut:focus,
+.hvrRadialOut:active {
+  color: light-dark(black, white);
+}
+
+.hvrRadialOut:hover:before,
+.hvrRadialOut:focus:before,
+.hvrRadialOut:active:before {
+  -webkit-transform: scale(2);
+  transform: scale(2);
 }

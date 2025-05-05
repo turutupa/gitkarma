@@ -10,7 +10,6 @@ import {
   Stack,
   Text,
   Transition,
-  useMantineColorScheme,
   useMantineTheme,
 } from '@mantine/core';
 import css from './PricingCard.module.css';
@@ -42,13 +41,12 @@ const Pricing: React.FC<Props> = ({
   hoverText = 'Coming soon!',
 }) => {
   const theme = useMantineTheme();
-  const { colorScheme } = useMantineColorScheme();
   const [isHovered, setIsHovered] = useState(false);
 
   // Use a single consistent emoji for all features
   const features = featuresList.map((feature) => (
     <Group key={feature} gap="xs" align="flex-start" wrap="nowrap">
-      <Text>
+      <Text className={css.feature}>
         <FaCheckCircle />
       </Text>
       <Text size="sm">{feature}</Text>
@@ -58,7 +56,7 @@ const Pricing: React.FC<Props> = ({
   const renderComingSoon = useCallback(() => {
     return (
       <>
-        <Transition mounted={!isHovered} transition="scale-y" duration={300}>
+        <Transition mounted={!isHovered} transition="fade-left" duration={300}>
           {(styles) => (
             <span
               style={{
@@ -78,7 +76,7 @@ const Pricing: React.FC<Props> = ({
           )}
         </Transition>
 
-        <Transition mounted={isHovered} transition="scale-y" duration={300}>
+        <Transition mounted={isHovered} transition="fade" duration={300}>
           {(styles) => (
             <span
               style={{
@@ -107,21 +105,17 @@ const Pricing: React.FC<Props> = ({
   }, [isHovered, actionText, hoverText]);
 
   return (
-    <Card withBorder radius="md" p="md" className={css.card} shadow="sm">
-      <Paper
-        shadow="xl"
-        p="md"
-        style={{
-          background:
-            // backgroundGradient ||
-            colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[3],
-        }}
-      >
+    <Card withBorder radius="md" p="md" className={`${css.card} ${css.hvrRadialOut}`} shadow="sm">
+      <Paper p="md" className={css.paper} shadow="xl">
         <Group justify="space-between">
           <Text fz={36} fw={500}>
             {title}
           </Text>
-          {titleBadge && <Badge bg={theme.colors.pink[8]}>{titleBadge}</Badge>}
+          {titleBadge && (
+            <span>
+              <Badge bg={theme.colors.pink[8]}>{titleBadge}</Badge>
+            </span>
+          )}
         </Group>
 
         <Text fz="sm" c="dimmed" lh="xs">
@@ -130,7 +124,7 @@ const Pricing: React.FC<Props> = ({
         <Box mt="lg">{price}</Box>
       </Paper>
 
-      <Text mt="lg" pl="sm" className={css.label} c="dimmed">
+      <Text mt="xl" pl="sm" className={css.label} c="dimmed">
         Features
       </Text>
       <Stack gap="xs" mt="xs" pl="sm">

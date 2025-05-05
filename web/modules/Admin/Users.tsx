@@ -5,6 +5,7 @@ import { useSession } from 'next-auth/react';
 import {
   ActionIcon,
   Avatar,
+  Container,
   Group,
   Loader,
   NumberInput,
@@ -301,7 +302,7 @@ const Users: React.FC<Props> = ({ users, repoId }) => {
   );
 
   return (
-    <>
+    <Container size="md">
       <Title mb="lg" order={2}>
         Users
       </Title>
@@ -356,7 +357,7 @@ const Users: React.FC<Props> = ({ users, repoId }) => {
           </Table>
         </Table.ScrollContainer>
       </Paper>
-    </>
+    </Container>
   );
 };
 
