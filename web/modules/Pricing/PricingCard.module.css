@@ -1,17 +1,19 @@
 .card {
   background-color: light-dark(var(--mantine-color-white), var(--mantine-color-dark-7));
   perspective: 1000px; /* sets a 3D space for children */
-  transition: transform 0.3s ease;
+  transition: transform 0.3s ease !important;
 }
 
 .card:hover {
+  transform: translateY(-10px) scale(1.03) rotateX(0.01deg) rotateY(0.02deg);
   border-color: light-dark(var(--mantine-color-primary-6), var(--mantine-color-pink-6));
-  box-shadow: 0px 3px 0px 2px light-dark(rgba(27, 196, 84, 0.4), rgba(193, 37, 91, 0.4));
+  box-shadow: 0px 10px 0px 0px light-dark(rgba(27, 196, 84, 0.4), rgba(193, 37, 91, 0.5));
+  perspective: 1000px;
 }
 
 .card:hover > .paper {
-  transform: translateY(-10px) scale(1.03) rotateX(5deg);
-  box-shadow: 0 15px 40px light-dark(rgba(0, 0, 0, 0.25), rgba(193, 37, 91, 0.15));
+  transform: translateY(-8px) scale(1.03) rotateX(5deg);
+  box-shadow: 0 15px 40px light-dark(rgba(0, 0, 0, 0.25), rgba(193, 37, 91, 0.25));
   background-color: light-dark(var(--mantine-color-gray-4), var(--mantine-color-dark-7));
 }
 
@@ -45,6 +47,7 @@
 }
 
 .paper {
+  z-index: 999;
   transition:
     background-color 0.5s ease,
     transform 0.5s ease,

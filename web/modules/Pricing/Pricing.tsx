@@ -118,7 +118,7 @@ const Pricing = () => {
       </Text>
 
       {/* render pricing cards */}
-      <SimpleGrid cols={{ base: 1, sm: 1, md: 3 }} spacing="lg">
+      <SimpleGrid cols={{ base: 1, sm: 1, md: 3 }} spacing={{ base: 'sm', lg: 'xl' }}>
         <PricingCard {...team} />
         <PricingCard {...startup} />
         <PricingCard {...enterprise} />

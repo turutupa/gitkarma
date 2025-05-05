@@ -288,7 +288,10 @@ const RepoActivity: React.FC<Props> = ({ repo, usersGlobalStats }) => {
           bg={colorScheme === 'dark' ? 'dark.7' : 'gray.1'}
           mt="sm"
           mb="md"
-          style={{ height: '100%', display: 'flex', flexDirection: 'column', position: 'relative' }}
+          h="100%"
+          display="flex"
+          pos="relative"
+          style={{ flexDirection: 'column' }}
         >
           <Box pos="absolute" top={10} right={10}>
             {isFullScreen ? (
