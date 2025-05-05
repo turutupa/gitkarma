@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { IconArrowsMaximize, IconArrowsMinimize, IconCalendar } from '@tabler/icons-react';
 import { FaSlidersH } from 'react-icons/fa';
 import { LineChart } from '@mantine/charts';
@@ -25,19 +25,19 @@ import { useAPI } from '@/src/utils/useAPI';
 const mantineColorPalette = [
   'indigo.6',
   'pink.6',
-  'blue.6',
-  'teal.6',
   'green.6',
-  'red.6',
   'yellow.6',
+  'grape.7',
   'violet.6',
   'grape.6',
+  'teal.6',
+  'red.6',
   'cyan.6',
   'lime.6',
+  'blue.6',
   'orange.6',
-  'rose.6',
-  'brown.6',
   'gray.6',
+  'brown.6',
 ];
 
 const getColorFromPalette = (index: number): string => {
@@ -62,9 +62,12 @@ const ChartTile: React.FC<Props> = ({
   const { colorScheme } = useMantineColorScheme();
   const { colors } = useMantineTheme();
 
+  const [counter, setCounter] = useState(0);
   const [apiUrl, setApiUrl] = useState(baseUrl);
+
   // Add flag to track if filters are applied to the API
   const [isFilteredApi, setIsFilteredApi] = useState(false);
+
   // filtering
   const [filterOpened, setFilterOpened] = useState(false);
   const [datePickerOpened, setDatePickerOpened] = useState(false);
@@ -77,6 +80,7 @@ const ChartTile: React.FC<Props> = ({
 
   const { data: res, isLoading, error } = useAPI<TAnalytics>(apiUrl);
 
+  // set loading overlay
   useEffect(() => {
     if (isLoading) {
       openOverlay();
@@ -106,16 +110,24 @@ const ChartTile: React.FC<Props> = ({
       }));
   }, [res, selectedFilters]);
 
-  const handleFilterToggle = (seriesName: string) => {
-    setSelectedFilters((prev) => {
-      if (prev.includes(seriesName)) {
-        return prev.filter((name) => name !== seriesName);
-      }
-      return [...prev, seriesName];
-    });
-  };
+  const handleFilterToggle = useCallback(
+    (seriesName: string) => {
+      setSelectedFilters((prev) => {
+        if (prev.includes(seriesName)) {
+          return prev.filter((name) => name !== seriesName);
+        }
+        return [...prev, seriesName];
+      });
+    },
+    [setSelectedFilters]
+  );
 
-  const handleApplyDateFilter = () => {
+  const handleMaximizeTile = useCallback(() => {
+    onToggleFullWidth();
+    setCounter((prev) => prev + 1);
+  }, [onToggleFullWidth]);
+
+  const handleApplyDateFilter = useCallback(() => {
     // If we have a date range, apply it as a filter
     if (dateRange[0] && dateRange[1]) {
       // Format dates as ISO strings (YYYY-MM-DD)
@@ -136,7 +148,7 @@ const ChartTile: React.FC<Props> = ({
     }
 
     setDatePickerOpened(false);
-  };
+  }, [dateRange, setApiUrl, setIsFilteredApi, setDatePickerOpened]);
 
   // Check if date range is active (both values are set)
   const isDateRangeActive = useMemo(
@@ -162,12 +174,13 @@ const ChartTile: React.FC<Props> = ({
       h={400}
       shadow="sm"
       withBorder
+      key={`${title}-${counter}`}
       bg={colorScheme === 'dark' ? 'dark.7' : 'gray.1'}
     >
-      {/* top right icons */}
+      {/* top right icons - filter, date picker, maximize */}
       <Box pos="absolute" top={10} right={10}>
         <Group gap="xs">
-          {/* filter by key */}
+          {/* slider - filter by key */}
           {res?.data?.length > 0 && (
             <Popover opened={filterOpened} onChange={setFilterOpened} position="bottom-end">
               <Popover.Target>
@@ -199,7 +212,7 @@ const ChartTile: React.FC<Props> = ({
             </Popover>
           )}
 
-          {/* date picker */}
+          {/* calendar - date picker */}
           <Popover opened={datePickerOpened} onChange={setDatePickerOpened} position="bottom-end">
             <Popover.Target>
               <IconCalendar
@@ -255,12 +268,7 @@ const ChartTile: React.FC<Props> = ({
                       size="xs"
                       onClick={handleApplyDateFilter}
                       // Enable Apply button if we have a date range OR if filters are applied
-                      disabled={
-                        !(
-                          (dateRange[0] && dateRange[1]) || // New selection
-                          isFilteredApi // OR we have active filters to clear
-                        )
-                      }
+                      disabled={!((dateRange[0] && dateRange[1]) || isFilteredApi)}
                     >
                       Apply
                     </Button>
@@ -276,14 +284,14 @@ const ChartTile: React.FC<Props> = ({
               size={16}
               color="gray"
               style={{ cursor: 'pointer' }}
-              onClick={onToggleFullWidth}
+              onClick={handleMaximizeTile}
             />
           ) : (
             <IconArrowsMaximize
               color="gray"
               size={16}
               style={{ cursor: 'pointer' }}
-              onClick={onToggleFullWidth}
+              onClick={handleMaximizeTile}
             />
           )}
         </Group>
@@ -300,7 +308,7 @@ const ChartTile: React.FC<Props> = ({
 
       {/* title & description */}
       <Stack gap={2} h="100%">
-        <Title mb={0} order={3}>
+        <Title mb={0} order={3} maw="calc(100% - 100px)">
           {title}
         </Title>
         <Text c="dimmed" size="sm" mb="sm">
@@ -316,19 +324,17 @@ const ChartTile: React.FC<Props> = ({
 
         {/* show graph */}
         {res && (
-          <Box h="100%" w="100%" style={{ height: '100%', width: '100%' }}>
-            <LineChart
-              data={res.data}
-              dataKey="date"
-              series={series}
-              curveType="linear"
-              tickLine="none"
-              withLegend
-              yAxisProps={{ width: 40 }}
-              legendProps={{ verticalAlign: 'bottom' }}
-              style={{ height: '100%' }}
-            />
-          </Box>
+          <LineChart
+            data={res.data}
+            dataKey="date"
+            series={series}
+            curveType="linear"
+            tickLine="none"
+            withLegend
+            yAxisProps={{ width: 40 }}
+            legendProps={{ verticalAlign: 'bottom' }}
+            style={{ height: '100%' }}
+          />
         )}
       </Stack>
     </Paper>

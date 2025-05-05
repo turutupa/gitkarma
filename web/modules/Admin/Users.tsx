@@ -349,7 +349,7 @@ const Users: React.FC<Props> = ({ users, repoId }) => {
                     </ActionIcon>
                   </Tooltip>
                 </Table.Th>
-                <Table.Th ta="center">Balance</Table.Th>
+                <Table.Th ta="center">Karma Points</Table.Th>
                 <Table.Th>Transfer funds</Table.Th>
               </Table.Tr>
             </Table.Thead>

@@ -29,7 +29,7 @@ export default function Admin() {
   // these 2 states are used to trigger transition when switching between repos
   const [isContentVisible, setIsVisible] = useState(true);
   const [prevRepoId, setPrevRepoId] = useState(currentRepoGithubId);
-  const isDesktop = useMediaQuery('(min-width: 768px)');
+  const isDesktop = useMediaQuery(`(min-width: 768px)`);
   const isMobile = useMediaQuery('(max-width: 450px)');
 
   const { data: reposAndUsers, error, isLoading, mutate } = useAPI<TRepoAndUsers[]>(`/repos`);
@@ -164,7 +164,11 @@ export default function Admin() {
     <>
       <Group align="center" justify="space-between" mb="xl">
         <Group>
-          {isDesktop && <Title order={2}>Repository</Title>}
+          {isDesktop && (
+            <Title order={2} mb="6px">
+              Repository
+            </Title>
+          )}
           <Select
             w={isMobile ? '150px' : '200px'}
             data={[...reposAndUsers]
