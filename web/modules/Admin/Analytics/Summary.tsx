@@ -84,7 +84,12 @@ const Summary: React.FC<Props> = ({ repo }) => {
         value: comments_this_month,
         diff: comments_this_month - comments_last_month,
       },
-      { title: 'Karma Points', icon: 'coin', value: debits_this_month, diff: debits_last_month },
+      {
+        title: 'Karma Points Awarded',
+        icon: 'coin',
+        value: debits_this_month,
+        diff: debits_last_month,
+      },
     ] as const;
   }, [data]);
 

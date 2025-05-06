@@ -10,7 +10,7 @@ export const getDebits = async (req: Request, res: Response): Promise<void> => {
   const startDateParam = startDate ? new Date(startDate as string) : undefined;
   const endDateParam = endDate ? new Date(endDate as string) : undefined;
 
-  const transfers = await db.getTransfersByRepoId(
+  const transfers = await db.getDebitsAwardedByRepoId(
     repo!.id,
     startDateParam,
     endDateParam

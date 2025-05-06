@@ -165,6 +165,15 @@ export type TPullRequestsByRepoId = {
   created_at: string;
 };
 
+type TBaseWeekly = {
+  year: number;
+  week_number: number;
+};
+export type TWeeklyPullRequests = { pr_count: number } & TBaseWeekly;
+export type TWeeklyReviews = { review_count: number } & TBaseWeekly;
+export type TWeeklyComments = { comment_count: number } & TBaseWeekly;
+export type TWeeklyDebits = { debit_count: number } & TBaseWeekly;
+
 export type TTransfer = {
   github_username: string;
   created_at: string;

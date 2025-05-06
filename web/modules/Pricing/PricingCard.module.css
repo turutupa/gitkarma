@@ -17,6 +17,7 @@
     0 15px 40px light-dark(rgba(0, 0, 0, 0.25), rgba(193, 37, 91, 0.25)),
     inset 0 -50px 100px -100px rgba(255, 255, 255, 0.2);
   background-color: light-dark(var(--mantine-color-gray-4), var(--mantine-color-dark-7));
+  /* border: 1px solid light-dark(var(--mantine-color-primary-8), var(--mantine-color-pink-6)) !important; */
 }
 
 .card:hover > p {

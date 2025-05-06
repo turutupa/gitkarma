@@ -14,6 +14,9 @@ import type {
   TUser,
   TUserRepo,
   TUsersGlobalStats,
+  TWeeklyComments,
+  TWeeklyPullRequests,
+  TWeeklyReviews,
 } from "./models";
 const { Pool } = pgk;
 
@@ -1064,6 +1067,43 @@ class DB {
     return rows;
   }
 
+  public async getWeeklyPullRequestsByRepoId(
+    repoId: number,
+    startDate?: Date,
+    endDate?: Date
+  ): Promise<TWeeklyPullRequests[]> {
+    let query = `
+    SELECT 
+      EXTRACT('isoyear' FROM created_at) AS year,
+      EXTRACT('week' FROM created_at) AS week_number,
+      COUNT(*) AS pr_count
+    FROM 
+      pull_requests
+    WHERE 
+      repo_id = $1
+  `;
+
+    const params: (number | string)[] = [repoId];
+
+    if (startDate) {
+      params.push(startDate.toISOString());
+      query += ` AND created_at >= $${params.length}`;
+    }
+
+    if (endDate) {
+      params.push(endDate.toISOString());
+      query += ` AND created_at <= $${params.length}`;
+    }
+
+    query += `
+    GROUP BY year, week_number
+    ORDER BY year ASC, week_number ASC
+  `;
+
+    const { rows } = await this.pg.query(query, params);
+    return rows;
+  }
+
   /**
    * getReviewsByRepoId:
    * Fetches reviews for pull requests in a specific repository.
@@ -1099,6 +1139,43 @@ class DB {
       params.push(endDate.toISOString());
       query += ` AND created_at <= $${params.length}`;
     }
+
+    const { rows } = await this.pg.query(query, params);
+    return rows;
+  }
+
+  public async getWeeklyReviewsByRepoId(
+    repoId: number,
+    startDate?: Date,
+    endDate?: Date
+  ): Promise<TWeeklyReviews[]> {
+    let query = `
+      SELECT 
+        EXTRACT('isoyear' FROM created_at) AS year,
+        EXTRACT('week' FROM created_at) AS week_number,
+        COUNT(*) AS review_count
+      FROM 
+        reviews r
+      WHERE 
+        pull_request_id IN (SELECT prs.id FROM pull_requests prs WHERE prs.repo_id = $1)
+    `;
+
+    const params: (number | string)[] = [repoId];
+
+    if (startDate) {
+      params.push(startDate.toISOString());
+      query += ` AND created_at >= $${params.length}`;
+    }
+
+    if (endDate) {
+      params.push(endDate.toISOString());
+      query += ` AND created_at <= $${params.length}`;
+    }
+
+    query += `
+      GROUP BY year, week_number
+      ORDER BY year ASC, week_number ASC
+    `;
 
     const { rows } = await this.pg.query(query, params);
     return rows;
@@ -1143,14 +1220,53 @@ class DB {
     return rows;
   }
 
+  public async getWeeklyCommentsByRepoId(
+    repoId: number,
+    startDate?: Date,
+    endDate?: Date
+  ): Promise<TWeeklyComments[]> {
+    let query = `
+      SELECT 
+        EXTRACT('isoyear' FROM rc.created_at) AS year,
+        EXTRACT('week' FROM rc.created_at) AS week_number,
+        COUNT(*) AS comment_count
+      FROM 
+        review_comments rc
+      JOIN reviews r ON rc.review_id = r.review_id
+      JOIN pull_requests pr ON r.pull_request_id = pr.id
+      WHERE 
+        pr.repo_id = $1
+    `;
+
+    const params: (number | string)[] = [repoId];
+
+    if (startDate) {
+      params.push(startDate.toISOString());
+      query += ` AND rc.created_at >= $${params.length}`;
+    }
+
+    if (endDate) {
+      params.push(endDate.toISOString());
+      query += ` AND rc.created_at <= $${params.length}`;
+    }
+
+    query += `
+      GROUP BY year, week_number
+      ORDER BY year ASC, week_number ASC
+    `;
+
+    const { rows } = await this.pg.query(query, params);
+    return rows;
+  }
+
   /**
-   * getTransfersByRepoId:
+   * getDebitsAwardedByRepoId:
    * Fetches transfer logs for a specific repository.
    *
    * @param repoId - The internal repository ID.
    * @returns A Promise that resolves to an array of transfer records.
    */
-  public async getTransfersByRepoId(
+  public async getDebitsAwardedByRepoId(
     repoId: number,
     startDate?: Date,
     endDate?: Date
@@ -1182,6 +1298,44 @@ class DB {
       WHERE
         ${whereClauses.join(" AND ")}
       ORDER BY created_at ASC
+    `;
+
+    const { rows } = await this.pg.query(query, params);
+    return rows;
+  }
+
+  public async getWeeklyDebitsAwardedByRepoId(
+    repoId: number,
+    startDate?: Date,
+    endDate?: Date
+  ): Promise<{ year: number; week_number: number; debit_count: number }[]> {
+    const whereClauses: string[] = [
+      "al.repo_id = $1",
+      "al.action = 'received'",
+    ];
+    const params: (number | string)[] = [repoId];
+
+    if (startDate) {
+      params.push(startDate.toISOString());
+      whereClauses.push(`al.created_at >= $${params.length}`);
+    }
+
+    if (endDate) {
+      params.push(endDate.toISOString());
+      whereClauses.push(`al.created_at <= $${params.length}`);
+    }
+
+    const query = `
+      SELECT
+        EXTRACT('isoyear' FROM al.created_at) AS year,
+        EXTRACT('week' FROM al.created_at) AS week_number,
+        COUNT(*) AS debit_count
+      FROM
+        activity_logs al
+      WHERE
+        ${whereClauses.join(" AND ")}
+      GROUP BY year, week_number
+      ORDER BY year ASC, week_number ASC
     `;
 
     const { rows } = await this.pg.query(query, params);

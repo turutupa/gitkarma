@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { IconArrowsMaximize, IconArrowsMinimize, IconCalendar } from '@tabler/icons-react';
 import { FaSlidersH } from 'react-icons/fa';
-import { LineChart } from '@mantine/charts';
+import { BarChart, LineChart } from '@mantine/charts';
 import {
   Box,
   Button,
@@ -47,17 +47,21 @@ const getColorFromPalette = (index: number): string => {
 type Props = {
   url: string;
   title: string;
+  dataKey?: string; // used for bar charts
+  chart: 'line' | 'bar';
   description?: string;
-  onToggleFullWidth: () => void;
   isFullWidth: boolean;
+  onToggleFullWidth: () => void;
 };
 
 const ChartTile: React.FC<Props> = ({
   url: baseUrl,
   title,
   description,
-  onToggleFullWidth,
+  chart,
+  dataKey,
   isFullWidth,
+  onToggleFullWidth,
 }) => {
   const { colorScheme } = useMantineColorScheme();
   const { colors } = useMantineTheme();
@@ -103,8 +107,8 @@ const ChartTile: React.FC<Props> = ({
 
     // Map series with consistent colors based on their original index
     return res.series
-      .filter((serie: any) => selectedFilters.includes(serie.name))
-      .map((serie: any) => ({
+      .filter((serie: { name: string }) => selectedFilters.includes(serie.name))
+      .map((serie: { name: string }) => ({
         ...serie,
         color: getColorFromPalette(res.series.findIndex((s: any) => s.name === serie.name)),
       }));
@@ -323,19 +327,31 @@ const ChartTile: React.FC<Props> = ({
         )}
 
         {/* show graph */}
-        {res && (
-          <LineChart
-            data={res.data}
-            dataKey="date"
-            series={series}
-            curveType="linear"
-            tickLine="none"
-            withLegend
-            yAxisProps={{ width: 40 }}
-            legendProps={{ verticalAlign: 'bottom' }}
-            style={{ height: '100%' }}
-          />
-        )}
+        {res &&
+          (chart === 'line' ? (
+            <LineChart
+              data={res.data}
+              dataKey="date"
+              series={series}
+              curveType="linear"
+              tickLine="none"
+              withLegend
+              yAxisProps={{ width: 40 }}
+              legendProps={{ verticalAlign: 'bottom' }}
+              style={{ height: '100%' }}
+            />
+          ) : (
+            <BarChart
+              data={res.data}
+              series={series}
+              dataKey={dataKey || ''}
+              tickLine="none"
+              yAxisProps={{ width: 40 }}
+              legendProps={{ verticalAlign: 'bottom' }}
+              style={{ height: '100%' }}
+              barProps={{ radius: [4, 4, 0, 0] }}
+            />
+          ))}
       </Stack>
     </Paper>
   );

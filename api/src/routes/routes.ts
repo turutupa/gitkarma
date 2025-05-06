@@ -13,6 +13,7 @@ import { getPullRequests } from "./analytics/getPullRequests";
 import { getRepoActivity } from "./analytics/getRepoActivity";
 import { getReviews } from "./analytics/getReviews";
 import { getSummary } from "./analytics/getSummary";
+import { getAllWeekly } from "./analytics/getWeeklyStats";
 import { getUsersGlobalStats } from "./getUsersGlobalStats";
 
 export const routes = (endpoint: string) => {
@@ -38,6 +39,7 @@ export const routes = (endpoint: string) => {
   routes.get(`${endpoint}/reviews`, getReviews);
   routes.get(`${endpoint}/comments`, getComments);
   routes.get(`${endpoint}/debits`, getDebits);
+  routes.get(`${endpoint}/weekly`, getAllWeekly);
 
   // error handling middleware
   routes.use(errorHandler);
