@@ -23,7 +23,7 @@ export const getRepoActivity = async (
     const repoActivity = await db.getActivityLogs(repo.id, filters);
     res.json(repoActivity);
   } catch (e) {
-    console.log(e);
-    res.status(500).json({ message: e });
+    log.error("Get Repo Activity > Error fetching activity logs", e);
+    res.status(500).json({ message: "Internal Server Error" });
   }
 };

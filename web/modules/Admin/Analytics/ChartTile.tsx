@@ -242,6 +242,7 @@ const ChartTile: React.FC<Props> = ({
                   value={dateRange}
                   onChange={setDateRange}
                   defaultDate={viewDate}
+                  maxDate={new Date()}
                 />
                 <Group justify="space-between">
                   <Button
