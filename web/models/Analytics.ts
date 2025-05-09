@@ -20,6 +20,7 @@ export type TSummary = {
 };
 
 export type TActivityLog = {
+  id: number;
   github_user_id: number;
   github_username: string;
   event: string;

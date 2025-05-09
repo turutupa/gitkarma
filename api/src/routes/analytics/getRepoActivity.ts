@@ -12,12 +12,20 @@ export const getRepoActivity = async (
     res.status(400).json({ error: "Repo not found" });
     return;
   }
-  const { userId, entityType, startDate, endDate } = req.query;
+  const { userId, event, startDate, endDate, limit, offset } = req.query;
   const filters = {
     userId: userId ? Number(userId) : undefined,
-    entityType: entityType ? String(entityType) : undefined,
+    event: event ? String(event) : undefined,
     startDate: startDate ? new Date(String(startDate)) : undefined,
     endDate: endDate ? new Date(String(endDate)) : undefined,
+    limit: limit ? Number(limit) : undefined,
+    offset: offset ? Number(offset) : undefined,
+  } as {
+    userId?: number;
+    event?: string;
+    startDate?: Date;
+    endDate?: Date;
+    limit?: number;
   };
   try {
     const repoActivity = await db.getActivityLogs(repo.id, filters);

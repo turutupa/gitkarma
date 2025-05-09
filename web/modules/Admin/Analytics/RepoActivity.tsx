@@ -1,10 +1,11 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   IconArrowsMaximize,
   IconArrowsMinimize,
   IconChevronDown,
   IconChevronUp,
 } from '@tabler/icons-react';
+import { AxiosError } from 'axios';
 import cx from 'clsx';
 import { FaArrowCircleDown, FaArrowCircleUp, FaCog, FaSearch, FaTimesCircle } from 'react-icons/fa';
 import {
@@ -12,8 +13,10 @@ import {
   Avatar,
   Badge,
   Box,
+  Center,
   Checkbox,
   Group,
+  Loader,
   LoadingOverlay,
   Modal,
   Paper,
@@ -26,10 +29,10 @@ import {
   Title,
   useMantineColorScheme,
 } from '@mantine/core';
-import { useDisclosure } from '@mantine/hooks';
+import { useDisclosure, useScrollIntoView } from '@mantine/hooks';
 import { TActivityLog, TUsersGlobalStats } from '@/models/Analytics';
 import { GITHUB_AVATAR_URL } from '@/src/endpoints';
-import { useAPI } from '@/src/utils/useAPI';
+import { http } from '@/src/utils/http';
 import UserProfile from './UserProfile';
 import css from './RepoActivity.module.css';
 
@@ -41,6 +44,8 @@ const eventColors: Record<string, string> = {
   comment: 'cyan',
   review: 'indigo',
 };
+
+const oneWeekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
 
 type Props = {
   repo: string;
@@ -61,12 +66,96 @@ const RepoActivity: React.FC<Props> = ({ repo, usersGlobalStats }) => {
   const [_, { open: openFilterPopover }] = useDisclosure(false);
   const [isModalOpened, { open: setIsModalOpened, close }] = useDisclosure(false);
 
-  const {
-    data: activityLog,
-    error,
-    isLoading,
-    // @ts-ignore
-  } = useAPI<TActivityLog[]>(`/repoActivity?${repo}`);
+  const { scrollIntoView, targetRef } = useScrollIntoView<HTMLDivElement>({
+    offset: 100,
+    duration: 300,
+  });
+  const scrollAreaRef = useRef<HTMLDivElement>(null);
+
+  const [activityLog, setActivityLog] = useState<TActivityLog[]>([]);
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string>('');
+
+  const isFetchingRef = useRef<boolean>(false);
+  const hasFechedAllLogs = useRef<boolean>(false);
+  const paramsRef = useRef<Record<string, string | number | Date>>({
+    repo,
+    startDate: oneWeekAgo,
+    endDate: new Date(),
+  });
+
+  const fetchRepoActivity = useCallback(() => {
+    http
+      .get(`/repoActivity`, { params: paramsRef.current })
+      .then((res) => {
+        let newLogs: TActivityLog[] = [];
+        setActivityLog((prev) => {
+          const existingIds = new Set(prev.map((log) => log.id));
+          newLogs = res.data.filter((log: TActivityLog) => !existingIds.has(log.id));
+          return [...prev, ...newLogs];
+        });
+        if (newLogs.length === 0) {
+          hasFechedAllLogs.current = true;
+        }
+      })
+      .catch((e: AxiosError) => {
+        setError(e.message);
+      });
+  }, [setActivityLog]);
+
+  useEffect(() => {
+    setIsInitialLoading(true);
+    try {
+      fetchRepoActivity();
+    } finally {
+      setIsInitialLoading(false);
+    }
+  }, []);
+
+  const handleFetchMoreLogItems = useCallback(async () => {
+    if (isFetchingRef.current || isLoading || hasFechedAllLogs.current) {
+      return;
+    }
+    isFetchingRef.current = true;
+    setIsLoading(true);
+
+    // Minimum loading time in milliseconds.
+    // To force loading spinner to not flicker
+    const MIN_LOADING_TIME = 600;
+    const startTime = Date.now();
+
+    try {
+      // new start & end dates
+      const endDate = new Date(paramsRef.current.startDate);
+      endDate.setDate(endDate.getDate());
+      const startDate: Date = new Date(paramsRef.current.startDate);
+      startDate.setDate(startDate.getDate() - 7);
+
+      const newParams = { repo, startDate, endDate };
+      paramsRef.current = newParams;
+      await fetchRepoActivity();
+    } finally {
+      const elapsedTime = Date.now() - startTime;
+      const remainingTime = MIN_LOADING_TIME - elapsedTime;
+      if (remainingTime > 0) {
+        await new Promise((resolve) => setTimeout(resolve, remainingTime));
+      }
+      setIsLoading(false);
+      isFetchingRef.current = false;
+    }
+  }, [activityLog, isLoading, setIsLoading]);
+
+  const onScrollPositionChange = useCallback(({ y }: { x: number; y: number }) => {
+    setScrolled(y !== 0);
+    const viewport = scrollAreaRef.current;
+    if (viewport) {
+      const { scrollTop, scrollHeight, clientHeight } = viewport;
+      if (scrollHeight - clientHeight - scrollTop - 2 < 1) {
+        handleFetchMoreLogItems();
+      }
+    }
+  }, []);
 
   const handleModal = useCallback((githubUserId: number) => {
     setSelectedUserId(githubUserId);
@@ -74,8 +163,17 @@ const RepoActivity: React.FC<Props> = ({ repo, usersGlobalStats }) => {
   }, []);
 
   const toggleFullScreen = useCallback(() => {
-    setIsFullScreen((prev) => !prev);
-  }, []);
+    if (!isFullScreen) {
+      setIsFullScreen(true);
+      scrollIntoView();
+      const logItemsThatFitOnScreen = 12;
+      if (activityLog.length < logItemsThatFitOnScreen) {
+        handleFetchMoreLogItems();
+      }
+      return;
+    }
+    setIsFullScreen(false);
+  }, [activityLog, isFullScreen, scrollIntoView, setIsFullScreen]);
 
   const toggleDateSort = useCallback(() => {
     setDateSort((prev) => {
@@ -146,11 +244,11 @@ const RepoActivity: React.FC<Props> = ({ repo, usersGlobalStats }) => {
     });
   }, [filteredRows, dateSort]);
 
-  if (isLoading) {
+  if (isInitialLoading) {
     return (
       <Box pos="relative" h={300} mt="sm">
         <LoadingOverlay
-          visible={isLoading}
+          visible={isInitialLoading}
           zIndex={1000}
           overlayProps={{ radius: 'sm', blur: 2 }}
         />
@@ -167,7 +265,7 @@ const RepoActivity: React.FC<Props> = ({ repo, usersGlobalStats }) => {
   }
 
   const rows = sortedRows.map((log: TActivityLog) => (
-    <Table.Tr key={log.github_user_id + log.created_at}>
+    <Table.Tr key={log.github_user_id + log.created_at + log.description}>
       {/* user */}
       <Table.Td className={css.username} onClick={() => handleModal(log.github_user_id)}>
         <Group gap="sm" wrap="nowrap">
@@ -183,11 +281,11 @@ const RepoActivity: React.FC<Props> = ({ repo, usersGlobalStats }) => {
         <Anchor
           c={colorScheme === 'light' ? 'primary.9' : 'primary.6'}
           size="sm"
-          href={log.pr_url}
+          href={log?.pr_url}
           target="_blank"
         >
           <Text fz="sm" fw={500} truncate="end">
-            #{log.pr_number} {log.pr_title}
+            #{log?.pr_number} {log?.pr_title}
           </Text>
         </Anchor>
       </Table.Td>
@@ -195,10 +293,10 @@ const RepoActivity: React.FC<Props> = ({ repo, usersGlobalStats }) => {
       {/* event */}
       <Table.Td ta="center">
         <Badge
-          color={eventColors[log.event]}
+          color={eventColors[log?.event]}
           variant={colorScheme === 'light' ? 'filled' : 'light'}
         >
-          {log.event.replace(/_/g, ' ')}
+          {log?.event?.replace(/_/g, ' ')}
         </Badge>
       </Table.Td>
 
@@ -207,42 +305,44 @@ const RepoActivity: React.FC<Props> = ({ repo, usersGlobalStats }) => {
           underline="not-hover"
           c={colorScheme === 'light' ? 'dark.4' : 'gray.5'}
           size="sm"
-          href={log.description_url}
+          href={log?.description_url}
           target="_blank"
         >
-          {log.description.replace(/^\w/, (c) => c.toUpperCase())}
+          {log?.description?.replace(/^\w/, (c) => c.toUpperCase())}
         </Anchor>
       </Table.Td>
 
       {/* action - spent / received */}
       <Table.Td ta="center" fw={600}>
-        {log.action === 'spent' ? (
+        {log?.action === 'spent' ? (
           <FaArrowCircleDown color="red" />
-        ) : log.action === 'received' ? (
+        ) : log?.action === 'received' ? (
           <FaArrowCircleUp color="green" />
         ) : (
           <FaTimesCircle />
         )}
       </Table.Td>
 
-      <Table.Td ta="center">{log.action ? log.debits : <Text c="dimmed">-</Text>}</Table.Td>
+      <Table.Td ta="center">{log.action ? log?.debits : <Text c="dimmed">-</Text>}</Table.Td>
 
       {/* date */}
       <Table.Td>
         <Group gap="xs" flex={1} justify="center">
           <Text fz="sm" fw={600}>
-            {new Intl.DateTimeFormat('en-US', {
-              hour: '2-digit',
-              minute: '2-digit',
-              hour12: false,
-            }).format(new Date(log.created_at))}
+            {log.created_at &&
+              new Intl.DateTimeFormat('en-US', {
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: false,
+              }).format(new Date(log.created_at))}
           </Text>
           <Text fz="sm" c="dimmed">
-            {new Intl.DateTimeFormat('en-US', {
-              month: 'short',
-              day: 'numeric',
-              year: 'numeric',
-            }).format(new Date(log.created_at))}
+            {log.created_at &&
+              new Intl.DateTimeFormat('en-US', {
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric',
+              }).format(new Date(log.created_at))}
           </Text>
         </Group>
       </Table.Td>
@@ -282,6 +382,7 @@ const RepoActivity: React.FC<Props> = ({ repo, usersGlobalStats }) => {
         }}
       >
         <Paper
+          ref={targetRef}
           withBorder
           p="xl"
           shadow="sm"
@@ -327,7 +428,13 @@ const RepoActivity: React.FC<Props> = ({ repo, usersGlobalStats }) => {
           />
 
           {/* table */}
-          <ScrollArea style={{ flex: 1 }} onScrollPositionChange={({ y }) => setScrolled(y !== 0)}>
+          <ScrollArea
+            viewportRef={scrollAreaRef}
+            style={{ flex: 1 }}
+            onBottomReached={handleFetchMoreLogItems}
+            offsetScrollbars="y"
+            onScrollPositionChange={onScrollPositionChange}
+          >
             <Table
               layout="fixed"
               stickyHeader
@@ -461,7 +568,7 @@ const RepoActivity: React.FC<Props> = ({ repo, usersGlobalStats }) => {
                                 color={eventColors[event]}
                                 variant={colorScheme === 'light' ? 'filled' : 'light'}
                               >
-                                {event.replace(/_/g, ' ')}
+                                {event?.replace(/_/g, ' ')}
                               </Badge>
                             </Group>
                           ))}
@@ -493,10 +600,14 @@ const RepoActivity: React.FC<Props> = ({ repo, usersGlobalStats }) => {
               <Table.Tbody>{rows}</Table.Tbody>
             </Table>
           </ScrollArea>
+          {isLoading && (
+            <Center mt="sm">
+              <Loader size="sm" />
+            </Center>
+          )}
         </Paper>
       </Box>
     </>
   );
 };
-
 export default RepoActivity;

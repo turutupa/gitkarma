@@ -955,18 +955,21 @@ class DB {
    * @param repoId - The internal repository ID (mandatory).
    * @param filters - Optional filters for the query.
    * @param filters.userId - Filter by user ID.
-   * @param filters.entityType - Filter by entity type (e.g., 'pull_request', 'review').
+   * @param filters.event - Filter by entity type (e.g., 'pull_request', 'review').
    * @param filters.startDate - Filter logs created after this date (defaults to 7 days ago).
    * @param filters.endDate - Filter logs created before this date (defaults to now).
+   * @param filters.limit - Limit the number of results.
+   * @param filters.offset - Offset for pagination.
    * @returns A Promise that resolves to an array of activity logs.
    */
   public async getActivityLogs(
     repoId: number,
     filters?: {
-      userId?: number | undefined;
-      event?: string | undefined;
-      startDate?: Date | undefined;
-      endDate?: Date | undefined;
+      userId?: number;
+      event?: string;
+      startDate?: Date;
+      endDate?: Date;
+      limit?: number;
     }
   ): Promise<TActivityLog[]> {
     const whereClauses: string[] = ["al.repo_id = $1"];
@@ -998,8 +1001,12 @@ class DB {
       whereClauses.push(`event = $${params.length}`);
     }
 
+    const limitClause = filters?.limit ? `LIMIT $${params.length + 1}` : "";
+    if (filters?.limit) params.push(filters.limit);
+
     const query = `
       SELECT 
+        al.id,
         u.github_id as github_user_id,
         u.github_username,
         pr.pr_number,
@@ -1015,7 +1022,8 @@ class DB {
       JOIN users u ON al.user_id = u.id
       JOIN pull_requests pr ON al.pull_request_id = pr.id
       WHERE ${whereClauses.join(" AND ")}
-      ORDER BY al.created_at DESC;
+      ORDER BY al.created_at DESC
+      ${limitClause};
     `;
 
     const { rows }: { rows: TActivityLog[] } = await this.pg.query(

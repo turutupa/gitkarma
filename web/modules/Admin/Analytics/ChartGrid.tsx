@@ -44,7 +44,7 @@ const chartConfigs: ChartConfig[] = [
   },
   {
     tileKey: 'weeklyPullRequests',
-    title: 'Weekly Pull Requests',
+    title: 'Weekly Comparison',
     description: 'Total number of Pull Requests created per week',
     url: '/weekly',
     chart: 'bar',

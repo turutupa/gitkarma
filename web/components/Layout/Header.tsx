@@ -126,7 +126,7 @@ const Header = () => {
         </Stack>
       </Drawer>
 
-      <Container className={css.inner}>
+      <Container size="xl" className={css.inner}>
         <Group gap={8} visibleFrom="xs">
           <Box mr={6} mt={6}>
             <Image src="/favicon.png" alt="Logo" width={38} height={38} />

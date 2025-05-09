@@ -27,5 +27,6 @@ export function useAPI<T>(url: string | null, params?: AxiosRequestConfig['param
   });
 
   const isLoading = !data && !error && url !== null;
+
   return { data, error, mutate, isLoading };
 }
