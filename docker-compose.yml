@@ -49,23 +49,23 @@ services:
   #     retries: 10
   #     start_period: 5s
 
-  tigerbeetle:
-    image: ghcr.io/tigerbeetle/tigerbeetle
-    command: "start --development --addresses=0.0.0.0:3001 /data/0_0.tigerbeetle"
-    network_mode: host
-    volumes:
-      - ./tigerbeetle:/data
-    security_opt:
-      - "seccomp=unconfined"
-    privileged: true
-    depends_on:
-      postgres:
-        condition: service_healthy
-    restart:
-      unless-stopped
+  # tigerbeetle:
+  #   image: ghcr.io/tigerbeetle/tigerbeetle
+  #   command: "start --development --addresses=0.0.0.0:3001 /data/0_0.tigerbeetle"
+  #   network_mode: host
+  #   volumes:
+  #     - ./tigerbeetle:/data
+  #   security_opt:
+  #     - "seccomp=unconfined"
+  #   privileged: true
+  #   depends_on:
+  #     postgres:
+  #       condition: service_healthy
+  #   restart:
+  #     unless-stopped
 
-      # migration:
-      #   condition: service_healthy
+  # migration:
+  #   condition: service_healthy
 
   api:
     build: ./api
@@ -74,8 +74,8 @@ services:
         condition: service_healthy
       # migration:
       #   condition: service_healthy
-      tigerbeetle:
-        condition: service_started
+      # tigerbeetle:
+      #   condition: service_started
     restart: unless-stopped
     privileged: true
     ports:

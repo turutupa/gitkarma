@@ -1,5 +1,6 @@
 import fs from "fs";
 import { glob } from "glob";
+import path from "path";
 
 async function addExtensions() {
   try {
@@ -19,11 +20,18 @@ async function addExtensions() {
       const updated = content.replace(
         regex,
         (match, p1, openingQuote, relStart, relPath, closingQuote) => {
-          // Check if the relative path already ends with .js.
-          if (relPath.endsWith(".js")) {
-            return match;
+          // Resolve the full path of index.js before checking its existence.
+          const fullPathToIndex = path.resolve(
+            path.dirname(file),
+            `${relStart}${relPath}/index.js`
+          );
+          if (fs.existsSync(fullPathToIndex)) {
+            return `${p1}${openingQuote}${relStart}${relPath}/index.js${closingQuote}`;
           }
-          return `${p1}${openingQuote}${relStart}${relPath}.js${closingQuote}`;
+          if (!relPath.endsWith(".js")) {
+            return `${p1}${openingQuote}${relStart}${relPath}.js${closingQuote}`;
+          }
+          return match;
         }
       );
 
