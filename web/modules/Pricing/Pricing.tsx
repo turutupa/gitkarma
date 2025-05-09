@@ -33,7 +33,7 @@ const Pricing = () => {
           </Text>
         </Group>
       ),
-      features: ['1 Repositories', '10 Team Members', 'Basic AI Review Quality'],
+      features: ['1 Repositories', '10 Team Members', 'Analytics Dashboard'],
       actionText: 'Select plan',
       actionColor: theme.colors.primary[7],
       actionRef: 'https://github.com/apps/gitkarma-dev',

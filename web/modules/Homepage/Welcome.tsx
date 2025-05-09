@@ -6,13 +6,13 @@ export default function Welcome() {
 
   return (
     <>
-      <Title className={css.title} ta="center" mt={100}>
+      <Title className={css.title} ta="center" mt={150}>
         Welcome to{' '}
         <Text
           inherit
           variant="gradient"
           component="span"
-          gradient={{ from: '#2CDD66', to: colorScheme === 'light' ? 'black' : 'white', deg: 90 }}
+          gradient={{ from: '#2CDD66', to: colorScheme === 'light' ? 'black' : 'white', deg: 60 }}
         >
           gitkarma
         </Text>
