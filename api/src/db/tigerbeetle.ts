@@ -245,7 +245,7 @@ class TigerBeetle {
    * @returns
    */
   public async getTransfersForAccounts(accounts: number[]) {
-    const filter = (accountId: number): AccountFilter => ({
+    const filter = (_accountId: number): AccountFilter => ({
       account_id: 0n,
       user_data_128: 0n,
       user_data_64: 0n,

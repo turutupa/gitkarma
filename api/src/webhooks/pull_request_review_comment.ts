@@ -2,10 +2,7 @@ import db from "@/db/db";
 import type { TRepo } from "@/db/models";
 import log from "@/log";
 import type { Octokit } from "@octokit/rest";
-import type {
-  PullRequestReviewCommentEvent,
-  PullRequestReviewEvent,
-} from "@octokit/webhooks-types";
+import type { PullRequestReviewCommentEvent } from "@octokit/webhooks-types";
 import { gitkarmaEnabledOrThrow } from "./utils";
 
 /**
@@ -22,7 +19,6 @@ import { gitkarmaEnabledOrThrow } from "./utils";
  * @returns {Promise<void>} A promise that resolves when the handler has finished processing.
  */
 export const handlePullRequestReviewComment = async ({
-  octokit,
   payload,
 }: {
   octokit: Octokit;

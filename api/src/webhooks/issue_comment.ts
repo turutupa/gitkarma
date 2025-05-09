@@ -49,8 +49,8 @@ export const handleIssueComment = async ({
   const prOwnerGithubName = payload.issue.user.login; // GitHub user id
   const prOwnerGithubUrl = payload.issue.user.html_url; // GitHub user id
   const commentBody: string = payload.comment.body.trim();
-  const commentUrl = payload.comment.html_url;
-  const prUrl = payload.comment.html_url;
+  // const commentUrl = payload.comment.html_url;
+  // const prUrl = payload.comment.html_url;
 
   log.info("Processing issue comment event");
 
