@@ -194,15 +194,21 @@ const pullRequestMergedMessage = (
     .map((approver) => `- @${approver}`)
     .join("\n");
 
-  return `### 🚀 PR #${prNumber} Merged Successfully
-
-Congratulations @${author}, your pull request has been merged!
-
-#### Reviewer Rewards
+  const approversMessage =
+    approvers.length > 0
+      ? `#### Reviewer Rewards
 Pull request approvers:
 ${approversList}
 
 All reviewers who approved this PR before merge have been awarded ${debitsAwarded} karma points as per repository rules.
+`
+      : ` There were no Pull Request approvers therefore no karma points were awarded.`;
+
+  return `### 🚀 PR #${prNumber} Merged Successfully
+
+Congratulations @${author}, your pull request has been merged!
+
+${approversMessage}
 `;
 };
 
