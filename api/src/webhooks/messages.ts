@@ -7,14 +7,14 @@ const failedCheckTitle = "GitKarma Funds Check Failed";
 const adminApprovedCheckTitle = "GitKarma Funds Check Approved by Admin";
 
 const adminApprovedCheckSummary = () => {
-  return `### ✅ Token Verification Complete - Admin Approved
+  return `### ✅ Karma Points Verification Complete - Admin Approved
 
 #### Pull Request Approved for Merge by Administrator
 
-This pull request has been administratively approved, bypassing the token verification process.
+This pull request has been administratively approved, bypassing the karma point verification process.
 
 #### Impact on Balance
-- No tokens were deducted from the author's balance
+- No karma points were deducted from the author's balance
 - This is an administrative override
 
 Thank you for using GitKarma!`;
@@ -26,28 +26,28 @@ const completedCheckSummary = (
   newBalance: number,
   mergePenalty: number
 ) => {
-  return `### ✅ Token Verification Complete
+  return `### ✅ Karma Points Verification Complete
 
 #### Pull Request Approved for Merge
 
-@${username} has a sufficient balance of **${oldBalance}💰** tokens, exceeding the required **${mergePenalty}** tokens for this repository.
+@${username} has a sufficient balance of **${oldBalance}💰** karma points, exceeding the required **${mergePenalty}** karma points for this repository.
 
 #### Balance Details
 - Previous balance: ${oldBalance}💰
-- Tokens deducted: ${mergePenalty}💰  
+- Karma points deducted: ${mergePenalty}💰  
 - New balance: ${newBalance}💰
 
 Thank you for using GitKarma!`;
 };
 
 const inProgressCheckSummary = (username: string, mergePenalty: number) => {
-  return `### 🔄 Processing Token Verification
+  return `### 🔄 Processing Karma Points Verification
 
-We're currently verifying if @${username} has sufficient tokens for this pull request.
+We're currently verifying if @${username} has sufficient karma points for this pull request.
 
-### Required Tokens: ${mergePenalty || "calculating..."} 💰
+### Required Karma Points: ${mergePenalty || "calculating..."} 💰
 
-The verification process typically takes a few seconds. Once complete, you'll see whether this pull request passes our token requirements.
+The verification process typically takes a few seconds. Once complete, you'll see whether this pull request passes our karma points requirements.
 
 Thank you for your patience!`;
 };
@@ -57,18 +57,18 @@ const failedCheckSummary = (
   balance: number,
   mergePenalty: number
 ) => {
-  return `## ❌ Funds Verification Failed
+  return `### ❌ Funds Verification Failed
 
-### Pull Request Blocked from Merging
+#### Pull Request Blocked from Merging
 
-@${username} has an insufficient balance of **${balance}💰** tokens, below the required **${mergePenalty}** tokens for this repository.
+@${username} has an insufficient balance of **${balance}💰** karma points, below the required **${mergePenalty}** karma points for this repository.
 
-### Balance Details
+#### Balance Details
 - Current balance: ${balance}💰
-- Required tokens: ${mergePenalty}💰  
+- Required karma points: ${mergePenalty}💰  
 - Shortfall: ${mergePenalty - balance}💰
 
-Please earn more tokens by reviewing PRs or contributing in other ways before attempting to merge.
+Please earn more karma points by reviewing PRs or contributing in other ways before attempting to merge.
 
 Thank you for using GitKarma!`;
 };
@@ -88,7 +88,7 @@ export const checks = {
 /*************************************************** */
 
 const pullRequestAdminOverrideMessage = (admin: string, prNumber: number) => {
-  return `### 🔄 Admin Override Activated for PR #${prNumber}
+  return `### ✅ Admin Override Activated for PR #${prNumber}
 
 #### Override Information
 Administrator @${admin} has manually approved this pull request, bypassing the funds verification process. 
@@ -101,7 +101,7 @@ Only repository administrators can perform this override.`;
 const pullRequestAlreadyFundedMessage = (prNumber: number) => {
   return `### ℹ️ PR #${prNumber} Already Funded
 
-The check is already marked as successful, so re-checking is unnecessary. No additional tokens are required.`;
+The check is already marked as successful, so re-checking is unnecessary. No additional karma points are required.`;
 };
 
 const balanceCheckMessage = (username: string, balance: number) => {
@@ -109,28 +109,29 @@ const balanceCheckMessage = (username: string, balance: number) => {
 
 Hello @${username}!
 
-Your current balance is **${balance} tokens**.
+Your current balance is **${balance} karma points**.
 
-You can use this balance to fund your pull requests in repositories that use GitKarma.
-Need more tokens? Earn them by reviewing PRs or through other contributions defined by your repository's rules.`;
+You can use this balance to fund your pull requests.
+
+#### How to Earn More Karma Points:
+- **Review Pull Requests**: Reviewing a PR will grant you karma points.
+- **Timely Reviews**: Submit your review within the configured time frame to earn extra karma points as a bonus.
+- **Claim Bounties**: Be the first to review a PR with a bounty and claim a one-time reward.
+- **PR Merge Bonus**: When a PR you reviewed gets merged, you'll receive additional bonus points.`;
 };
 
-const pullRequestFundedMessage = (
-  username: string,
-  balance: number,
-  reTriggerText: string,
-  adminReTriggerText: string
-) => {
+const pullRequestFundedMessage = (username: string, balance: number) => {
   return `### ✅ PR Funding Check: Passed
 
 Hi @${username}! Your pull request has been successfully funded.
 
-#### Current Balance: ${balance} karma points
+Current Balance: **${balance} karma points**
 
-##### Need to re-trigger gitkarma check? Use:
-- ${reTriggerText} - for all users
-- ${adminReTriggerText} - for bypassing gitkarma rules and directly passing check (admin only)
-- 💰 - to view your current balance
+#### How to Earn More Karma Points:
+- **Review Pull Requests**: Reviewing a PR will grant you karma points.
+- **Timely Reviews**: Submit your review within the configured time frame to earn extra karma points as a bonus.
+- **Claim Bounties**: Be the first to review a PR with a bounty and claim a one-time reward.
+- **PR Merge Bonus**: When a PR you reviewed gets merged, you'll receive additional bonus points.
 
 Thank you for contributing!`;
 };
@@ -142,18 +143,23 @@ const pullRequestNotEnoughFundsMessage = (
   reTriggerText: string,
   adminReTriggerText: string
 ) => {
-  return `## ❌ PR Funding Check: Insufficient Funds
+  return `### ❌ PR Funding Check: Insufficient Funds
 
 Hi @${username}! Your pull request could not be approved due to insufficient funds.
 
-### Balance Details:
+#### Balance Details:
 - Current balance: ${balance} karma points
 - Required balance: ${prMergePenalty} karma points
 - Shortfall: ${prMergePenalty - balance} karma points
 
-#### What to do next:
-- Earn more karma points by reviewing and approving other PRs
-- Add helpful comments to other PRs
+#### How to Earn More Karma Points:
+- **Review Pull Requests**: Reviewing a PR will grant you karma points.
+- **Timely Reviews**: Submit your review within the configured time frame to earn extra karma points as a bonus.
+- **Claim Bounties**: Be the first to review a PR with a bounty and claim a one-time reward.
+- **PR Merge Bonus**: When a PR you reviewed gets merged, you'll receive additional bonus points.
+
+#### How to re-trigger gitkarma check:
+- Earn more karma points 
 - ${reTriggerText} - after you've earned more karma points to re-trigger gitkarma check
 - ${adminReTriggerText} - for bypassing rules and directly passing gitkarma check (admin only)
 - 💰 - to view your current balance
@@ -164,12 +170,18 @@ Need help? Contact your repository administrator.`;
 const pullRequestReviewSubmittedMessage = (
   username: string,
   totalDebitsAwarded: number,
-  timelyBonus: number
+  timelyBonus: number,
+  bountyBonus: number
 ) => {
   const timelyBonusMessage =
     timelyBonus > 0
       ? `This includes a timely review bonus of **${timelyBonus} karma points** for submitting your review within the configured time frame.`
       : `No timely review bonus was awarded as the review was submitted outside the configured time frame.`;
+
+  const bountyBonusMessage =
+    bountyBonus > 0
+      ? `You also claimed a bounty of **${bountyBonus} karma points** for this pull request.`
+      : `No bounty was claimed for this pull request.`;
 
   return `### 🎉 Review Submitted - Debits Awarded!
 
@@ -178,6 +190,7 @@ Thank you @${username} for submitting your review!
 #### Reward Details:
 - **${totalDebitsAwarded} karma points** have been added to your balance
 - ${timelyBonusMessage}
+- ${bountyBonusMessage}
 - These karma points can be used to fund your future pull requests
 - Quality reviews help maintain code quality while building your balance
 
@@ -222,7 +235,7 @@ const pullRequestClosedMessage = (
     ? `> ℹ️ This PR was approved via admin override, so **no refund** has been issued.`
     : `> 💸 **${refundAmount} karma points** have been refunded to @${author}.`;
 
-  return `## ❌ PR #${prNumber} Closed Without Merge
+  return `### ❌ PR #${prNumber} Closed Without Merge
 
 Hello @${author},
 
@@ -231,6 +244,20 @@ This pull request was closed without being merged.
 ${refundMessage}
 
 Thank you for participating — feel free to continue contributing!`;
+};
+
+const bountyAddedMessage = (bountyAmount: number) => {
+  return `### 🎯 New Bounty Alert!
+
+A bounty of **${bountyAmount} karma points** has been added to this pull request. 
+
+Hurry up! Be the first to submit a review and claim the reward!`;
+};
+
+const bountyRemovedMessage = () => {
+  return `### ❌ Bounty Removed
+
+The bounty for this pull request has been removed. Better luck next time!`;
 };
 
 export const comments = {
@@ -242,4 +269,6 @@ export const comments = {
   pullRequestReviewSubmittedMessage,
   pullRequestMergedMessage,
   pullRequestClosedMessage,
+  bountyAddedMessage,
+  bountyRemovedMessage,
 };

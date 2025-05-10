@@ -81,6 +81,7 @@ export type TPullRequest = {
   pr_num_changed_files: number;
   head_sha: string;
   state: string;
+  bounty?: number;
   check_passed: boolean;
   admin_approved: boolean;
   created_at: Date;

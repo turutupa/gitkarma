@@ -138,12 +138,7 @@ export const handlePullRequestSynchronize = async ({
       owner,
       repo: repoName,
       issue_number: prNumber,
-      body: comments.pullRequestFundedMessage(
-        prOwnerGithubName,
-        balance,
-        repo.trigger_recheck_text,
-        repo.admin_trigger_recheck_text
-      ),
+      body: comments.pullRequestFundedMessage(prOwnerGithubName, balance),
       headers: githubHeaders,
     });
 

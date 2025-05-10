@@ -90,6 +90,7 @@ export const handlePullRequestReview = async ({
 
   let totalBonus = repo.review_bonus;
   let timelyReviewBonus = 0;
+  let bountyBonus = 0;
 
   const reviewSubmittedAtStr = payload.review.submitted_at;
   const prCreatedAtStr = payload.pull_request.created_at;
@@ -108,6 +109,33 @@ export const handlePullRequestReview = async ({
     }
   }
 
+  // Check if there is a bounty on the pull request
+  if (pr.bounty) {
+    bountyBonus = pr.bounty;
+    totalBonus += bountyBonus;
+
+    // Update the pull request to set the bounty to null
+    await db.updatePullRequest(prNumber, repo.id, { bounty: null });
+
+    // Remove the bounty label
+    try {
+      await octokit.rest.issues.removeLabel({
+        owner,
+        repo: repoName,
+        issue_number: prNumber,
+        name: `bounty: ${bountyBonus} karma`,
+      });
+    } catch (error: any) {
+      if (error.status !== 404) {
+        throw error; // Re-throw other errors
+      }
+    }
+
+    log.info(
+      `Bounty of ${bountyBonus} karma points claimed for PR #${prNumber}`
+    );
+  }
+
   log.info(
     {
       repo,
@@ -119,7 +147,7 @@ export const handlePullRequestReview = async ({
     "Persisted pull request review, transferring funds to reviewer"
   );
 
-  // Transfer review bonus (including timely review bonus if applicable) to the reviewer
+  // Transfer review bonus (including timely review bonus and bounty if applicable) to the reviewer
   await tb.repoTransfersFundsToUser(
     BigInt(repo.tigerbeetle_account_id),
     BigInt(account.id),
@@ -137,7 +165,8 @@ export const handlePullRequestReview = async ({
       body: comments.pullRequestReviewSubmittedMessage(
         user.github_username,
         totalBonus,
-        timelyReviewBonus
+        timelyReviewBonus,
+        bountyBonus
       ),
       headers: githubHeaders,
     }

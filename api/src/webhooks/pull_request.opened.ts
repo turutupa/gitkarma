@@ -119,12 +119,7 @@ export const handlePullRequestOpened = async ({
       owner,
       repo: repoName,
       issue_number: prNumber,
-      body: comments.pullRequestFundedMessage(
-        githubUsername,
-        newBalance,
-        repo.trigger_recheck_text,
-        repo.admin_trigger_recheck_text
-      ),
+      body: comments.pullRequestFundedMessage(githubUsername, newBalance),
       headers: githubHeaders,
     });
 

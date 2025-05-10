@@ -47,6 +47,9 @@ export class PullRequest {
   @Column({ length: 50, type: "varchar" })
   state: string; // e.g., 'open', 'closed', 'merged'
 
+  @Column({ type: "int", nullable: true })
+  bounty: number;
+
   @Column({ default: false, type: "boolean" })
   check_passed: boolean;
 

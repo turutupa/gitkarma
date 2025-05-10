@@ -609,6 +609,7 @@ class DB {
       state?: EPullRequestState;
       checkPassed?: boolean;
       adminApproved?: boolean;
+      bounty?: number | null;
     }
   ): Promise<TPullRequest | null> {
     const setClauses: string[] = [];
@@ -627,6 +628,11 @@ class DB {
       params.push(updates.adminApproved);
       setClauses.push(`admin_approved = $${params.length}`);
     }
+    if (updates.bounty !== undefined) {
+      params.push(updates.bounty);
+      setClauses.push(`bounty = $${params.length}`);
+    }
+
     // If no fields are provided, return the existing record.
     if (setClauses.length === 0) {
       return await this.getPullRequest(prNumber, repoId);
