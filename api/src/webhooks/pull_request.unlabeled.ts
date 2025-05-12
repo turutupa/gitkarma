@@ -14,14 +14,14 @@ export const handlePullRequestUnlabeled = async ({
   octokit: Octokit;
   payload: PullRequestUnlabeledEvent;
 }) => {
-  const pullRequestLabeledWebhook = new PullRequestLabeledWebhook(
+  const pullRequestUnlabeledWebhook = new PullRequestUnlabeledWebhook(
     octokit,
     payload
   );
-  return await pullRequestLabeledWebhook.handle();
+  return await pullRequestUnlabeledWebhook.handle();
 };
 
-class PullRequestLabeledWebhook {
+class PullRequestUnlabeledWebhook {
   private repoId: number;
   private repoName: string;
   private repoOwner: string;
