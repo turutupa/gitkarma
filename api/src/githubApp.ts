@@ -10,6 +10,8 @@ import fs from "fs";
 import { App } from "octokit";
 import log from "./log";
 import { handleInstallationRepositoriesAdded } from "./webhooks/installation_repositories.added";
+import { handlePullRequestUnlabeled } from "./webhooks/pull_request.unlabeled";
+import { handlePullRequestLabeled } from "./webhooks/pull_request_labeled";
 import { handlePullRequestReview } from "./webhooks/pull_request_review";
 import { handlePullRequestReviewComment } from "./webhooks/pull_request_review_comment";
 
@@ -89,6 +91,11 @@ export const startGithubApp = () => {
   app.webhooks.on(
     "pull_request_review_comment",
     withCatch(handlePullRequestReviewComment)
+  );
+  app.webhooks.on("pull_request.labeled", withCatch(handlePullRequestLabeled));
+  app.webhooks.on(
+    "pull_request.unlabeled",
+    withCatch(handlePullRequestUnlabeled)
   );
 
   // This logs any errors that occur.

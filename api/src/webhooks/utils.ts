@@ -2,6 +2,11 @@ import db from "@/db/db";
 import { EUserRepoRole } from "@/db/entities/UserRepo";
 import type { TRepo, TUser, TUserRepo } from "@/db/models";
 import tb from "@/db/tigerbeetle";
+import type { Octokit } from "@octokit/rest";
+import type {
+  IssueCommentEvent,
+  PullRequestEvent,
+} from "@octokit/webhooks-types";
 import type { Account } from "tigerbeetle-node";
 import { DEFAULT_REPO_CONFIG } from "./constants";
 
@@ -110,4 +115,36 @@ export const gitkarmaEnabledOrThrow = (repo: TRepo) => {
   if (repo.disable_gitkarma) {
     throw new Error("GitKarma is disabled for this repo");
   }
+};
+
+export const isSenderAdmin = async (
+  octokit: Octokit,
+  githubSchema: PullRequestEvent | IssueCommentEvent,
+  repo: TRepo
+): Promise<boolean> => {
+  // Verify if the sender is an admin
+  const sender = await getOrDefaultGithubUser(
+    repo,
+    githubSchema.sender.id,
+    githubSchema.sender.login,
+    githubSchema.sender.html_url
+  );
+
+  let isAdmin = false;
+  if (githubSchema.repository.permissions?.admin) {
+    isAdmin = true;
+  } else if (sender.userRepo.role === EUserRepoRole.ADMIN) {
+    isAdmin = true;
+  } else {
+    const { data: permissionData } =
+      await octokit.rest.repos.getCollaboratorPermissionLevel({
+        owner: githubSchema.repository.owner.login,
+        repo: repo.repo_name,
+        username: githubSchema.sender.login,
+      });
+    if (permissionData.permission === "admin") {
+      isAdmin = true;
+    }
+  }
+  return isAdmin;
 };

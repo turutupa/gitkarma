@@ -19,7 +19,11 @@ import {
   GITKARMA_CHECK_NAME,
 } from "./constants";
 import { checks, comments } from "./messages";
-import { getOrDefaultGithubUser, gitkarmaEnabledOrThrow } from "./utils";
+import {
+  getOrDefaultGithubUser,
+  gitkarmaEnabledOrThrow,
+  isSenderAdmin,
+} from "./utils";
 
 /**
  * handleIssueComment:
@@ -155,30 +159,7 @@ class IssueCommentWebhook {
     }
 
     // Verify if the sender is an admin
-    const sender = await getOrDefaultGithubUser(
-      this.repo,
-      this.sender.id,
-      this.sender.login,
-      this.sender.html_url
-    );
-
-    let isAdmin = false;
-    if (this.repository.permissions?.admin) {
-      isAdmin = true;
-    } else if (sender.userRepo.role === EUserRepoRole.ADMIN) {
-      isAdmin = true;
-    } else {
-      const { data: permissionData } =
-        await this.octokit.rest.repos.getCollaboratorPermissionLevel({
-          owner: this.owner,
-          repo: this.repoName,
-          username: this.sender.login,
-        });
-      if (permissionData.permission === "admin") {
-        isAdmin = true;
-      }
-    }
-
+    const isAdmin = isSenderAdmin(this.octokit, this.payload, this.repo);
     if (!isAdmin) {
       log.info(
         { user: this.payload.sender },
