@@ -56,19 +56,19 @@ class PullRequestUnlabeledWebhook {
     // If sender is not admin then revert changes
     const isAdmin = await isSenderAdmin(this.octokit, this.payload, this.repo);
     if (!isAdmin) {
-      await this.handleSenderNotAdmin();
+      await this.handleRevertUnlabeling();
       return;
     }
 
     // remove bounty from pr
-    await this.handleSenderIsAdmin();
+    await this.handleUnlabeling();
   }
 
   /**
    * Updates the Pull Request to remove the bounty from it
    * @returns
    */
-  private async handleSenderIsAdmin() {
+  private async handleUnlabeling() {
     // Remove bounty from the database
     const pr = await db.getPullRequest(this.prNumber, this.repo.id);
     if (!pr) {
@@ -92,7 +92,7 @@ class PullRequestUnlabeledWebhook {
    * Should revert changes by adding the bounty back again
    * @returns
    */
-  private async handleSenderNotAdmin() {
+  private async handleRevertUnlabeling() {
     // 1. Ensure the label exists or create it
     try {
       await this.octokit.rest.issues.getLabel({

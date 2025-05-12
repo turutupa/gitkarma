@@ -62,11 +62,11 @@ class PullRequestLabeledWebhook {
 
     const isAdmin = await isSenderAdmin(this.octokit, this.payload, this.repo);
     if (!isAdmin) {
-      await this.handleIsNotAdmin();
+      await this.handleRevertLabeling();
       return;
     }
 
-    await this.handleIsAdmin;
+    await this.handleLabeling();
   }
 
   /**
@@ -77,7 +77,7 @@ class PullRequestLabeledWebhook {
    *
    * Notify on github of newly added bounty.
    */
-  private async handleIsAdmin() {
+  private async handleLabeling() {
     // Remove already existing bounty from GitHub PR if present
     if (this.pr!.bounty) {
       try {
@@ -114,7 +114,7 @@ class PullRequestLabeledWebhook {
   /**
    * If not Admin then revert the action by deleting the newly added bounty label
    */
-  private async handleIsNotAdmin() {
+  private async handleRevertLabeling() {
     try {
       await this.octokit.rest.issues.removeLabel({
         owner: this.repoOwner,
