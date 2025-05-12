@@ -117,18 +117,36 @@ export const gitkarmaEnabledOrThrow = (repo: TRepo) => {
   }
 };
 
+/**
+ * Verify if the sender is an admin. Checks:
+ * - admin permissions from github
+ * - gitkarma role
+ * - get collaborator role from github
+ * @param octokit
+ * @param githubSchema
+ * @param repo
+ * @param sender
+ * @returns
+ */
 export const isSenderAdmin = async (
   octokit: Octokit,
   githubSchema: PullRequestEvent | IssueCommentEvent,
-  repo: TRepo
+  repo: TRepo,
+  // can optionally provide sender if sender si required in parent func
+  sender?: {
+    user: TUser;
+    userRepo: TUserRepo;
+    account: Account;
+  }
 ): Promise<boolean> => {
-  // Verify if the sender is an admin
-  const sender = await getOrDefaultGithubUser(
-    repo,
-    githubSchema.sender.id,
-    githubSchema.sender.login,
-    githubSchema.sender.html_url
-  );
+  sender =
+    sender ||
+    (await getOrDefaultGithubUser(
+      repo,
+      githubSchema.sender.id,
+      githubSchema.sender.login,
+      githubSchema.sender.html_url
+    ));
 
   let isAdmin = false;
   if (githubSchema.repository.permissions?.admin) {

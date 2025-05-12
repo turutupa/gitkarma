@@ -1,5 +1,4 @@
 import db from "@/db/db";
-import { EUserRepoRole } from "@/db/entities/UserRepo";
 import type { TPullRequest, TRepo } from "@/db/models";
 import tb from "@/db/tigerbeetle";
 import log from "@/log";
@@ -159,7 +158,7 @@ class IssueCommentWebhook {
     }
 
     // Verify if the sender is an admin
-    const isAdmin = isSenderAdmin(this.octokit, this.payload, this.repo);
+    const isAdmin = await isSenderAdmin(this.octokit, this.payload, this.repo);
     if (!isAdmin) {
       log.info(
         { user: this.payload.sender },
@@ -341,27 +340,7 @@ class IssueCommentWebhook {
     );
 
     // verify if the sender is an admin
-    let isAdmin = false;
-    if (isTriggeringAdminRecheck) {
-      // Option 1: Try checking the repository permissions in the payload (if available)
-      if (this.repository.permissions && this.repository.permissions.admin) {
-        isAdmin = true;
-        // Optoin 2: Check if the sender is an admin in the database
-      } else if (sender.userRepo.role === EUserRepoRole.ADMIN) {
-        isAdmin = true;
-      } else {
-        // Option 3: Query the GitHub API to get the permission level.
-        const { data: permissionData } =
-          await this.octokit.rest.repos.getCollaboratorPermissionLevel({
-            owner: this.owner,
-            repo: this.repoName,
-            username: this.sender.login,
-          });
-        if (permissionData.permission === "admin") {
-          isAdmin = true;
-        }
-      }
-    }
+    const isAdmin = await isSenderAdmin(this.octokit, this.payload, this.repo);
 
     // if its admin override, then pass check
     if (isAdmin && isTriggeringAdminRecheck) {
