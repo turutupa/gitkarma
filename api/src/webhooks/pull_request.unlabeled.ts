@@ -1,7 +1,8 @@
 import db from "@/db/db";
+import type { TRepo } from "@/db/models";
 import log from "@/log";
 import type { Octokit } from "@octokit/rest";
-import type { PullRequestUnlabeledEvent } from "@octokit/webhooks-types";
+import type { Label, PullRequestUnlabeledEvent } from "@octokit/webhooks-types";
 import { EGithubEndpoints, githubHeaders } from "./constants";
 import { comments } from "./messages";
 import { isSenderAdmin } from "./utils";
@@ -13,71 +14,115 @@ export const handlePullRequestUnlabeled = async ({
   octokit: Octokit;
   payload: PullRequestUnlabeledEvent;
 }) => {
-  const { repository, pull_request, label } = payload;
-  const repoId = repository.id;
-  const repoName = repository.name;
-  const repoOwner = repository.owner.login;
-  const prNumber = pull_request.number;
+  const pullRequestLabeledWebhook = new PullRequestLabeledWebhook(
+    octokit,
+    payload
+  );
+  return await pullRequestLabeledWebhook.handle();
+};
 
-  // Check if the label is a bounty label
-  const bountyLabelMatch = label?.name?.match(/^bounty: (\d+) karma$/);
-  if (!bountyLabelMatch) {
-    return;
+class PullRequestLabeledWebhook {
+  private repoId: number;
+  private repoName: string;
+  private repoOwner: string;
+  private prNumber: number;
+  private label: Label;
+  private bountyAmount: number;
+
+  private repo: TRepo;
+
+  constructor(
+    private octokit: Octokit,
+    private payload: PullRequestUnlabeledEvent
+  ) {
+    const { repository, pull_request, label } = payload;
+    this.repoId = repository.id;
+    this.repoName = repository.name;
+    this.repoOwner = repository.owner.login;
+    this.prNumber = pull_request.number;
+    this.label = label;
   }
 
-  const bountyAmount = parseInt(bountyLabelMatch[1], 10);
-  const repo = await db.getRepoByGithubRepoId(repoId);
+  public async handle() {
+    // Check if the label is a bounty label
+    const bountyLabelMatch = this.label?.name?.match(/^bounty: (\d+) karma$/);
+    if (!bountyLabelMatch) {
+      return;
+    }
 
-  // Check if the sender is an admin
-  const isAdmin = await isSenderAdmin(octokit, payload, repo);
-  if (!isAdmin) {
-    // Ensure the label exists or create it
+    this.bountyAmount = parseInt(bountyLabelMatch[1], 10);
+    this.repo = await db.getRepoByGithubRepoId(this.repoId);
+
+    // If sender is not admin then revert changes
+    const isAdmin = await isSenderAdmin(this.octokit, this.payload, this.repo);
+    if (!isAdmin) {
+      await this.handleSenderNotAdmin();
+      return;
+    }
+
+    // remove bounty from pr
+    await this.handleSenderIsAdmin();
+  }
+
+  /**
+   * Updates the Pull Request to remove the bounty from it
+   * @returns
+   */
+  private async handleSenderIsAdmin() {
+    // Remove bounty from the database
+    const pr = await db.getPullRequest(this.prNumber, this.repo.id);
+    if (!pr) {
+      log.warn(`Pull request #${this.prNumber} not found in database.`);
+      return;
+    }
+
+    await db.updatePullRequest(this.prNumber, this.repo.id, { bounty: null });
+    log.info(`Removed bounty from PR #${this.prNumber}`);
+
+    await this.octokit.request(EGithubEndpoints.Comments, {
+      owner: this.repoOwner,
+      repo: this.repoName,
+      issue_number: this.prNumber,
+      body: comments.bountyRemovedMessage(),
+      headers: githubHeaders,
+    });
+  }
+
+  /**
+   * Should revert changes by adding the bounty back again
+   * @returns
+   */
+  private async handleSenderNotAdmin() {
+    // 1. Ensure the label exists or create it
     try {
-      await octokit.rest.issues.getLabel({
-        owner: repoOwner,
-        repo: repoName,
-        name: `bounty: ${bountyAmount} karma`,
+      await this.octokit.rest.issues.getLabel({
+        owner: this.repoOwner,
+        repo: this.repoName,
+        name: `bounty: ${this.bountyAmount} karma`,
       });
     } catch (error: any) {
       if (error.status === 404) {
-        await octokit.rest.issues.createLabel({
-          owner: repoOwner,
-          repo: repoName,
-          name: `bounty: ${bountyAmount} karma`,
+        await this.octokit.rest.issues.createLabel({
+          owner: this.repoOwner,
+          repo: this.repoName,
+          name: `bounty: ${this.bountyAmount} karma`,
           color: "79E99E",
-          description: `Be the first to claim the bounty of ${bountyAmount} karma points!`,
+          description: `Be the first to claim the bounty of ${this.bountyAmount} karma points!`,
         });
       } else {
         throw error;
       }
     }
 
-    // Re-add the bounty label
-    await octokit.rest.issues.addLabels({
-      owner: repoOwner,
-      repo: repoName,
-      issue_number: prNumber,
-      labels: [`bounty: ${bountyAmount} karma`],
+    // 2. Re-add the bounty label
+    await this.octokit.rest.issues.addLabels({
+      owner: this.repoOwner,
+      repo: this.repoName,
+      issue_number: this.prNumber,
+      labels: [`bounty: ${this.bountyAmount} karma`],
     });
-    log.warn(`Non-admin attempted to remove bounty label from PR #${prNumber}`);
-    return;
+    log.warn(
+      `Non-admin attempted to remove bounty label from PR #${this.prNumber}`
+    );
   }
-
-  const pr = await db.getPullRequest(prNumber, repo.id);
-  if (!pr) {
-    log.warn(`Pull request #${prNumber} not found in database.`);
-    return;
-  }
-
-  // Remove bounty from the database
-  await db.updatePullRequest(prNumber, repo.id, { bounty: null });
-  log.info(`Removed bounty from PR #${prNumber}`);
-
-  await octokit.request(EGithubEndpoints.Comments, {
-    owner: repoOwner,
-    repo: repoName,
-    issue_number: prNumber,
-    body: comments.bountyRemovedMessage(),
-    headers: githubHeaders,
-  });
-};
+}
