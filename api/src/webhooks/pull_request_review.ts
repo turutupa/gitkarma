@@ -11,7 +11,7 @@ import {
   githubHeaders,
 } from "./constants";
 import { comments } from "./messages";
-import { getOrDefaultGithubUser, gitkarmaEnabledOrThrow } from "./utils";
+import { getOrDefaultGithubUser, gitkarmaEnabledOrThrow, isBot } from "./utils";
 
 /**
  * handlePullRequestReview:
@@ -42,6 +42,10 @@ export const handlePullRequestReview = async ({
   const reviewerGithubUrl = payload.review.user.html_url;
   const reviewState = payload.review.state;
   const reviewUrl = payload.review.html_url;
+
+  if (isBot(payload)) {
+    return;
+  }
 
   const repo: TRepo = await db.getRepoByGithubRepoId(repoId);
   gitkarmaEnabledOrThrow(repo);

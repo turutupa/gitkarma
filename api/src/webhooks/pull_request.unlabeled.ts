@@ -44,6 +44,11 @@ class PullRequestUnlabeledWebhook {
   }
 
   public async handle() {
+    const isBot = this.payload.sender.type === "Bot";
+    if (isBot) {
+      return;
+    }
+
     // Check if the label is a bounty label
     const bountyLabelMatch = this.label?.name?.match(/^bounty: (\d+) karma$/);
     if (!bountyLabelMatch) {

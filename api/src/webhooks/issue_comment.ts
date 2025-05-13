@@ -21,6 +21,7 @@ import { checks, comments } from "./messages";
 import {
   getOrDefaultGithubUser,
   gitkarmaEnabledOrThrow,
+  isBot,
   isSenderAdmin,
 } from "./utils";
 
@@ -97,6 +98,10 @@ class IssueCommentWebhook {
 
   public async handle() {
     log.info("Processing issue comment event");
+
+    if (isBot(this.payload)) {
+      return;
+    }
 
     // its an issues' comment, not a pr comment
     if (!this.pullRequest) {

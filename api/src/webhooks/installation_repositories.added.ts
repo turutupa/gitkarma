@@ -2,7 +2,7 @@ import { EUserRepoRole } from "@/db/entities/UserRepo";
 import log from "@/log";
 import type { Octokit } from "@octokit/rest";
 import type { InstallationRepositoriesAddedEvent } from "@octokit/webhooks-types";
-import { getOrDefaultGithubRepo, getOrDefaultGithubUser } from "./utils";
+import { getOrDefaultGithubRepo, getOrDefaultGithubUser, isBot } from "./utils";
 
 /**
  * handleInstallationCreated:
@@ -63,7 +63,7 @@ export const handleInstallationRepositoriesAdded = async ({
     );
 
     // add sender as admin if it's not the repo owner
-    if (githubSenderId !== githubRepoOwnerId) {
+    if (githubSenderId !== githubRepoOwnerId && !isBot(payload)) {
       await getOrDefaultGithubUser(
         repo,
         githubSenderId,

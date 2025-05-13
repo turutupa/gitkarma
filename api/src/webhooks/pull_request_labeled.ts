@@ -2,7 +2,11 @@ import db from "@/db/db";
 import type { TPullRequest, TRepo } from "@/db/models";
 import log from "@/log";
 import type { Octokit } from "@octokit/rest";
-import type { Label, PullRequestLabeledEvent } from "@octokit/webhooks-types";
+import type {
+  Label,
+  PullRequestLabeledEvent,
+  User,
+} from "@octokit/webhooks-types";
 import { EGithubEndpoints, githubHeaders } from "./constants";
 import { comments } from "./messages";
 import { isSenderAdmin } from "./utils";
@@ -27,6 +31,7 @@ class PullRequestLabeledWebhook {
   repoOwner: string;
   prNumber: number;
   label: Label;
+  sender: User;
 
   bountyAmount: number;
   repo: TRepo;
@@ -36,15 +41,25 @@ class PullRequestLabeledWebhook {
     private octokit: Octokit,
     private payload: PullRequestLabeledEvent
   ) {
-    const { repository, pull_request, label } = payload;
+    const { repository, pull_request, label, sender } = payload;
     this.label = label;
     this.repoId = repository.id;
     this.repoName = repository.name;
     this.repoOwner = repository.owner.login;
     this.prNumber = pull_request.number;
+    this.sender = sender;
   }
 
   public async handle() {
+    const isBot = this.payload.sender.type === "Bot";
+    if (isBot) {
+      log.error(
+        { payload: this.payload },
+        `[pull request labeled] exit, user is bot`
+      );
+      return;
+    }
+
     // Check if the label is a bounty label
     const bountyLabelMatch = this.label?.name?.match(/^bounty: (\d+) karma$/);
     if (!bountyLabelMatch) {
@@ -54,6 +69,11 @@ class PullRequestLabeledWebhook {
     this.bountyAmount = parseInt(bountyLabelMatch[1], 10);
     this.repo = await db.getRepoByGithubRepoId(this.repoId);
     this.pr = await db.getPullRequest(this.prNumber, this.repo.id);
+    const metadata = {
+      repo: this.repo,
+      label: this.label,
+      sender: this.sender,
+    };
 
     if (!this.pr) {
       log.warn(`Pull request #${this.prNumber} not found in database.`);
@@ -62,10 +82,15 @@ class PullRequestLabeledWebhook {
 
     const isAdmin = await isSenderAdmin(this.octokit, this.payload, this.repo);
     if (!isAdmin) {
+      log.info(
+        metadata,
+        `Reverting label, user ${this.sender.login} is not admin`
+      );
       await this.handleRevertLabeling();
       return;
     }
 
+    log.info(metadata, `Added label by admin ${this.sender.login}`);
     await this.handleLabeling();
   }
 

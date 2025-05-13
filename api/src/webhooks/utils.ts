@@ -4,11 +4,74 @@ import type { TRepo, TUser, TUserRepo } from "@/db/models";
 import tb from "@/db/tigerbeetle";
 import type { Octokit } from "@octokit/rest";
 import type {
+  InstallationCreatedEvent,
+  InstallationEvent,
+  InstallationRepositoriesAddedEvent,
   IssueCommentEvent,
+  PullRequestClosedEvent,
   PullRequestEvent,
+  PullRequestLabeledEvent,
+  PullRequestOpenedEvent,
+  PullRequestReopenedEvent,
+  PullRequestReviewComment,
+  PullRequestReviewEvent,
+  PullRequestUnlabeledEvent,
+  User,
 } from "@octokit/webhooks-types";
 import type { Account } from "tigerbeetle-node";
 import { DEFAULT_REPO_CONFIG } from "./constants";
+
+// Type guards
+function hasRepository(
+  payload: any
+): payload is { repository: { owner: User } } {
+  return payload?.repository?.owner?.type !== undefined;
+}
+
+function hasSender(payload: any): payload is { sender: User } {
+  return payload?.sender?.type !== undefined;
+}
+
+function hasPullRequest(
+  payload: any
+): payload is { pull_request: { user: User } } {
+  return payload?.pull_request?.user?.type !== undefined;
+}
+
+function hasReview(payload: any): payload is { review: { user: User } } {
+  return payload?.review?.user?.type !== undefined;
+}
+
+export const isBot = (
+  payload:
+    | PullRequestOpenedEvent
+    | PullRequestReopenedEvent
+    | PullRequestClosedEvent
+    | PullRequestLabeledEvent
+    | PullRequestUnlabeledEvent
+    | PullRequestReviewComment
+    | PullRequestReviewEvent
+    | IssueCommentEvent
+    | InstallationEvent
+    | InstallationCreatedEvent
+    | InstallationRepositoriesAddedEvent,
+  userType: "repo_owner" | "sender" | "pr_owner" | "review_owner" = "sender"
+): boolean => {
+  switch (userType) {
+    case "repo_owner":
+      return hasRepository(payload) && payload.repository.owner.type === "Bot";
+    case "sender":
+      return hasSender(payload) && payload.sender.type === "Bot";
+    case "pr_owner":
+      return (
+        hasPullRequest(payload) && payload.pull_request.user.type === "Bot"
+      );
+    case "review_owner":
+      return hasReview(payload) && payload.review.user.type === "Bot";
+    default:
+      return false;
+  }
+};
 
 /**
  * getOrDefaultGithubRepo:
