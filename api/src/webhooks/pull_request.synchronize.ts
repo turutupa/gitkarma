@@ -15,6 +15,7 @@ import {
   getOrDefaultGithubRepo,
   getOrDefaultGithubUser,
   gitkarmaEnabledOrThrow,
+  retry,
 } from "./utils";
 
 /**
@@ -62,17 +63,23 @@ export const handlePullRequestSynchronize = async ({
   gitkarmaEnabledOrThrow(repo);
 
   // set remote pull request check to in progress
-  await octokit.rest.checks.create({
-    owner,
-    repo: repoName,
-    name: GITKARMA_CHECK_NAME,
-    head_sha: headSha,
-    status: "in_progress",
-    output: {
-      title: checks.inProgress.title,
-      summary: checks.inProgress.summary(prOwnerGithubName, repo.merge_penalty),
-    },
-  });
+  await retry(
+    async () =>
+      await octokit.rest.checks.create({
+        owner,
+        repo: repoName,
+        name: GITKARMA_CHECK_NAME,
+        head_sha: headSha,
+        status: "in_progress",
+        output: {
+          title: checks.inProgress.title,
+          summary: checks.inProgress.summary(
+            prOwnerGithubName,
+            repo.merge_penalty
+          ),
+        },
+      })
+  );
 
   const { user, account } = await getOrDefaultGithubUser(
     repo,
@@ -95,23 +102,28 @@ export const handlePullRequestSynchronize = async ({
     log.info(
       "Pull Request had already passed gitkarma check. No further actions required."
     );
-    await octokit.rest.checks.create({
-      owner,
-      repo: repoName,
-      name: GITKARMA_CHECK_NAME,
-      head_sha: headSha,
-      status: "completed",
-      conclusion: "success",
-      output: {
-        title: checks.completed.title,
-        summary: checks.completed.summary(
-          prOwnerGithubName,
-          balance + repo.merge_penalty,
-          balance,
-          repo.merge_penalty
-        ),
-      },
-    });
+
+    // set pr check to success
+    await retry(
+      async () =>
+        await octokit.rest.checks.create({
+          owner,
+          repo: repoName,
+          name: GITKARMA_CHECK_NAME,
+          head_sha: headSha,
+          status: "completed",
+          conclusion: "success",
+          output: {
+            title: checks.completed.title,
+            summary: checks.completed.summary(
+              prOwnerGithubName,
+              balance + repo.merge_penalty,
+              balance,
+              repo.merge_penalty
+            ),
+          },
+        })
+    );
     return;
   }
 
@@ -142,23 +154,27 @@ export const handlePullRequestSynchronize = async ({
       headers: githubHeaders,
     });
 
-    await octokit.rest.checks.create({
-      owner,
-      repo: repoName,
-      name: GITKARMA_CHECK_NAME,
-      head_sha: headSha,
-      status: "completed",
-      conclusion: "success",
-      output: {
-        title: checks.completed.title,
-        summary: checks.completed.summary(
-          prOwnerGithubName,
-          balance,
-          newBalance,
-          repo.merge_penalty
-        ),
-      },
-    });
+    // set pr check to success
+    await retry(
+      async () =>
+        await octokit.rest.checks.create({
+          owner,
+          repo: repoName,
+          name: GITKARMA_CHECK_NAME,
+          head_sha: headSha,
+          status: "completed",
+          conclusion: "success",
+          output: {
+            title: checks.completed.title,
+            summary: checks.completed.summary(
+              prOwnerGithubName,
+              balance,
+              newBalance,
+              repo.merge_penalty
+            ),
+          },
+        })
+    );
 
     // activity log - pr funded
     await db.createActivityLog(
@@ -190,22 +206,26 @@ export const handlePullRequestSynchronize = async ({
     headers: githubHeaders,
   });
 
-  await octokit.rest.checks.create({
-    owner,
-    repo: repoName,
-    name: GITKARMA_CHECK_NAME,
-    head_sha: headSha,
-    status: "completed",
-    conclusion: "failure",
-    output: {
-      title: checks.failed.title,
-      summary: checks.failed.summary(
-        prOwnerGithubName,
-        balance,
-        repo.merge_penalty
-      ),
-    },
-  });
+  // set pr check to failed
+  await retry(
+    async () =>
+      await octokit.rest.checks.create({
+        owner,
+        repo: repoName,
+        name: GITKARMA_CHECK_NAME,
+        head_sha: headSha,
+        status: "completed",
+        conclusion: "failure",
+        output: {
+          title: checks.failed.title,
+          summary: checks.failed.summary(
+            prOwnerGithubName,
+            balance,
+            repo.merge_penalty
+          ),
+        },
+      })
+  );
 
   // activity log - failed to fund pr
   await db.createActivityLog(

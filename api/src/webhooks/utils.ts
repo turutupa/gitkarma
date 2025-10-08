@@ -229,3 +229,43 @@ export const isSenderAdmin = async (
   }
   return isAdmin;
 };
+
+/**
+ * Robust retry mechanism using a loop for a more reliable implementation.
+ *
+ * @param func The async function to execute and retry.
+ * @param retries The number of retry attempts (defaults to 3).
+ * @param delayMs The delay between retries in milliseconds (defaults to 2000).
+ * @returns The resolved value of the async function.
+ */
+export const retry = async <T>(
+  func: () => Promise<T>,
+  retries = 10,
+  delayMs = 2000
+): Promise<T> => {
+  for (let i = 0; i <= retries; i++) {
+    try {
+      return await func();
+    } catch (error) {
+      // All retries failed, re-throw the last error
+      if (i === retries) {
+        throw error;
+      }
+      // Wait before the next attempt
+      const secs = delayMs / 1000;
+      console.warn(`Attempt ${i + 1} failed. Retrying in ${secs} seconds...`);
+      await sleep(delayMs);
+    }
+  }
+  // This line is unreachable but included for full type-safety
+  throw new Error("All retry attempts failed.");
+};
+
+/**
+ * Sleep mechanism - similar to java
+ * @param ms
+ * @returns
+ */
+const sleep = (ms: number) => {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+};

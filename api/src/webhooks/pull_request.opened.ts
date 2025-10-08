@@ -17,6 +17,7 @@ import {
   getOrDefaultGithubRepo,
   getOrDefaultGithubUser,
   gitkarmaEnabledOrThrow,
+  retry,
 } from "./utils";
 
 /**
@@ -67,17 +68,23 @@ export const handlePullRequestOpened = async ({
   gitkarmaEnabledOrThrow(repo);
 
   // set remote pull request check to in progress
-  await octokit.rest.checks.create({
-    owner,
-    repo: repoName,
-    name: GITKARMA_CHECK_NAME,
-    head_sha: headSha,
-    status: "in_progress",
-    output: {
-      title: checks.inProgress.title,
-      summary: checks.inProgress.summary(githubUsername, repo.merge_penalty),
-    },
-  });
+  await retry(
+    async () =>
+      await octokit.rest.checks.create({
+        owner,
+        repo: repoName,
+        name: GITKARMA_CHECK_NAME,
+        head_sha: headSha,
+        status: "in_progress",
+        output: {
+          title: checks.inProgress.title,
+          summary: checks.inProgress.summary(
+            githubUsername,
+            repo.merge_penalty
+          ),
+        },
+      })
+  );
 
   const { user, account } = await getOrDefaultGithubUser(
     repo,
@@ -123,23 +130,26 @@ export const handlePullRequestOpened = async ({
       headers: githubHeaders,
     });
 
-    await octokit.rest.checks.create({
-      owner,
-      repo: repoName,
-      name: GITKARMA_CHECK_NAME,
-      head_sha: headSha,
-      status: "completed",
-      conclusion: "success",
-      output: {
-        title: checks.completed.title,
-        summary: checks.completed.summary(
-          githubUsername,
-          balance,
-          newBalance,
-          repo.merge_penalty
-        ),
-      },
-    });
+    await retry(
+      async () =>
+        await octokit.rest.checks.create({
+          owner,
+          repo: repoName,
+          name: GITKARMA_CHECK_NAME,
+          head_sha: headSha,
+          status: "completed",
+          conclusion: "success",
+          output: {
+            title: checks.completed.title,
+            summary: checks.completed.summary(
+              githubUsername,
+              balance,
+              newBalance,
+              repo.merge_penalty
+            ),
+          },
+        })
+    );
 
     // activity log - pr funded
     await db.createActivityLog(
@@ -172,22 +182,25 @@ export const handlePullRequestOpened = async ({
   });
 
   // complete check with failure
-  await octokit.rest.checks.create({
-    owner,
-    repo: repoName,
-    name: GITKARMA_CHECK_NAME,
-    head_sha: headSha,
-    status: "completed",
-    conclusion: "failure",
-    output: {
-      title: checks.failed.title,
-      summary: checks.failed.summary(
-        githubUsername,
-        balance,
-        repo.merge_penalty
-      ),
-    },
-  });
+  await retry(
+    async () =>
+      await octokit.rest.checks.create({
+        owner,
+        repo: repoName,
+        name: GITKARMA_CHECK_NAME,
+        head_sha: headSha,
+        status: "completed",
+        conclusion: "failure",
+        output: {
+          title: checks.failed.title,
+          summary: checks.failed.summary(
+            githubUsername,
+            balance,
+            repo.merge_penalty
+          ),
+        },
+      })
+  );
 
   // activity log - failed to fund pr
   await db.createActivityLog(

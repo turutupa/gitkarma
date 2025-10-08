@@ -23,6 +23,7 @@ import {
   gitkarmaEnabledOrThrow,
   isBot,
   isSenderAdmin,
+  retry,
 } from "./utils";
 
 /**
@@ -324,17 +325,20 @@ class IssueCommentWebhook {
     log.info({ account }, "issue_comment > user account");
 
     // set the check to in progress
-    await this.octokit.rest.checks.create({
-      owner: this.owner,
-      repo: this.repoName,
-      name: GITKARMA_CHECK_NAME,
-      head_sha: pr.head_sha,
-      status: "in_progress",
-      output: {
-        title: checks.inProgress.title,
-        summary: checks.inProgress.summary(user.github_username, balance),
-      },
-    });
+    await retry(
+      async () =>
+        await this.octokit.rest.checks.create({
+          owner: this.owner,
+          repo: this.repoName,
+          name: GITKARMA_CHECK_NAME,
+          head_sha: pr.head_sha,
+          status: "in_progress",
+          output: {
+            title: checks.inProgress.title,
+            summary: checks.inProgress.summary(user.github_username, balance),
+          },
+        })
+    );
 
     // If the admin emoji is used, verify if the sender is a repo admin:
     const sender = await getOrDefaultGithubUser(
@@ -365,18 +369,22 @@ class IssueCommentWebhook {
           headers: githubHeaders,
         }
       );
-      await this.octokit.rest.checks.create({
-        owner: this.owner,
-        repo: this.repoName,
-        name: GITKARMA_CHECK_NAME,
-        head_sha: pr.head_sha,
-        status: "completed",
-        conclusion: "success",
-        output: {
-          title: checks.adminApproved.title,
-          summary: checks.adminApproved.summary(),
-        },
-      });
+      // mark pr as completed
+      await retry(
+        async () =>
+          await this.octokit.rest.checks.create({
+            owner: this.owner,
+            repo: this.repoName,
+            name: GITKARMA_CHECK_NAME,
+            head_sha: pr.head_sha,
+            status: "completed",
+            conclusion: "success",
+            output: {
+              title: checks.adminApproved.title,
+              summary: checks.adminApproved.summary(),
+            },
+          })
+      );
       // activity log - admin override
       await db.createActivityLog(
         this.repo.id,
@@ -429,23 +437,26 @@ class IssueCommentWebhook {
       );
 
       // notify github to pass check
-      await this.octokit.rest.checks.create({
-        owner: this.owner,
-        repo: this.repoName,
-        name: GITKARMA_CHECK_NAME,
-        head_sha: pr.head_sha,
-        status: "completed",
-        conclusion: "success",
-        output: {
-          title: checks.completed.title,
-          summary: checks.completed.summary(
-            user.github_username,
-            balance,
-            newBalance,
-            this.repo.merge_penalty
-          ),
-        },
-      });
+      await retry(
+        async () =>
+          await this.octokit.rest.checks.create({
+            owner: this.owner,
+            repo: this.repoName,
+            name: GITKARMA_CHECK_NAME,
+            head_sha: pr.head_sha,
+            status: "completed",
+            conclusion: "success",
+            output: {
+              title: checks.completed.title,
+              summary: checks.completed.summary(
+                user.github_username,
+                balance,
+                newBalance,
+                this.repo.merge_penalty
+              ),
+            },
+          })
+      );
 
       // activity log - re-check successfull, pr funded
       await db.createActivityLog(
@@ -479,22 +490,25 @@ class IssueCommentWebhook {
       }
     );
 
-    await this.octokit.rest.checks.create({
-      owner: this.owner,
-      repo: this.repoName,
-      name: GITKARMA_CHECK_NAME,
-      head_sha: pr.head_sha,
-      status: "completed",
-      conclusion: "failure",
-      output: {
-        title: checks.failed.title,
-        summary: checks.failed.summary(
-          this.prOwnerGithubName,
-          balance,
-          this.repo.merge_penalty
-        ),
-      },
-    });
+    await retry(
+      async () =>
+        await this.octokit.rest.checks.create({
+          owner: this.owner,
+          repo: this.repoName,
+          name: GITKARMA_CHECK_NAME,
+          head_sha: pr.head_sha,
+          status: "completed",
+          conclusion: "failure",
+          output: {
+            title: checks.failed.title,
+            summary: checks.failed.summary(
+              this.prOwnerGithubName,
+              balance,
+              this.repo.merge_penalty
+            ),
+          },
+        })
+    );
 
     // activity log - re-check failed, not enough funds
     await db.createActivityLog(

@@ -23,6 +23,7 @@
   "dependencies": {
     "@emoji-mart/data": "^1.2.1",
     "@emoji-mart/react": "^1.1.1",
+    "@emotion/react": "^11.14.0",
     "@mantine/charts": "^7.17.5",
     "@mantine/core": "7.17.0",
     "@mantine/dates": "^7.17.7",
@@ -42,6 +43,7 @@
     "next": "^15.1.5",
     "next-auth": "^4.24.11",
     "react": "19.0.0",
+    "react-awesome-reveal": "^4.3.1",
     "react-dom": "19.0.0",
     "react-icons": "^5.5.0",
     "recharts": "^2.15.3",
