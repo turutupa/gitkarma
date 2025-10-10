@@ -1,10 +1,10 @@
 /*********************************************** */
 /*                  CHECKS                       */
 /*********************************************** */
-const completedCheckTitle = "GitKarma Funds Check Completed";
-const inProgressCheckTitle = "GitKarma Funds Check in Progress";
-const failedCheckTitle = "GitKarma Funds Check Failed";
-const adminApprovedCheckTitle = "GitKarma Funds Check Approved by Admin";
+const completedCheckTitle = "GitKarma Check Completed";
+const inProgressCheckTitle = "GitKarma Check in Progress";
+const failedCheckTitle = "GitKarma Check Failed";
+const adminApprovedCheckTitle = "GitKarma Check Approved by Admin";
 
 const adminApprovedCheckSummary = () => {
   return `## ✅ Karma Points Verification Complete - Admin Approved

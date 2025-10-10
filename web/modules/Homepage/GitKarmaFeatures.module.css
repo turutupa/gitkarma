@@ -1,0 +1,39 @@
+.feature {
+  display: flex;
+  flex-direction: column;
+  transition:
+    transform 200ms ease,
+    box-shadow 200ms ease;
+  background-color: light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-9));
+  user-select: none;
+  position: relative;
+}
+
+.feature:hover {
+  transform: translateY(-5px);
+}
+
+.iconBox {
+  background-color: var(--feature-color);
+  color: #fff;
+  border-radius: var(--mantine-radius-md);
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.description {
+  flex-grow: 1;
+  color: light-dark(var(--mantine-color-gray-7), var(--mantine-color-gray-5));
+}
+
+.upcoming {
+  position: absolute;
+  top: 8px;
+  right: 6px;
+  pointer-events: none;
+  font-weight: 500;
+}

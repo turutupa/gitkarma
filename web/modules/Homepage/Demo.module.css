@@ -1,0 +1,586 @@
+.container {
+  width: 100%;
+  min-height: 420px;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  padding: 3.25rem 1.5rem;
+  background: linear-gradient(
+    135deg,
+    light-dark(var(--mantine-color-gray-1), var(--mantine-color-dark-7)),
+    light-dark(var(--mantine-color-gray-2), var(--mantine-color-dark-8))
+  );
+  border: 1px solid light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-6));
+  border-radius: 22px;
+  box-shadow:
+    0 12px 32px -12px color-mix(in srgb, var(--mantine-color-primary-4) 25%, transparent),
+    0 4px 14px -6px rgba(0, 0, 0, 0.45),
+    inset 0 0 0 1px color-mix(in srgb, var(--mantine-color-primary-4) 18%, transparent);
+  position: relative;
+  overflow: hidden;
+}
+
+.container::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    120deg,
+    color-mix(in srgb, var(--mantine-color-primary-5) 35%, transparent),
+    transparent 55%
+  );
+  pointer-events: none;
+  mix-blend-mode: overlay;
+  opacity: 0.7;
+  z-index: -1;
+}
+
+.container::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 10%;
+  right: 10%;
+  height: 4px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--mantine-color-primary-4),
+    color-mix(in srgb, var(--mantine-color-primary-4) 80%, var(--mantine-color-white)),
+    transparent
+  );
+  opacity: 0.65;
+  filter: blur(0.5px);
+  pointer-events: none;
+  z-index: -1;
+}
+
+.title {
+  color: light-dark(var(--mantine-color-black), var(--mantine-color-white));
+  font-family:
+    Greycliff CF,
+    var(--mantine-font-family);
+  font-size: 44px;
+  line-height: 1.2;
+  font-weight: 900;
+
+  @media (max-width: $mantine-breakpoint-xs) {
+    font-size: 28px;
+  }
+}
+
+.slide {
+  max-width: 720px;
+  margin: 0 auto;
+  text-align: center;
+  padding-block: 0.5rem;
+}
+
+.slide.leftAlign {
+  text-align: left;
+}
+
+.primaryBtn {
+  background: linear-gradient(
+    60deg,
+    var(--mantine-color-primary-5),
+    color-mix(in srgb, var(--mantine-color-primary-7), var(--mantine-color-dark-6))
+  ) !important;
+  color: var(--mantine-color-white);
+  font-weight: 600;
+  font-size: 1rem;
+  border: none;
+  padding: 0.9rem 1.6rem;
+  border-radius: 0.55rem;
+  cursor: pointer;
+  box-shadow: 0 4px 14px -4px color-mix(in srgb, var(--mantine-color-primary-4) 55%, transparent);
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease,
+    filter 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1.2;
+  height: auto;
+  min-height: 44px;
+  overflow: visible;
+}
+
+.primaryBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px -6px color-mix(in srgb, var(--mantine-color-primary-4) 60%, transparent);
+  filter: brightness(1.05);
+}
+
+.primaryBtn:active {
+  transform: translateY(1px);
+  box-shadow: 0 3px 10px -4px color-mix(in srgb, var(--mantine-color-primary-4) 50%, transparent);
+}
+
+.primaryBtn:focus-visible {
+  outline: 2px solid var(--mantine-color-primary-4);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--mantine-color-primary-4) 35%, transparent);
+}
+
+.primaryBtn > span {
+  line-height: 1.2;
+  font-weight: 600;
+  position: relative;
+  top: 1px;
+}
+
+.progress {
+  font-size: 0.75rem;
+  opacity: 0.55;
+}
+
+.slideTitle {
+  margin: 0 0 0.4rem;
+  font-weight: 700;
+  font-size: clamp(1.3rem, 2.6vw, 1.9rem);
+  color: light-dark(var(--mantine-color-primary-7), var(--mantine-color-primary-4));
+}
+
+.slideDesc {
+  margin: 0 0 1rem;
+  font-size: 0.95rem;
+  line-height: 1.45;
+  opacity: 0.78;
+}
+
+.actions {
+  margin-top: 1.25rem;
+  display: flex;
+  justify-content: center;
+}
+
+.reviewBox {
+  margin: 0 auto 1rem;
+  text-align: left;
+  border: 1px solid light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-6));
+  background: light-dark(var(--mantine-color-gray-0), var(--mantine-color-dark-9));
+  border-radius: 6px;
+  padding: 12px 14px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 13px;
+  line-height: 1.4;
+  min-height: 72px;
+  display: flex;
+  align-items: flex-start;
+  white-space: pre-wrap;
+  position: relative;
+  flex: 1;
+  width: 100%;
+}
+
+.reviewInput {
+  flex: 1;
+  color: light-dark(var(--mantine-color-dark-7), var(--mantine-color-dark-1));
+}
+
+.cursor {
+  display: inline-block;
+  width: 7px;
+  height: 1.1em;
+  background: var(--mantine-color-primary-4);
+  margin-left: 2px;
+  border-radius: 2px;
+  animation: blink 1s steps(1, end) infinite;
+  vertical-align: text-bottom;
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+.approveBtnDisabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.inputRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  max-width: 720px;
+  margin: 0 0 1rem;
+}
+
+.avatar {
+  margin-top: 1px;
+}
+
+.demoSection {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+  align-items: center;
+}
+
+.demoHeader {
+  text-align: center;
+  max-width: 760px;
+  padding: 0 1rem;
+}
+
+.demoTitle {
+  margin: 0 0 0.4rem;
+  font-size: clamp(1.4rem, 2.9vw, 2.05rem);
+  font-weight: 700;
+  background: linear-gradient(
+    90deg,
+    var(--mantine-color-primary-4),
+    color-mix(in srgb, var(--mantine-color-primary-4) 80%, white)
+  );
+  -webkit-background-clip: text;
+  color: transparent;
+  letter-spacing: 0.5px;
+}
+
+.demoTagline {
+  margin: 0;
+  font-size: 0.95rem;
+  opacity: 0.7;
+  line-height: 1.4;
+}
+
+.progressSteps {
+  display: flex;
+  justify-content: center;
+  gap: 0.75rem;
+  margin: 0 0 1.1rem;
+  flex-wrap: nowrap;
+  position: relative;
+  max-width: 960px;
+  padding: 0 1rem;
+}
+
+.progressStep {
+  position: relative;
+  display: flex;
+  align-items: center;
+  font-size: 11px;
+  font-weight: 500;
+  color: light-dark(var(--mantine-color-dark-4), var(--mantine-color-dark-4));
+  transition: color 0.25s ease;
+}
+
+.progressStep .stepCircle {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: light-dark(var(--mantine-color-gray-2), var(--mantine-color-dark-6));
+  display: grid;
+  place-items: center;
+  font-size: 12px;
+  font-weight: 600;
+  color: light-dark(var(--mantine-color-dark-6), #ccd6dd);
+  box-shadow: inset 0 0 0 1px light-dark(var(--mantine-color-gray-4), var(--mantine-color-dark-5));
+  transition:
+    background 0.35s ease,
+    color 0.35s ease,
+    box-shadow 0.35s ease;
+  z-index: 1;
+}
+
+.progressStep .stepLabel {
+  margin-left: 0.5rem;
+  white-space: nowrap;
+  max-width: 88px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  opacity: 0.75;
+  transition: opacity 0.3s ease;
+}
+
+.progressStep .stepConnector {
+  position: absolute;
+  top: 14px;
+  left: calc(100% + 4px);
+  width: 44px;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-6)),
+    light-dark(var(--mantine-color-gray-4), var(--mantine-color-dark-5))
+  );
+  border-radius: 2px;
+  pointer-events: none;
+}
+
+.progressStep.done .stepConnector {
+  background: linear-gradient(
+    90deg,
+    var(--mantine-color-primary-4),
+    color-mix(in srgb, var(--mantine-color-primary-4) 85%, white)
+  );
+}
+
+.progressStep.done .stepCircle {
+  background: var(--mantine-color-primary-4);
+  color: var(--mantine-color-white);
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--mantine-color-primary-4) 85%, #fff),
+    0 0 0 4px color-mix(in srgb, var(--mantine-color-primary-4) 28%, transparent);
+}
+
+.progressStep.active .stepCircle {
+  background: linear-gradient(
+    140deg,
+    var(--mantine-color-primary-4),
+    color-mix(in srgb, var(--mantine-color-primary-5) 80%, white)
+  );
+  color: var(--mantine-color-white);
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--mantine-color-primary-5) 85%, #fff),
+    0 0 0 6px color-mix(in srgb, var(--mantine-color-primary-4) 34%, transparent);
+}
+
+.progressStep.active,
+.progressStep.done {
+  color: light-dark(var(--mantine-color-dark-7), var(--mantine-color-dark-0));
+}
+
+.progressStep.active .stepLabel,
+.progressStep.done .stepLabel {
+  opacity: 0.95;
+}
+
+@media (max-width: 760px) {
+  .progressSteps {
+    gap: 0.4rem;
+  }
+  .progressStep .stepLabel {
+    display: none;
+  }
+  .progressStep .stepConnector {
+    width: 32px;
+    left: calc(100% + 2px);
+  }
+  .progressStep .stepCircle {
+    width: 24px;
+    height: 24px;
+    font-size: 11px;
+  }
+}
+
+.progressBar {
+  --seg-height: 38px;
+  --seg-radius: 10px;
+  --seg-gap: 6px;
+  width: 100%;
+  max-width: 920px;
+  margin: 0 auto 1.2rem;
+  display: flex;
+  gap: var(--seg-gap);
+  padding: 0 0.5rem;
+}
+
+.progressSegment {
+  position: relative;
+  flex: 1 1 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: var(--seg-height);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.15px;
+  line-height: 1;
+  border-radius: var(--seg-radius);
+  background: linear-gradient(
+    145deg,
+    light-dark(var(--mantine-color-gray-2), var(--mantine-color-dark-8)),
+    light-dark(var(--mantine-color-gray-1), var(--mantine-color-dark-9))
+  );
+  color: light-dark(var(--mantine-color-dark-5), var(--mantine-color-dark-3));
+  box-shadow:
+    inset 0 0 0 1px light-dark(var(--mantine-color-gray-4), var(--mantine-color-dark-6)),
+    0 1px 2px rgba(0 0 0 / 25%);
+  overflow: hidden;
+  transition:
+    background 0.4s ease,
+    color 0.35s ease,
+    box-shadow 0.4s ease,
+    flex-basis 0.45s ease;
+}
+
+.segLabel {
+  padding: 0 0.75rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  max-width: 100%;
+  opacity: 0.85;
+  transition: opacity 0.35s ease;
+}
+
+.segDivider {
+  position: absolute;
+  right: -3px;
+  top: 10%;
+  bottom: 10%;
+  width: 6px;
+  background: linear-gradient(
+    180deg,
+    transparent,
+    color-mix(in srgb, var(--mantine-color-primary-4) 55%, transparent),
+    transparent
+  );
+  filter: blur(4px);
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+.segDone {
+  background:
+    linear-gradient(
+      150deg,
+      color-mix(in srgb, var(--mantine-color-primary-4) 55%, transparent),
+      transparent 60%
+    ),
+    linear-gradient(
+      145deg,
+      color-mix(in srgb, var(--mantine-color-primary-4) 55%, #000),
+      color-mix(in srgb, var(--mantine-color-primary-5) 35%, #000)
+    );
+  color: light-dark(var(--mantine-color-white), var(--mantine-color-dark-1));
+  box-shadow:
+    inset 0 0 0 1px
+      color-mix(in srgb, var(--mantine-color-primary-4) 70%, var(--mantine-color-black)),
+    0 4px 10px -4px color-mix(in srgb, var(--mantine-color-primary-4) 45%, transparent),
+    0 1px 2px rgba(0 0 0 / 40%);
+  position: relative;
+  filter: brightness(1.08);
+  outline: 1px solid
+    color-mix(in srgb, var(--mantine-color-primary-4) 70%, var(--mantine-color-black));
+  outline-offset: -1px;
+}
+
+.segDone::before {
+  content: '✔';
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  translate: 0 -50%;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--mantine-color-white) !important;
+}
+
+.segDone .segLabel {
+  padding-left: 29px;
+  color: inherit;
+}
+
+.segDone::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    120deg,
+    transparent,
+    color-mix(in srgb, var(--mantine-color-primary-4) 45%, transparent),
+    transparent 60%
+  );
+  opacity: 0;
+  animation: segSheen 1s ease 0.05s forwards;
+  pointer-events: none;
+}
+
+@keyframes segSheen {
+  0% {
+    opacity: 0;
+    transform: translateX(-15%);
+  }
+  40% {
+    opacity: 0.55;
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(25%);
+  }
+}
+
+.segActive {
+  background: linear-gradient(
+    160deg,
+    color-mix(in srgb, var(--mantine-color-primary-5) 75%, white),
+    color-mix(in srgb, var(--mantine-color-primary-4) 65%, #000)
+  );
+  color: var(--mantine-color-white);
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--mantine-color-primary-5) 85%, var(--mantine-color-black)),
+    0 0 0 5px color-mix(in srgb, var(--mantine-color-primary-4) 30%, transparent),
+    0 6px 16px -6px color-mix(in srgb, var(--mantine-color-primary-5) 55%, transparent);
+}
+
+.segActive .segLabel {
+  opacity: 1;
+}
+
+.segTodo {
+  /* base style is default */
+}
+
+.progressSegment:hover:not(.segActive) {
+  color: light-dark(var(--mantine-color-dark-6), var(--mantine-color-dark-2));
+  box-shadow:
+    inset 0 0 0 1px light-dark(var(--mantine-color-gray-5), var(--mantine-color-dark-5)),
+    0 2px 6px -3px rgba(0 0 0 / 35%);
+}
+
+.progressSegment,
+.progressSegment * {
+  user-select: none;
+}
+
+@media (max-width: 860px) {
+  .progressBar {
+    --seg-height: 34px;
+  }
+  .progressSegment {
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 620px) {
+  .segLabel {
+    font-size: 0;
+    padding: 0;
+  }
+  .progressBar {
+    gap: 4px;
+  }
+  .progressSegment {
+    min-width: 0;
+  }
+}
+
+.karmaGain {
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--mantine-color-primary-4);
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  letter-spacing: 0.5px;
+  background: linear-gradient(
+    90deg,
+    var(--mantine-color-primary-4),
+    color-mix(in srgb, var(--mantine-color-primary-4) 85%, white)
+  );
+  -webkit-background-clip: text;
+  color: transparent;
+  text-shadow: 0 2px 6px color-mix(in srgb, var(--mantine-color-primary-4) 55%, transparent);
+  margin: 0.4rem 0 0.2rem;
+}

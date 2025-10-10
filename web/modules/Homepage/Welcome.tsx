@@ -14,7 +14,7 @@ export default function Welcome() {
           component="span"
           gradient={{ from: '#2CDD66', to: colorScheme === 'light' ? 'black' : 'white', deg: 60 }}
         >
-          gitkarma
+          GitKarma
         </Text>
       </Title>
       <Text color="dimmed" ta="center" size="lg" maw={700} mx="auto" mt="xl">

@@ -1,0 +1,76 @@
+.wrapper {
+  border: 1px solid light-dark(var(--mantine-color-gray-3), #2d333a);
+  background: light-dark(var(--mantine-color-white), #161b22);
+  border-radius: 6px;
+  font-size: 13px;
+  line-height: 1.4;
+  overflow: hidden;
+  box-shadow: 0 1px 2px rgba(0 0 0 / 6%);
+  width: 100%;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 10px;
+  background: light-dark(var(--mantine-color-gray-0), #0d1117);
+  border-bottom: 1px solid light-dark(var(--mantine-color-gray-3), #2d333a);
+  font-weight: 600;
+  font-size: 12.5px;
+}
+
+.title {
+  background: none;
+  color: light-dark(var(--mantine-color-dark-7), #e6edf3);
+}
+
+.statusIcon {
+  width: 18px;
+  height: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  border-radius: 50%;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.passed {
+  background: #238636;
+  color: #fff;
+}
+
+.failed {
+  background: #da3633;
+  color: #fff;
+}
+
+.body {
+  padding: 10px 14px 12px;
+  text-align: left;
+}
+
+.lead {
+  margin: 0 0 6px;
+  font-weight: 500;
+  color: light-dark(var(--mantine-color-dark-6), #d0d7de);
+}
+
+.list {
+  margin: 0 0 8px 0;
+  padding-left: 18px;
+}
+
+.list li {
+  margin: 2px 0;
+}
+
+.sub {
+  margin: 0;
+  opacity: 0.7;
+  font-size: 12.5px;
+}
+
+/* removed .centered and .list strong styling */

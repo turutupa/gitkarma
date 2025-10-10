@@ -8,12 +8,11 @@ export default function Homepage() {
   return (
     <div className={css.inner}>
       <div className={css.content}>
-        <Title className={css.title}>
-          The <span className={css.highlight}>smart</span> pull request <br /> management system
-        </Title>
+        <Title className={css.title}>Instant Reduced Time to Merge.</Title>
         <Text c="dimmed" mt="md">
-          gitkarma enhances development workflows by creating a balanced ecosystem where quality
-          reviews are incentivized and meaningful contributions are rewarded.
+          GitKarma speeds up pull request merges by requiring developers to review others’ PRs
+          before merging their own. Build a collaborative, fair workflow that rewards meaningful
+          code reviews and keeps your team moving fast.
         </Text>
 
         <List

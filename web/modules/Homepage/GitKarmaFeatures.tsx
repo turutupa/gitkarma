@@ -8,53 +8,45 @@ import {
   IconRobot,
   IconUserCheck,
 } from '@tabler/icons-react';
-import { Box, Container, Grid, Group, Paper, Text, Title, useMantineTheme } from '@mantine/core';
+import {
+  Badge,
+  Box,
+  Container,
+  Grid,
+  Group,
+  Paper,
+  Text,
+  Title,
+  useMantineTheme,
+} from '@mantine/core';
+import classes from './GitKarmaFeatures.module.css';
 
 interface FeatureProps {
   icon: React.ReactNode;
   title: string;
   description: string;
   color: string;
+  upcoming?: boolean;
 }
 
-const Feature = ({ icon, title, description, color }: FeatureProps) => {
-  const theme = useMantineTheme();
-
+const Feature = ({ icon, title, description, color, upcoming }: FeatureProps) => {
   return (
-    <Paper
-      withBorder
-      p="md"
-      radius="md"
-      shadow="sm"
-      h="100%"
-      style={{
-        transition: 'transform 200ms ease, box-shadow 200ms ease',
-        display: 'flex',
-        flexDirection: 'column',
-        '&:hover': {
-          transform: 'translateY(-5px)',
-          boxShadow: theme.shadows.md,
-        },
-      }}
-    >
+    <Paper p="md" h="100%" radius="md" shadow="md" withBorder className={classes.feature}>
+      {upcoming && (
+        <Badge variant="filled" size="xs" className={classes.upcoming}>
+          Upcoming
+        </Badge>
+      )}
       <Group mb="xs">
         <Box
-          style={(theme) => ({
-            backgroundColor: color,
-            color: '#fff',
-            borderRadius: theme.radius.md,
-            width: 40,
-            height: 40,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          })}
+          className={classes.iconBox}
+          style={{ '--feature-color': color } as React.CSSProperties}
         >
           {icon}
         </Box>
         <Title order={4}>{title}</Title>
       </Group>
-      <Text size="sm" color="dimmed" style={{ flexGrow: 1 }}>
+      <Text size="sm" color="dimmed" className={classes.description}>
         {description}
       </Text>
     </Paper>
@@ -118,24 +110,41 @@ export default function GitkarmaCapabilities() {
     },
   ];
 
+  // Mark upcoming features (all except non-upcoming titles) and reorder them at the end.
+  const nonUpcomingTitles = [
+    'Karma Economy',
+    'PR Workflow Integration',
+    'Team Dashboard',
+    'Productivity Metrics',
+  ];
+  const featuresWithUpcoming = features.map((feature) => ({
+    ...feature,
+    upcoming: !nonUpcomingTitles.includes(feature.title),
+  }));
+  const sortedFeatures = [
+    ...featuresWithUpcoming.filter((f) => !f.upcoming),
+    ...featuresWithUpcoming.filter((f) => f.upcoming),
+  ];
+
   return (
-    <Container size="lg" py={60}>
+    <Container mt="xl" size="xl" py={60}>
       <Title order={2} ta="center" mb={50}>
-        Full{' '}
-        <Text span color={theme.colors.primary[6]} inherit>
-          gitkarma
+        Upcoming{' '}
+        <Text span color={theme.colors.primary[6]} inherit fw={900}>
+          GitKarma
         </Text>{' '}
-        Capabilities
+        Features
       </Title>
 
       <Grid>
-        {features.map((feature, index) => (
+        {sortedFeatures.map((feature, index) => (
           <Grid.Col key={index} span={{ base: 12, sm: 6, md: 3 }}>
             <Feature
               icon={feature.icon}
               title={feature.title}
               description={feature.description}
               color={feature.color}
+              upcoming={feature.upcoming}
             />
           </Grid.Col>
         ))}

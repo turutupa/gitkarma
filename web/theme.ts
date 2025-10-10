@@ -24,8 +24,24 @@ const primary: MantineColorsTuple = [
   '#00973c',
 ];
 
+const darkBluish: MantineColorsTuple = [
+  '#f1f5f9',
+  '#d8dee6',
+  '#b3bcc9',
+  '#7a8899',
+  '#556273',
+  '#3d4a59',
+  '#2a3744',
+  '#16222f',
+  '#0f1925',
+  '#08111b',
+];
+
 export const theme = createTheme({
-  colors: { primary },
+  colors: {
+    primary,
+    dark: darkBluish, // override Mantine dark palette
+  },
   primaryColor: 'primary',
   breakpoints: {
     xs: '36em',
