@@ -28,7 +28,7 @@ export const GitHubCheck: React.FC<GitHubCheckProps> = (props) => {
       <div className={css.wrapper} data-variant="failed">
         <div className={css.header}>
           <span className={`${css.statusIcon} ${css.failed}`}>✖</span>
-          <span className={css.title}>{props.title || 'GitKarma Funds Check Failed'}</span>
+          <span className={css.title}>{props.title || 'GitKarma Check Failed'}</span>
         </div>
         <div className={css.body}>
           <p className={css.lead}>Balance too low to fund this pull request.</p>
@@ -50,7 +50,7 @@ export const GitHubCheck: React.FC<GitHubCheckProps> = (props) => {
     <div className={css.wrapper} data-variant="completed">
       <div className={css.header}>
         <span className={`${css.statusIcon} ${css.passed}`}>✔</span>
-        <span className={css.title}>{props.title || 'GitKarma Funds Check Passed'}</span>
+        <span className={css.title}>{props.title || 'GitKarma Check Passed'}</span>
       </div>
       <div className={css.body}>
         <p className={css.lead}>Required karma successfully reserved for this pull request.</p>

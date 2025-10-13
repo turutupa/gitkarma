@@ -6,7 +6,7 @@ export const DEFAULT_REPO_CONFIG = {
   prMergeDeductionDebits: 100, // debits deducted from the PR creator when merged
 };
 
-export const GITKARMA_CHECK_NAME: string = "GitKarma Funds Check";
+export const GITKARMA_CHECK_NAME: string = "GitKarma Check";
 export const TRIGGER_RECHECK_EMOJI: string = "✨";
 export const ADMIN_TRIGGER_RECHECK_EMOJI: string = "🚀";
 export const BALANCE_CHECK_EMOJI = "💰";

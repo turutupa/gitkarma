@@ -29,7 +29,7 @@ export class PullRequest {
   @Column({ type: "int" })
   pr_number: number; // GitHub PR number (unique per repo)
 
-  @Column({ type: "varchar", length: 50, nullable: true })
+  @Column({ type: "varchar", length: 255, nullable: true })
   pr_title: string;
 
   @Column({ type: "varchar", length: 512, nullable: true })
@@ -44,7 +44,7 @@ export class PullRequest {
   @Column({ length: 255, type: "varchar" })
   head_sha: string;
 
-  @Column({ length: 50, type: "varchar" })
+  @Column({ length: 255, type: "varchar" })
   state: string; // e.g., 'open', 'closed', 'merged'
 
   @Column({ type: "int", nullable: true })

@@ -114,6 +114,7 @@ export const getOrDefaultGithubRepo = async (
  * @param repo
  * @param githubUserId
  * @param githubUsername
+ * @param githubUrl?
  * @returns
  */
 export const getOrDefaultGithubUser = async (
@@ -236,25 +237,86 @@ export const isSenderAdmin = async (
  * @param func The async function to execute and retry.
  * @param retries The number of retry attempts (defaults to 3).
  * @param delayMs The delay between retries in milliseconds (defaults to 2000).
+ * @param validate Optional validator to treat "soft failures" (non-throwing) as retryable.
  * @returns The resolved value of the async function.
  */
+
+// Default validator for GitHub/Octokit responses.
+// - REST: expect 2xx status and no data.errors
+// - GraphQL-like: fail if top-level errors array is present
+const defaultGithubValidate = (result: any): boolean => {
+  if (result && typeof result.status === "number") {
+    const ok = result.status >= 200 && result.status < 300;
+    if (!ok) {
+      return false;
+    }
+    const data = (result as any).data;
+    if (data && Array.isArray((data as any).errors) && data.errors.length > 0) {
+      return false;
+    }
+    return true;
+  }
+  if (result && Array.isArray((result as any).errors)) {
+    return false;
+  }
+  return true;
+};
+
 export const retry = async <T>(
   func: () => Promise<T>,
   retries = 10,
-  delayMs = 2000
+  delayMs = 2000,
+  validate?: (result: T) => boolean | Promise<boolean>
 ): Promise<T> => {
   for (let i = 0; i <= retries; i++) {
     try {
-      return await func();
-    } catch (error) {
+      const result = await func();
+
+      const isValid =
+        typeof validate === "function"
+          ? await validate(result)
+          : defaultGithubValidate(result as any);
+
+      if (isValid) {
+        return result;
+      }
+
+      // Validation failed, continue retrying
+      if (i === retries) {
+        throw new Error("All retry attempts failed validation.");
+      }
+
+      console.warn(
+        `Attempt ${i + 1} failed validation. Retrying in ${
+          delayMs / 1000
+        } seconds...`
+      );
+      await sleep(delayMs);
+    } catch (error: any) {
       // All retries failed, re-throw the last error
       if (i === retries) {
         throw error;
       }
-      // Wait before the next attempt
-      const secs = delayMs / 1000;
+
+      // Respect Retry-After and rate limit headers if present
+      let waitMs = delayMs;
+      const resp = error?.response;
+      const headers = resp?.headers || {};
+      const retryAfter = Number(headers["retry-after"]);
+      if (!Number.isNaN(retryAfter) && retryAfter > 0) {
+        waitMs = retryAfter * 1000;
+      } else if (resp?.status === 403 || resp?.status === 429) {
+        const resetSec = Number(headers["x-ratelimit-reset"]);
+        if (!Number.isNaN(resetSec) && resetSec > 0) {
+          const nowSec = Math.floor(Date.now() / 1000);
+          const deltaMs = (resetSec - nowSec) * 1000;
+          if (deltaMs > waitMs) waitMs = deltaMs;
+        }
+      }
+
+      const secs = Math.max(0, Math.ceil(waitMs / 1000));
       console.warn(`Attempt ${i + 1} failed. Retrying in ${secs} seconds...`);
-      await sleep(delayMs);
+      await sleep(waitMs);
     }
   }
   // This line is unreachable but included for full type-safety
