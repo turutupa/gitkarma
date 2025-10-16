@@ -48,13 +48,7 @@ const Contact = () => {
         </Text>
       </Fade>
 
-      <form
-        name="contact"
-        onSubmit={form.onSubmit(handleSubmit)}
-        action="https://formspree.io/f/xwprylwk"
-        method="POST"
-        noValidate
-      >
+      <form name="contact" action="https://formspree.io/f/xwprylwk" method="POST" noValidate>
         {/* Honeypot field for spam protection */}
         <input type="hidden" name="form-name" value="contact" />
         <input type="text" name="bot-field" style={{ display: 'none' }} />
