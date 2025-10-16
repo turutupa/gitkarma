@@ -1,12 +1,12 @@
 .wrapper {
-  border: 1px solid light-dark(var(--mantine-color-gray-3), #2d333a);
-  background: light-dark(var(--mantine-color-white), #161b22);
+  border: 1px solid light-dark(var(--mantine-color-gray-5), var(--mantine-color-dark-6));
   border-radius: 6px;
+  background: light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-8));
   font-size: 13px;
   line-height: 1.4;
-  overflow: hidden;
-  box-shadow: 0 1px 2px rgba(0 0 0 / 6%);
   width: 100%;
+  overflow: hidden;
+  transition: all 0.15s linear;
 }
 
 .header {
@@ -14,8 +14,8 @@
   align-items: center;
   gap: 6px;
   padding: 8px 10px;
-  background: light-dark(var(--mantine-color-gray-0), #0d1117);
-  border-bottom: 1px solid light-dark(var(--mantine-color-gray-3), #2d333a);
+  background: light-dark(var(--mantine-color-gray-5), var(--mantine-color-dark-9));
+  border-bottom: 1px solid light-dark(var(--mantine-color-gray-5), var(--mantine-color-dark-6));
   font-weight: 600;
   font-size: 12.5px;
 }

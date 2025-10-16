@@ -1,3 +1,8 @@
+.margin {
+  margin-top: calc(var(--mantine-spacing-xl) * 2);
+  margin-bottom: calc(var(--mantine-spacing-xl) * 2);
+}
+
 .container {
   width: 100%;
   min-height: 420px;
@@ -10,8 +15,8 @@
   padding: 3.25rem 1.5rem;
   background: linear-gradient(
     135deg,
-    light-dark(var(--mantine-color-gray-1), var(--mantine-color-dark-7)),
-    light-dark(var(--mantine-color-gray-2), var(--mantine-color-dark-8))
+    light-dark(var(--mantine-color-gray-1), var(--mantine-color-dark-8)),
+    light-dark(var(--mantine-color-gray-4), var(--mantine-color-dark-9))
   );
   border: 1px solid light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-6));
   border-radius: 22px;

@@ -1,20 +1,58 @@
 .title {
   color: light-dark(var(--mantine-color-black), var(--mantine-color-white));
-  font-size: rem(100px);
+  font-size: rem(32px);
   font-weight: 900;
-  letter-spacing: rem(-2px);
+  letter-spacing: rem(-1px);
 
   @media (max-width: $mantine-breakpoint-md) {
-    font-size: rem(50px);
+    font-size: rem(22px);
   }
 }
 
-.subtitle {
+.title {
+  font-size: rem(72px);
+  font-weight: 900;
+  margin-top: rem(12px);
 }
 
 .highlight {
   position: relative;
-  background-color: var(--mantine-color-primary-4);
+  background: light-dark(var(--mantine-color-primary-4), var(--mantine-color-primary-7));
+  color: light-dark(var(--mantine-color-gray-9), var(--mantine-color-gray-1));
   border-radius: var(--mantine-radius-sm);
-  padding: 4px 12px;
+  padding: 3px 8px;
+}
+
+.quote {
+  margin: 0 auto;
+  max-width: 600px;
+  padding: rem(24px) rem(16px);
+  background: light-dark(var(--mantine-color-primary-0), var(--mantine-color-dark-6));
+  border-left: 6px solid #2cdd66;
+  border-radius: var(--mantine-radius-md);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.14);
+  position: relative;
+}
+
+.quoteMarks {
+  font-size: rem(48px);
+  color: var(--mantine-color-primary-4);
+  text-align: center;
+  line-height: 0.2;
+  font-family: serif;
+}
+
+.quoteText {
+  font-size: rem(28px);
+  color: light-dark(var(--mantine-color-gray-8), var(--mantine-color-gray-2));
+}
+
+.quoteAttribution {
+  color: var(--mantine-color-dimmed);
+  margin-top: rem(8px);
+  font-style: normal;
+}
+
+.quoteAuthor {
+  font-style: italic;
 }

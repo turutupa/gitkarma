@@ -1,4 +1,5 @@
 import React from 'react';
+import { FaCheckCircle } from 'react-icons/fa';
 import css from './GitHubCheck.module.css';
 
 type FailedCheck = {
@@ -49,7 +50,9 @@ export const GitHubCheck: React.FC<GitHubCheckProps> = (props) => {
   return (
     <div className={css.wrapper} data-variant="completed">
       <div className={css.header}>
-        <span className={`${css.statusIcon} ${css.passed}`}>✔</span>
+        <span className={`${css.statusIcon} ${css.passed}`}>
+          <FaCheckCircle style={{ color: '#2CDD66', fontSize: 22, verticalAlign: 'middle' }} />
+        </span>
         <span className={css.title}>{props.title || 'GitKarma Check Passed'}</span>
       </div>
       <div className={css.body}>

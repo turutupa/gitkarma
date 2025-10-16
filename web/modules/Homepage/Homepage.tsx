@@ -1,19 +1,45 @@
 import Link from 'next/link';
 import { IconCoin } from '@tabler/icons-react';
-import { Button, Group, Image, List, Text, ThemeIcon, Title } from '@mantine/core';
-import image from './image.svg';
+import {
+  Button,
+  Group,
+  List,
+  Paper,
+  Text,
+  ThemeIcon,
+  Title,
+  useMantineColorScheme,
+} from '@mantine/core';
+import { GitHubCheck } from '../../components/GitHubCheck/GitHubCheck';
 import css from './Homepage.module.css';
 
 export default function Homepage() {
+  const { colorScheme } = useMantineColorScheme();
+
   return (
-    <div className={css.inner}>
+    <div className={css.container}>
       <div className={css.content}>
         <Title className={css.title}>Instant Reduced Time to Merge.</Title>
-        <Text c="dimmed" mt="md">
-          GitKarma speeds up pull request merges by requiring developers to review others’ PRs
-          before merging their own. Build a collaborative, fair workflow that rewards meaningful
-          code reviews and keeps your team moving fast.
+        <Text c={colorScheme === 'dark' ? 'dimmed' : ''} mt="md">
+          Remember chasing teammates on Slack just to get your PR reviewed?{' '}
+          <b>“Can you review my PR?”</b> was a daily ritual.
         </Text>
+
+        <Text c={colorScheme === 'dark' ? 'dimmed' : ''} mt="md">
+          With GitKarma, that’s history.
+        </Text>
+
+        <Text c={colorScheme === 'dark' ? 'dimmed' : ''} mt="md">
+          Now, developers earn karma by reviewing others’ PRs and spend it to merge their own—no
+          more nagging, just a fair, collaborative workflow that rewards meaningful code reviews and
+          keeps your team moving fast.
+        </Text>
+
+        <Paper shadow="xs" p="lg" mt="lg" mb="lg">
+          <Text ta="center" size="lg" maw={700}>
+            It's a <span className={css.highlightGate}>gate</span> – not a game.
+          </Text>
+        </Paper>
 
         <List
           mt={30}
@@ -62,7 +88,43 @@ export default function Homepage() {
           </Button>
         </Group>
       </div>
-      <Image src={image.src} className={css.image} />
+
+      <div className={css.slackColumn}>
+        <div className={css.transitionWrapper}>
+          <div className={css.slackPosition}>
+            <div className={css.slackWindow}>
+              <div className={css.slackHeader}>
+                <span className={css.slackHeaderDot} />
+              </div>
+              <div className={css.slackMessage}>
+                <img
+                  src="https://raw.githubusercontent.com/mantinedev/mantine/refs/heads/master/.demo/avatars/avatar-2.png"
+                  alt="Slack Avatar"
+                  className={css.slackAvatar}
+                />
+                <div className={css.slackText}>
+                  <div className={css.slackMeta}>
+                    <span className={css.slackUsername}>johndoe</span>
+                    <span className={css.slackTimestamp}>10:24 AM</span>
+                  </div>
+                  <div className={css.slackContent}>Can you review my PR?</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Present: GitHubCheck */}
+          <div className={css.githubCheckPosition}>
+            <GitHubCheck
+              variant="completed"
+              oldBalance={120}
+              newBalance={100}
+              mergePenalty={20}
+              title="GitKarma Check"
+            />
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

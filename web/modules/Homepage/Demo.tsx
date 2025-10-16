@@ -243,14 +243,7 @@ export const Demo = () => {
     ),
   ];
 
-  const stepLabels = [
-    'Open PR',
-    'Check Fails',
-    'Review Teammate',
-    'Karma Earned',
-    'Re-run Check',
-    'Funded',
-  ];
+  const stepLabels = ['Open PR', 'Check Fails', 'Review Teammate', 'Karma Earned', 'Re-run Check'];
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -266,7 +259,7 @@ export const Demo = () => {
   }, [next]);
 
   return (
-    <>
+    <div className={css.margin}>
       <header aria-label="User journey walkthrough introduction" style={{ textAlign: 'center' }}>
         <Title mb="sm" className={css.title}>
           How does GitKarma work?
@@ -312,7 +305,7 @@ export const Demo = () => {
           </Fade>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 
