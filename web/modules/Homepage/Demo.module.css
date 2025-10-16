@@ -387,6 +387,8 @@
   display: flex;
   gap: var(--seg-gap);
   padding: 0 0.5rem;
+  display: flex;
+  justify-content: center;
 }
 
 .progressSegment {

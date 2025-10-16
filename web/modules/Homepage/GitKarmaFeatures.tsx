@@ -8,6 +8,7 @@ import {
   IconRobot,
   IconUserCheck,
 } from '@tabler/icons-react';
+import { Fade } from 'react-awesome-reveal';
 import {
   Badge,
   Box,
@@ -128,27 +129,31 @@ export default function GitkarmaCapabilities() {
 
   return (
     <Container mt="xl" size="xl" py={60}>
-      <Title order={2} ta="center" mb={50}>
-        Upcoming{' '}
-        <Text span color={theme.colors.primary[6]} inherit fw={900}>
-          GitKarma
-        </Text>{' '}
-        Features
-      </Title>
+      <Fade triggerOnce cascade delay={200} fraction={0.6}>
+        <Title order={2} ta="center" mb={50}>
+          Upcoming{' '}
+          <Text span color={theme.colors.primary[6]} inherit fw={900}>
+            GitKarma
+          </Text>{' '}
+          Features
+        </Title>
+      </Fade>
 
-      <Grid>
-        {sortedFeatures.map((feature, index) => (
-          <Grid.Col key={index} span={{ base: 12, sm: 6, md: 3 }}>
-            <Feature
-              icon={feature.icon}
-              title={feature.title}
-              description={feature.description}
-              color={feature.color}
-              upcoming={feature.upcoming}
-            />
-          </Grid.Col>
-        ))}
-      </Grid>
+      <Fade triggerOnce cascade delay={200} fraction={0.5}>
+        <Grid>
+          {sortedFeatures.map((feature, index) => (
+            <Grid.Col key={index} span={{ base: 12, sm: 6, md: 3 }}>
+              <Feature
+                icon={feature.icon}
+                title={feature.title}
+                description={feature.description}
+                color={feature.color}
+                upcoming={feature.upcoming}
+              />
+            </Grid.Col>
+          ))}
+        </Grid>
+      </Fade>
     </Container>
   );
 }

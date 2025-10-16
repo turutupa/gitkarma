@@ -260,51 +260,61 @@ export const Demo = () => {
 
   return (
     <div className={css.margin}>
-      <header aria-label="User journey walkthrough introduction" style={{ textAlign: 'center' }}>
-        <Title mb="sm" className={css.title}>
-          How does GitKarma work?
-        </Title>
-        <Text mb="lg">
-          <span className={css.slideDesc} style={{ marginTop: 0 }}>
-            Interactive walkthrough of how GitKarma funds and validates a PR.
-          </span>
-        </Text>
-      </header>
+      <Fade triggerOnce cascade direction="right" damping={0.6} fraction={0.8}>
+        <header aria-label="User journey walkthrough introduction" style={{ textAlign: 'center' }}>
+          <Title mb="sm" className={css.title}>
+            How does GitKarma work?
+          </Title>
+          <Text mb="lg">
+            <span className={css.slideDesc} style={{ marginTop: 0 }}>
+              Interactive walkthrough of how GitKarma funds and validates a PR.
+            </span>
+          </Text>
+        </header>
+      </Fade>
 
       {/* Progress steps (outside animated height container) */}
       <div className={css.progressBar} role="list" aria-label="Funding journey progress">
-        {stepLabels.map((label, i) => {
-          const stateClass = i < index ? css.segDone : i === index ? css.segActive : css.segTodo;
-          return (
-            <Text
-              key={label}
-              role="listitem"
-              className={`${css.progressSegment} ${stateClass}`}
-              aria-current={i === index ? 'step' : undefined}
-              aria-label={`${label} (${i < index ? 'completed' : i === index ? 'current step' : 'upcoming'})`}
-            >
-              <span className={css.segLabel}>{label}</span>
-              {i < stepLabels.length - 1 && <span className={css.segDivider} aria-hidden="true" />}
-            </Text>
-          );
-        })}
+        <Fade triggerOnce cascade direction="right" delay={200} damping={0.2} fraction={0.8}>
+          {stepLabels.map((label, i) => {
+            const stateClass = i < index ? css.segDone : i === index ? css.segActive : css.segTodo;
+            return (
+              <Text
+                key={label}
+                role="listitem"
+                className={`${css.progressSegment} ${stateClass}`}
+                aria-current={i === index ? 'step' : undefined}
+                aria-label={`${label} (${i < index ? 'completed' : i === index ? 'current step' : 'upcoming'})`}
+              >
+                <span className={css.segLabel}>{label}</span>
+
+                {i < stepLabels.length - 1 && (
+                  <span className={css.segDivider} aria-hidden="true" />
+                )}
+              </Text>
+            );
+          })}
+        </Fade>
       </div>
-      <div
-        className={css.container}
-        aria-label="Demo slideshow"
-        style={{
-          // Height here is the content box height; padding (from CSS) sits outside it
-          height: containerHeight,
-          overflow: 'hidden',
-          transition: animateHeight ? 'height 300ms ease' : undefined,
-        }}
-      >
-        <div ref={contentRef}>
-          <Fade key={index} direction="down" triggerOnce>
-            {slides[index]({ next, restart })}
-          </Fade>
+
+      <Fade triggerOnce direction="up" fraction={0.8}>
+        <div
+          className={css.container}
+          aria-label="Demo slideshow"
+          style={{
+            // Height here is the content box height; padding (from CSS) sits outside it
+            height: containerHeight,
+            overflow: 'hidden',
+            transition: animateHeight ? 'height 300ms ease' : undefined,
+          }}
+        >
+          <div ref={contentRef}>
+            <Fade key={index} direction="down" triggerOnce>
+              {slides[index]({ next, restart })}
+            </Fade>
+          </div>
         </div>
-      </div>
+      </Fade>
     </div>
   );
 };

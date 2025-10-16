@@ -1,11 +1,14 @@
-import { Text, Title } from '@mantine/core';
+import { Fade } from 'react-awesome-reveal';
+import { Text, Title, useMantineColorScheme } from '@mantine/core';
 import css from './Welcome.module.css';
 
 export default function Welcome() {
+  const { colorScheme } = useMantineColorScheme();
+
   return (
-    <div className="reveal fade-in">
-      <Title className={css.title} ta="center" mt="xl" mb="xl">
-        GitKarma
+    <Fade triggerOnce cascade damping={0.2} fraction={0.2}>
+      <Title className={css.title} ta="center">
+        Git<span className={css.bright}>Karma</span>
       </Title>
 
       {/* blockquote */}
@@ -16,15 +19,28 @@ export default function Welcome() {
         <Text ta="center" size="xl" fw={700} className={css.quoteText}>
           Can you review my PR?
         </Text>
-        <Text ta="center" size="lg" className={css.quoteAttribution}>
-          – <span className={css.quoteAuthor}>said no one ever again</span>
+        <Text
+          ta="center"
+          size="lg"
+          fs="italic"
+          className={css.quoteAttribution}
+          color={colorScheme === 'dark' && 'dimmed'}
+        >
+          – said no one ever again
         </Text>
       </blockquote>
 
-      <Text color="dimmed" ta="center" size="lg" maw={700} mx="auto" mt="xl">
+      <Text
+        color={colorScheme === 'dark' && 'dimmed'}
+        ta="center"
+        size="lg"
+        maw={700}
+        mx="auto"
+        mt="xl"
+      >
         No more Slack chasing. Merge PRs faster with a karma-based reward system. Boost developer
         productivity, incentivize collaboration, and improve code quality across your team.
       </Text>
-    </div>
+    </Fade>
   );
 }
