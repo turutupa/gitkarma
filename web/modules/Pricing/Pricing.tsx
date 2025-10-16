@@ -122,7 +122,14 @@ const Pricing = () => {
       </Text> */}
 
       <Fade triggerOnce delay={400} duration={1200}>
-        <Text ta="center" mb="xl" fw={500} c="dimmed" maw={800} m="auto">
+        <Text
+          ta="center"
+          mb="xl"
+          fw={500}
+          c={colorScheme === 'dark' ? 'dimmed' : ''}
+          maw={800}
+          m="auto"
+        >
           Gitkarma is <span className={css.highlight}>free</span> to use right now — and we plan to
           keep it that way for the time being! Down the road, as we grow and add more features,
           pricing or plan options might change. If that happens, we’ll be sure to give you a
