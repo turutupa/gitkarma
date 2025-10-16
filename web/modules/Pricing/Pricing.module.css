@@ -1,0 +1,8 @@
+.highlight {
+  position: relative;
+  background: light-dark(var(--mantine-color-primary-5), var(--mantine-color-primary-8));
+  color: light-dark(var(--mantine-color-gray-9), var(--mantine-color-gray-1));
+  border-radius: var(--mantine-radius-sm);
+  padding: 2px 4px;
+  font-weight: bold;
+}

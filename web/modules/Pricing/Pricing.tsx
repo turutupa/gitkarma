@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import Link from 'next/link';
+import { Fade } from 'react-awesome-reveal';
 import {
   Box,
   Button,
@@ -13,6 +14,7 @@ import {
   useMantineTheme,
 } from '@mantine/core';
 import PricingCard from './PricingCard';
+import css from './Pricing.module.css';
 
 const Pricing = () => {
   const theme = useMantineTheme();
@@ -110,18 +112,31 @@ const Pricing = () => {
   return (
     <div>
       {/* heading */}
-      <Title ta="center" order={1} mb="sm" fw={900}>
-        Pricing
-      </Title>
-      <Text ta="center" mb="xl" fw={500} c="dimmed" maw={400} m="auto">
+      <Fade triggerOnce direction="down" delay={300}>
+        <Title ta="center" order={1} mt="xl" mb="sm" fw={900}>
+          Pricing
+        </Title>
+      </Fade>
+      {/* <Text ta="center" mb="xl" fw={500} c="dimmed" maw={800} m="auto" td="line-through">
         Choose the perfect plan for your needs. Flexible options for teams of all sizes.
-      </Text>
+      </Text> */}
+
+      <Fade triggerOnce delay={400} duration={1200}>
+        <Text ta="center" mb="xl" fw={500} c="dimmed" maw={800} m="auto">
+          Gitkarma is <span className={css.highlight}>free</span> to use right now — and we plan to
+          keep it that way for the time being! Down the road, as we grow and add more features,
+          pricing or plan options might change. If that happens, we’ll be sure to give you a
+          heads-up.
+        </Text>
+      </Fade>
 
       {/* render pricing cards */}
       <SimpleGrid cols={{ base: 1, sm: 1, md: 3 }} spacing={{ base: 'sm', lg: 'xl' }}>
-        <PricingCard {...team} />
-        <PricingCard {...startup} />
-        <PricingCard {...enterprise} />
+        {[team, startup, enterprise].map((plan, i) => (
+          <Fade key={`pricing-card-fade-${plan.title}`} direction="right" delay={i * 200}>
+            <PricingCard {...plan} />
+          </Fade>
+        ))}
       </SimpleGrid>
 
       {/* divider */}

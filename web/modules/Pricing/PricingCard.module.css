@@ -2,22 +2,23 @@
   background-color: light-dark(var(--mantine-color-white), var(--mantine-color-dark-7));
   perspective: 1000px; /* sets a 3D space for children */
   transition: transform 0.3s ease !important;
+  height: 100%;
 }
 
 .card:hover {
   transform: translateY(-10px) scale(1.03) rotateX(0.01deg) rotateY(0.02deg);
-  border-color: light-dark(var(--mantine-color-primary-6), var(--mantine-color-pink-6));
-  box-shadow: 0px 10px 0px 0px light-dark(rgba(27, 196, 84, 0.4), rgba(193, 37, 91, 0.5));
+  border-color: light-dark(var(--mantine-color-primary-6), var(--mantine-color-primary-6));
+  box-shadow: 0px 10px 0px 0px
+    light-dark(var(--mantine-color-primary-6), var(--mantine-color-primary-6));
   perspective: 1000px;
 }
 
 .card:hover > .paper {
   transform: translateY(-10px) scale(1.03) rotateX(5deg);
   box-shadow:
-    0 15px 40px light-dark(rgba(0, 0, 0, 0.25), rgba(193, 37, 91, 0.25)),
+    0 15px 40px light-dark(rgba(0, 0, 0, 0.25), rgba(var(--mantine-color-gray-1), 0.3)),
     inset 0 -50px 100px -100px rgba(255, 255, 255, 0.2);
   background-color: light-dark(var(--mantine-color-gray-4), var(--mantine-color-dark-7));
-  /* border: 1px solid light-dark(var(--mantine-color-primary-8), var(--mantine-color-pink-6)) !important; */
 }
 
 .card:hover > p {
@@ -29,7 +30,7 @@
 }
 
 .card:hover > .paper > div > div > :nth-child(1) {
-  color: light-dark(var(--mantine-color-primary-8), var(--mantine-color-pink-6)) !important;
+  color: light-dark(var(--mantine-color-primary-8), var(--mantine-color-primary-6)) !important;
 }
 
 .card:hover > .paper > div > div > :nth-child(2) {

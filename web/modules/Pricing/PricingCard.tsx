@@ -113,7 +113,7 @@ const Pricing: React.FC<Props> = ({
           </Text>
           {titleBadge && (
             <span>
-              <Badge bg={theme.colors.pink[8]}>{titleBadge}</Badge>
+              <Badge bg={theme.colors.primary[8]}>{titleBadge}</Badge>
             </span>
           )}
         </Group>

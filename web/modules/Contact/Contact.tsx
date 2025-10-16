@@ -1,3 +1,4 @@
+import { Fade } from 'react-awesome-reveal';
 import {
   Button,
   Center,
@@ -20,68 +21,100 @@ const Contact = () => {
       message: '',
     },
     validate: {
-      name: (value: string) => value.trim().length < 2,
-      email: (value: string) => !/^\S+@\S+$/.test(value),
-      subject: (value: string) => value.trim().length === 0,
+      name: (value: string) =>
+        value.trim().length < 2 ? 'Name must have at least 2 characters' : null,
+      email: (value: string) => (/^\S+@\S+$/.test(value) ? null : 'Invalid email'),
+      subject: (value: string) => (value.trim().length === 0 ? 'Subject is required' : null),
     },
   });
 
+  // This function handles form submission
+  const handleSubmit = (values: typeof form.values) => {
+    console.log('Submitting', values);
+  };
+
   return (
     <Container size="sm" p={0}>
-      <Title ta="center" order={1} mb="sm" fw={900}>
-        Get in touch
-      </Title>
-      <Text ta="center" mb="xl" fw={500} c="dimmed" maw={400} m="auto">
-        We're all ears! Whether you need help, want a quote, or just want to chat — we'd love to
-        hear from you!
-      </Text>
-      <form onSubmit={form.onSubmit(() => {})}>
+      <Fade triggerOnce direction="down" delay={300}>
+        <Title ta="center" order={1} mb="sm" fw={900}>
+          Get in touch
+        </Title>
+      </Fade>
+
+      <Fade triggerOnce delay={400} duration={1200}>
+        <Text ta="center" mb="xl" fw={500} c="dimmed" maw={400} m="auto">
+          We're all ears! Whether you need help, want a quote, or just want to chat — we'd love to
+          hear from you!
+        </Text>
+      </Fade>
+
+      <form
+        name="contact"
+        onSubmit={form.onSubmit(handleSubmit)}
+        action="https://formspree.io/f/xwprylwk"
+        method="POST"
+        noValidate
+      >
+        {/* Honeypot field for spam protection */}
+        <input type="hidden" name="form-name" value="contact" />
+        <input type="text" name="bot-field" style={{ display: 'none' }} />
+
         <SimpleGrid cols={{ base: 1, sm: 2 }}>
-          <TextInput
-            label="Name"
-            placeholder="Your name"
-            name="name"
-            variant="filled"
-            disabled
-            {...form.getInputProps('name')}
-          />
-          <TextInput
-            label="Email"
-            placeholder="Your email"
-            name="email"
-            variant="filled"
-            disabled
-            {...form.getInputProps('email')}
-          />
+          <Fade triggerOnce cascade direction="right" damping={0.1}>
+            <TextInput
+              label="Name"
+              placeholder="Your name"
+              {...form.getInputProps('name')}
+              name="name"
+              required
+              variant="filled"
+              autoFocus
+            />
+            <TextInput
+              label="Email"
+              placeholder="Your email"
+              {...form.getInputProps('email')}
+              name="email"
+              required
+              variant="filled"
+              type="email"
+            />
+          </Fade>
         </SimpleGrid>
 
-        <TextInput
-          label="Subject"
-          placeholder="Subject"
-          mt="md"
-          name="subject"
-          variant="filled"
-          disabled
-          {...form.getInputProps('subject')}
-        />
-        <Textarea
-          mt="md"
-          label="Message"
-          placeholder="Your message"
-          maxRows={10}
-          minRows={5}
-          autosize
-          name="message"
-          variant="filled"
-          disabled
-          {...form.getInputProps('message')}
-        />
-        <Group justify="center" mt="xl">
-          <Button type="submit" size="md" disabled>
-            Send message
-          </Button>
-        </Group>
-        <Center mt="xl">Temporarily disabled. Sorry for the inconvenience.</Center>
+        <Fade triggerOnce cascade direction="right" damping={0.1}>
+          <TextInput
+            label="Subject"
+            placeholder="Subject"
+            {...form.getInputProps('subject')}
+            name="subject"
+            required
+            mt="md"
+            variant="filled"
+          />
+          <Textarea
+            label="Message"
+            placeholder="Your message"
+            {...form.getInputProps('message')}
+            name="message"
+            required
+            mt="md"
+            maxRows={10}
+            minRows={5}
+            autosize
+            variant="filled"
+          />
+          <Group justify="center" mt="xl">
+            <Button type="submit" size="md" color="primary.7" disabled={!form.isValid()}>
+              Send message
+            </Button>
+          </Group>
+        </Fade>
+
+        <Fade triggerOnce cascade direction="up" delay={800}>
+          <Center mt="xl">Thanks for reaching out!</Center>
+          <Center mt="xs">We’ll get back to you faster than a caffeinated squirrel 🐿️.</Center>
+        </Fade>
       </form>
     </Container>
   );
