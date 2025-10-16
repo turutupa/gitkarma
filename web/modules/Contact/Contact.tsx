@@ -28,11 +28,6 @@ const Contact = () => {
     },
   });
 
-  // This function handles form submission
-  const handleSubmit = (values: typeof form.values) => {
-    console.log('Submitting', values);
-  };
-
   return (
     <Container size="sm" p={0}>
       <Fade triggerOnce direction="down" delay={300}>
@@ -49,7 +44,6 @@ const Contact = () => {
       </Fade>
 
       <form name="contact" action="https://formspree.io/f/xwprylwk" method="POST" noValidate>
-        {/* Honeypot field for spam protection */}
         <input type="hidden" name="form-name" value="contact" />
         <input type="text" name="bot-field" style={{ display: 'none' }} />
 
