@@ -24,14 +24,14 @@ export default function Welcome() {
           size="lg"
           fs="italic"
           className={css.quoteAttribution}
-          color={colorScheme === 'dark' && 'dimmed'}
+          c={colorScheme === 'dark' ? 'dimmed' : ''}
         >
           – said no one ever again
         </Text>
       </blockquote>
 
       <Text
-        color={colorScheme === 'dark' && 'dimmed'}
+        c={colorScheme === 'dark' ? 'dimmed' : ''}
         ta="center"
         size="lg"
         maw={700}
