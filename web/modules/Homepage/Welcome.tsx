@@ -22,9 +22,8 @@ export default function Welcome() {
       </blockquote>
 
       <Text color="dimmed" ta="center" size="lg" maw={700} mx="auto" mt="xl">
-        No more Slack chasing. Merge PRs faster with a karma-based reward system. It's a{' '}
-        <span className={css.highlight}>gate</span> – not a game. Boost developer productivity,
-        incentivize collaboration, and improve code quality across your team.
+        No more Slack chasing. Merge PRs faster with a karma-based reward system. Boost developer
+        productivity, incentivize collaboration, and improve code quality across your team.
       </Text>
     </div>
   );
