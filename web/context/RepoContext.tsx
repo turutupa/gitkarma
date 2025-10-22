@@ -13,6 +13,13 @@ const RepoContext = createContext<RepoContextType>({
   setCurrentRepoGithubId: () => {},
 });
 
+/**
+ * Provides the current repository context to the application.
+ * Manages the `currentRepoGithubId` state using session storage and updates HTTP headers accordingly.
+ *
+ * @param children - The child components to be wrapped by the provider.
+ * @returns A context provider for repository-related state.
+ */
 export const RepoProvider = ({ children }: { children: ReactNode }) => {
   const [currentRepoGithubId, setCurrentRepoGithubId] = useSessionStorage<number | null>(
     'currentRepo',

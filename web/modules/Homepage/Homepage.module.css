@@ -10,6 +10,7 @@
   padding-right: 10px;
   background-color: light-dark(var(--mantine-color-dark-1), var(--mantine-color-dark-9));
   border-radius: 8px;
+  --image-perspective: 1200px;
 }
 
 .content {
@@ -43,266 +44,81 @@
   }
 }
 
-.image {
-  width: 376px;
-  height: 356px;
-
-  @media (max-width: $mantine-breakpoint-md) {
-    display: none;
-  }
-}
-
-.highlight {
-  position: relative;
-  background-color: var(--mantine-color-primary-4);
-  border-radius: var(--mantine-radius-sm);
-  padding: 4px 12px;
-}
-
 .highlightGate {
   position: relative;
   background: light-dark(var(--mantine-color-primary-5), var(--mantine-color-primary-8));
   color: light-dark(var(--mantine-color-gray-9), var(--mantine-color-gray-1));
+  font-weight: bold;
   border-radius: var(--mantine-radius-sm);
   padding: 3px 8px;
 }
 
-.slackWindow {
-  background: light-dark(var(--mantine-color-gray-0), var(--mantine-color-dark-7));
-  border-radius: 14px;
-  max-width: 540px;
-  margin: 40px auto 0 auto;
-  border: 1px solid light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-5));
-  overflow: hidden;
+.memeImage {
+  width: 480px;
+  max-width: 100%;
+  height: auto;
+  border-radius: 12px;
+  margin-left: 32px;
+  will-change: transform, box-shadow;
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+  transition:
+    transform 0.5s ease-out,
+    box-shadow 0.5s ease-out;
+  -webkit-transform-style: preserve-3d;
+  -webkit-backface-visibility: hidden;
+  -webkit-perspective: 1000px;
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  /* Increased elevation for floating effect */
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
   position: relative;
-  min-width: 340px;
-  filter: grayscale(0.8) brightness(0.85);
-  opacity: 0.7;
+  /* Add a slight lift at rest to enhance floating appearance */
+  transform: translateZ(20px);
+  filter: drop-shadow(0 15px 15px rgba(0, 0, 0, 0.15));
 }
 
-.slackPastOverlay {
+.memeImage::after {
+  content: '';
   position: absolute;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, rgba(255, 255, 255, 0.15) 0%, rgba(0, 0, 0, 0.1) 100%);
-  display: flex;
-  align-items: flex-start;
-  justify-content: flex-end;
-  pointer-events: none;
-}
-
-.slackPastLabel {
-  background: #4a154b;
-  color: #fff;
-  font-size: 0.85rem;
-  font-weight: 700;
-  padding: 4px 14px;
-  border-radius: 0 0 0 12px;
-  margin: 10px 0 0 0;
-  letter-spacing: 2px;
-  opacity: 0.85;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
-}
-
-.arrowDown {
-  display: block;
-  margin: 18px auto 0 auto;
-  width: 32px;
-  height: 32px;
-  opacity: 0.7;
-}
-
-.slackHeader {
-  background: linear-gradient(90deg, #4a154b 0%, #611f69 100%);
-  height: 36px;
-  display: flex;
-  align-items: center;
-  padding: 0 14px;
-  color: #fff;
-  font-size: 1rem;
-  font-weight: 600;
-  letter-spacing: 0.5px;
-  border-bottom: 1px solid light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-5));
-}
-
-.slackHeaderDot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  margin-right: 8px;
-  background: #fff;
-  opacity: 0.6;
-  box-shadow:
-    16px 0 0 #fff,
-    32px 0 0 #fff;
-}
-
-.slackMessage {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  padding: 18px 18px 18px 18px;
-  background: none;
-  font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
-}
-
-.slackMessage:hover {
-  animation: shake 0.35s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
-}
-
-.slackAvatar {
-  width: 40px;
-  height: 40px;
-  border-radius: 6px;
-  object-fit: cover;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  margin-top: 2px;
-}
-
-.slackText {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-  max-width: 320px;
-}
-
-.slackMeta {
-  display: flex;
-  align-items: baseline;
-  gap: 6px;
-}
-
-.slackUsername {
-  font-weight: 600;
-  color: light-dark(var(--mantine-color-primary-8), var(--mantine-color-primary-5));
-  font-size: 15px;
-  margin-right: 0;
-}
-
-.slackTimestamp {
-  color: light-dark(var(--mantine-color-gray-6), var(--mantine-color-gray-4));
-  font-size: 13px;
-  margin-left: 0;
-}
-
-.slackContent {
-  margin-top: 2px;
-  font-size: 15px;
-  color: light-dark(var(--mantine-color-gray-9), var(--mantine-color-gray-1));
-  word-break: break-word;
-  line-height: 1.6;
-}
-
-.slackBubble,
-.slackBubble:before {
-  display: none;
-}
-
-.checkCircle {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin: 18px auto 0 auto;
-  animation: check-pop 0.8s cubic-bezier(0.68, -0.55, 0.27, 1.55) 0.2s both;
-}
-
-@keyframes check-pop {
-  0% {
-    transform: scale(0.5) rotate(-20deg);
-    opacity: 0;
-  }
-  60% {
-    transform: scale(1.15) rotate(8deg);
-    opacity: 1;
-  }
-  100% {
-    transform: scale(1) rotate(0deg);
-    opacity: 1;
-  }
-}
-
-@keyframes shake {
-  0% {
-    transform: translateX(0);
-  }
-  15% {
-    transform: translateX(-4px);
-  }
-  30% {
-    transform: translateX(4px);
-  }
-  45% {
-    transform: translateX(-4px);
-  }
-  60% {
-    transform: translateX(4px);
-  }
-  75% {
-    transform: translateX(-2px);
-  }
-  90% {
-    transform: translateX(2px);
-  }
-  100% {
-    transform: translateX(0);
-  }
-}
-
-.slackColumn {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  max-width: 800px;
-  min-width: 600px;
-  min-height: 520px;
-}
-
-.transitionWrapper {
-  position: relative;
-  width: 100%;
-  max-width: 800px;
-  height: 520px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
+  right: 0;
+  bottom: 0;
+  border-radius: 12px;
   background: linear-gradient(
     135deg,
-    light-dark(var(--mantine-color-gray-4) 40%, var(--mantine-color-dark-5) 0%),
-    light-dark(var(--mantine-color-primary-8) 100%, var(--mantine-color-dark-7) 100%)
+    rgba(255, 255, 255, 0.1) 0%,
+    rgba(255, 255, 255, 0) 50%,
+    rgba(0, 0, 0, 0.05) 100%
   );
-  border-radius: 18px;
+  pointer-events: none;
+  z-index: 1;
 }
 
-.slackPosition {
-  position: absolute;
-  top: 75px;
-  left: 38px;
-  width: 420px;
-  z-index: 2;
+.container:hover .memeImage {
+  /* More pronounced hover lift for floating effect */
+  transform: scale(1.055) translateZ(60px); /* Increase z-distance to make it pop more */
+  transition:
+    transform 0.15s ease-out,
+    box-shadow 0.15s ease-out;
+  filter: drop-shadow(0 20px 20px rgba(0, 0, 0, 0.2));
 }
 
-.githubCheckPosition {
-  position: absolute;
-  bottom: 70px;
-  right: 30px;
-  width: 400px;
-  max-width: 100%;
-  z-index: 3;
-  transform: scale(1.2) translateZ(10px);
-  transform-origin: bottom right;
-  transition: all 0.15s linear;
-  overflow: hidden;
-  overflow: visible;
+.imageWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Increase perspective for more dramatic 3D effect */
+  perspective: var(--image-perspective);
+  transform-style: preserve-3d;
+  -webkit-transform-style: preserve-3d;
+  -webkit-perspective: var(--image-perspective);
+  /* Add some margin at the bottom for the shadow */
+  margin-bottom: 30px;
 }
 
-.githubCheckPosition:hover {
-  transform: scale(1.25) translateZ(10px);
-}
-
+/* Responsive: stack image below text on smaller screens */
 @media (max-width: 1034px) {
   .container {
     flex-direction: column;
@@ -314,43 +130,27 @@
     margin-right: 0;
     margin-bottom: calc(var(--mantine-spacing-xl) * 2);
     max-width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
   }
-  .image {
+
+  .imageWrapper {
+    margin-top: 24px;
+    margin-left: 0;
+    justify-content: center;
+    align-items: center;
+    display: flex;
     width: 100%;
-    height: auto;
+  }
+
+  .memeImage {
+    width: 100%;
+    max-width: 600px;
+    margin-left: 0;
+    margin-top: 0;
     display: block;
-    margin: 0 auto;
-  }
-
-  .slackColumn {
-    min-width: auto;
-    width: inherit;
-  }
-
-  .transitionWrapper {
-    width: 100%;
-  }
-
-  .slackPosition {
-    position: absolute;
-    width: 100%;
-    max-width: 90%;
-    top: 50px;
-    left: auto;
-    right: auto;
-  }
-
-  .slackWindow {
-    min-width: auto;
-  }
-
-  .githubCheckPosition {
-    position: absolute;
-    top: 240px;
-    left: auto;
-    right: auto;
-    width: 100%;
-    margin-left: 17%;
-    max-width: 90%;
   }
 }

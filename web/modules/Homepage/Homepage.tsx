@@ -1,3 +1,5 @@
+import { useCallback, useEffect, useRef, useState } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { IconCoin } from '@tabler/icons-react';
 import { Fade } from 'react-awesome-reveal';
@@ -11,15 +13,81 @@ import {
   Title,
   useMantineColorScheme,
 } from '@mantine/core';
-import { GitHubCheck } from '../../components/GitHubCheck/GitHubCheck';
 import css from './Homepage.module.css';
 
 export default function Homepage() {
   const { colorScheme } = useMantineColorScheme();
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [isHovering, setIsHovering] = useState(false);
+  const rafRef = useRef<number | null>(null);
+  const lastUpdateTimeRef = useRef<number>(0);
+
+  // Throttle function to limit updates
+  const updateMousePosition = useCallback((clientX: number, clientY: number) => {
+    if (!containerRef.current) return;
+
+    const now = Date.now();
+    // Only update every 16ms (roughly 60fps)
+    if (now - lastUpdateTimeRef.current < 16) return;
+
+    const { left, top, width, height } = containerRef.current.getBoundingClientRect();
+    // Make horizontal movement more sensitive (30 instead of 40)
+    const x = (clientX - left - width / 2) / 30; // More aggressive horizontal tilt
+    const y = (clientY - top - height / 2) / 40; // Vertical sensitivity unchanged
+
+    // Use requestAnimationFrame for smoother updates
+    if (rafRef.current) {
+      cancelAnimationFrame(rafRef.current);
+    }
+
+    rafRef.current = requestAnimationFrame(() => {
+      setMousePosition({ x, y });
+    });
+
+    lastUpdateTimeRef.current = now;
+  }, []);
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (containerRef.current && isHovering) {
+        updateMousePosition(e.clientX, e.clientY);
+      }
+    };
+
+    window.addEventListener('mousemove', handleMouseMove, { passive: true });
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      if (rafRef.current) {
+        cancelAnimationFrame(rafRef.current);
+      }
+    };
+  }, [isHovering, updateMousePosition]);
+
+  // Calculate tilt values
+  const tiltX = -mousePosition.y;
+  // Remove the negative sign to invert the direction so image tilts toward cursor
+  const tiltY = mousePosition.x - 10; // Removed the negative sign
+
+  // Create a floating shadow effect
+  // Also invert shadow direction to match the new tilt direction
+  const shadowDistance = 40 + Math.abs(tiltX) * 1.5 + Math.abs(tiltY) * 1.5;
+  const shadowOffsetX = -tiltY * 2; // Inverted direction for shadow
+  const shadowOffsetY = Math.abs(tiltX) * 1.5 + 30; // Always keep some Y offset for floating look
+  const shadowBlur = Math.max(5, Math.abs(tiltX) + Math.abs(tiltY));
+  const shadowOpacity = 0.6 - (Math.abs(tiltX) + Math.abs(tiltY)) * 0.01;
 
   return (
     <Fade triggerOnce delay={800} direction="left">
-      <div className={css.container}>
+      <div
+        className={css.container}
+        ref={containerRef}
+        onMouseEnter={() => setIsHovering(true)}
+        onMouseLeave={() => {
+          setIsHovering(false);
+          setMousePosition({ x: 0, y: 0 });
+        }}
+      >
         <div className={css.content}>
           <Title className={css.title}>Instant Reduced Time to Merge.</Title>
           <Text c={colorScheme === 'dark' ? 'dimmed' : ''} mt="md">
@@ -91,41 +159,21 @@ export default function Homepage() {
           </Group>
         </div>
 
-        <div className={css.slackColumn}>
-          <div className={css.transitionWrapper}>
-            <div className={css.slackPosition}>
-              <div className={css.slackWindow}>
-                <div className={css.slackHeader}>
-                  <span className={css.slackHeaderDot} />
-                </div>
-                <div className={css.slackMessage}>
-                  <img
-                    src="https://raw.githubusercontent.com/mantinedev/mantine/refs/heads/master/.demo/avatars/avatar-2.png"
-                    alt="Slack Avatar"
-                    className={css.slackAvatar}
-                  />
-                  <div className={css.slackText}>
-                    <div className={css.slackMeta}>
-                      <span className={css.slackUsername}>johndoe</span>
-                      <span className={css.slackTimestamp}>10:24 AM</span>
-                    </div>
-                    <div className={css.slackContent}>Can you review my PR?</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Present: GitHubCheck */}
-            <div className={css.githubCheckPosition}>
-              <GitHubCheck
-                variant="completed"
-                oldBalance={120}
-                newBalance={100}
-                mergePenalty={20}
-                title="GitKarma Check"
-              />
-            </div>
-          </div>
+        <div className={css.imageWrapper}>
+          <Image
+            src="/two-buttons-meme.jpeg"
+            alt="two-buttons-meme-gitkarma"
+            width={400}
+            height={500}
+            className={css.memeImage}
+            style={{
+              transform: `rotateX(${tiltX}deg) rotateY(${tiltY}deg)`,
+              // Create a more defined drop shadow below the image
+              boxShadow: isHovering
+                ? `${shadowOffsetX}px ${shadowOffsetY}px ${shadowBlur}px rgba(0, 0, 0, ${shadowOpacity}), 0 ${shadowDistance}px ${shadowBlur * 1.5}px rgba(0, 0, 0, 0.2)`
+                : '0 15px 30px rgba(0, 0, 0, 0.15)',
+            }}
+          />
         </div>
       </div>
     </Fade>
