@@ -131,7 +131,6 @@ export default function GitkarmaCapabilities() {
     <Container mt="xl" size="xl" py={60}>
       <Fade triggerOnce cascade delay={200} fraction={0.6}>
         <Title order={2} ta="center" mb={50}>
-          Upcoming{' '}
           <Text span color={theme.colors.primary[6]} inherit fw={900}>
             GitKarma
           </Text>{' '}
