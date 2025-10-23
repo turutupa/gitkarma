@@ -40,7 +40,7 @@ const darkBluish: MantineColorsTuple = [
 export const theme = createTheme({
   colors: {
     primary,
-    dark: darkBluish, // override Mantine dark palette
+    dark: darkBluish,
   },
   primaryColor: 'primary',
   breakpoints: {

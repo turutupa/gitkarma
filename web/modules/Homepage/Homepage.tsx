@@ -18,18 +18,23 @@ import css from './Homepage.module.css';
 export default function Homepage() {
   const { colorScheme } = useMantineColorScheme();
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  const containerRef = useRef<HTMLDivElement>(null);
   const [isHovering, setIsHovering] = useState(false);
+
+  const containerRef = useRef<HTMLDivElement>(null);
   const rafRef = useRef<number | null>(null);
   const lastUpdateTimeRef = useRef<number>(0);
 
   // Throttle function to limit updates
   const updateMousePosition = useCallback((clientX: number, clientY: number) => {
-    if (!containerRef.current) return;
+    if (!containerRef.current) {
+      return;
+    }
 
     const now = Date.now();
     // Only update every 16ms (roughly 60fps)
-    if (now - lastUpdateTimeRef.current < 16) return;
+    if (now - lastUpdateTimeRef.current < 16) {
+      return;
+    }
 
     const { left, top, width, height } = containerRef.current.getBoundingClientRect();
     // Make horizontal movement more sensitive (30 instead of 40)
@@ -75,7 +80,7 @@ export default function Homepage() {
   const shadowOffsetX = -tiltY * 2; // Inverted direction for shadow
   const shadowOffsetY = Math.abs(tiltX) * 1.5 + 30; // Always keep some Y offset for floating look
   const shadowBlur = Math.max(5, Math.abs(tiltX) + Math.abs(tiltY));
-  const shadowOpacity = 0.6 - (Math.abs(tiltX) + Math.abs(tiltY)) * 0.01;
+  const shadowOpacity = 0.45 - (Math.abs(tiltX) + Math.abs(tiltY)) * 0.01; // Reduced from 0.6 to 0.45
 
   return (
     <Fade triggerOnce delay={800} direction="left">
@@ -168,10 +173,17 @@ export default function Homepage() {
             className={css.memeImage}
             style={{
               transform: `rotateX(${tiltX}deg) rotateY(${tiltY}deg)`,
-              // Create a more defined drop shadow below the image
               boxShadow: isHovering
-                ? `${shadowOffsetX}px ${shadowOffsetY}px ${shadowBlur}px rgba(0, 0, 0, ${shadowOpacity}), 0 ${shadowDistance}px ${shadowBlur * 1.5}px rgba(0, 0, 0, 0.2)`
-                : '0 15px 30px rgba(0, 0, 0, 0.15)',
+                ? `${shadowOffsetX}px ${shadowOffsetY}px ${shadowBlur}px ${
+                    colorScheme === 'dark'
+                      ? `rgba(100, 110, 130, ${shadowOpacity})`
+                      : `rgba(0, 0, 0, ${shadowOpacity * 0.8})`
+                  }, 0 ${shadowDistance}px ${shadowBlur * 1.5}px ${
+                    colorScheme === 'dark' ? 'rgba(80, 90, 110, 0.15)' : 'rgba(0, 0, 0, 0.15)'
+                  }`
+                : colorScheme === 'dark'
+                  ? '0 15px 30px rgba(70, 80, 100, 0.65)'
+                  : '0 15px 30px rgba(0, 0, 0, 0.12)',
             }}
           />
         </div>
