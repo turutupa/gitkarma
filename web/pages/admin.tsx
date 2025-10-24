@@ -9,4 +9,9 @@ const ProtectedAdmin = () => {
   );
 };
 
+(ProtectedAdmin as any).meta = {
+  title: 'Admin',
+  description: 'Manage your GitKarma instance, view analytics, and configure repository settings.',
+};
+
 export default ProtectedAdmin;

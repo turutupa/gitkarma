@@ -10,7 +10,11 @@ export default function HomePage() {
       <Homepage />
       <Demo />
       <GitKarmaFeatures />
-      {/* <GitkarmaFlow /> */}
     </>
   );
 }
+
+(HomePage as any).meta = {
+  title: 'Home',
+  description: 'Learn how GitKarma can help you merge pull requests faster and improve your team\'s workflow.',
+};
