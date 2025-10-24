@@ -34,11 +34,15 @@ export default function Welcome() {
         target="_blank"
         radius="xl"
         size="xl"
-        className={css.control}
+        className={css.installButton}
         mt="xl"
         mx="auto"
         display="block"
         w="fit-content"
+        variant="default"
+        styles={{
+          inner: { position: 'relative', zIndex: 1 },
+        }}
       >
         Install GitKarma
       </Button>

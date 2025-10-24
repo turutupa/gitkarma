@@ -46,15 +46,25 @@
 .subtitle {
   font-weight: 600;
   font-size: rem(28px);
-  max-width: rem(900px);
+  max-width: rem(700px);
 
   @media (max-width: $mantine-breakpoint-md) {
     font-size: rem(24px);
-    max-width: rem(700px);
+    max-width: rem(600px);
   }
 
   @media (max-width: $mantine-breakpoint-sm) {
     font-size: rem(20px);
     max-width: rem(500px);
   }
+}
+
+.installButton {
+  transition: all 0.1s linear;
+}
+
+.installButton:hover {
+  color: white !important;
+  border-color: var(--mantine-color-primary-3) !important;
+  background-color: var(--mantine-color-primary-7) !important;
 }
