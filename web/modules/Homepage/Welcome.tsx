@@ -6,8 +6,12 @@ export default function Welcome() {
   const { colorScheme } = useMantineColorScheme();
 
   return (
-    <Fade triggerOnce cascade delay={300} damping={0.4} fraction={0.2}>
-      <Title className={css.headline} ta="center">
+    <Fade triggerOnce cascade delay={350} damping={0.4}>
+      <Title
+        className={css.headline}
+        ta="center"
+        data-text="Never ask for a pull request review again."
+      >
         Never ask for a pull request review again.
       </Title>
 

@@ -6,6 +6,32 @@
   margin-top: clamp(rem(60), 25vh, rem(300));
   margin-bottom: 32px;
   line-height: 1;
+  position: relative;
+  z-index: 3;
+
+  &::before,
+  &::after {
+    content: attr(data-text);
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+  }
+
+  /* &::before {
+    color: light-dark(var(--mantine-color-blue-5), var(--mantine-color-blue-4));
+    animation: firstLayer 2s ease-in-out forwards;
+    animation-delay: 0.7s;
+  }
+
+  &::after {
+    color: light-dark(var(--mantine-color-violet-5), var(--mantine-color-violet-4));
+    animation: secondLayer 2s ease-in-out forwards;
+    animation-delay: 0.7s;
+    z-index: -2;
+  } */
 
   @media (max-width: $mantine-breakpoint-md) {
     font-size: rem(64px);
@@ -17,6 +43,56 @@
     font-size: rem(48px);
     letter-spacing: rem(-1.5px);
     margin-top: clamp(rem(40), 10vh, rem(100));
+  }
+}
+
+@keyframes firstLayer {
+  0% {
+    transform: translateY(0);
+    opacity: 0.9;
+  }
+  20% {
+    transform: translateY(30px);
+    opacity: 0.3;
+  }
+  40% {
+    transform: translateY(30px);
+    opacity: 0.3;
+  }
+  60% {
+    transform: translateY(0);
+    opacity: 0.9;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 0.9;
+  }
+}
+
+@keyframes secondLayer {
+  0% {
+    transform: translateY(0);
+    opacity: 0.9;
+  }
+  10% {
+    transform: translateY(0);
+    opacity: 0.9;
+  }
+  30% {
+    transform: translateY(15px);
+    opacity: 0.3;
+  }
+  50% {
+    transform: translateY(15px);
+    opacity: 0.3;
+  }
+  70% {
+    transform: translateY(0);
+    opacity: 0.9;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 0.9;
   }
 }
 
