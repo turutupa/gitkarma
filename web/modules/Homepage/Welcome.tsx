@@ -7,18 +7,21 @@ export default function Welcome() {
 
   return (
     <Fade triggerOnce cascade delay={350} damping={0.4}>
+      <Title className={css.title} ta="center" mb="lg">
+        Git<span className={css.bright}>Karma</span>
+      </Title>
       <Title
         className={css.headline}
         ta="center"
         data-text="Never ask for a pull request review again."
       >
-        Never ask for a pull request review again.
+        Never ask for a <br />
+        PR review again.
       </Title>
 
       <Text
         c={colorScheme === 'dark' ? 'dimmed' : 'gray.7'}
         ta="center"
-        maw={800}
         mx="auto"
         className={css.subtitle}
       >
