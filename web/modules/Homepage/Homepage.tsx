@@ -149,7 +149,7 @@ export default function Homepage() {
               size="md"
               className={css.control}
             >
-              Install App
+              Install GitKarma
             </Button>
             <Button
               component={Link}

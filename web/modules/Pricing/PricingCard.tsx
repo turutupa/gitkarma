@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { FaCheckCircle } from 'react-icons/fa';
 import {
   Badge,
@@ -10,6 +10,7 @@ import {
   Stack,
   Text,
   Transition,
+  useMantineColorScheme,
   useMantineTheme,
 } from '@mantine/core';
 import css from './PricingCard.module.css';
@@ -41,7 +42,69 @@ const Pricing: React.FC<Props> = ({
   hoverText = 'Coming soon!',
 }) => {
   const theme = useMantineTheme();
+  const { colorScheme } = useMantineColorScheme();
   const [isHovered, setIsHovered] = useState(false);
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [isCardHovering, setIsCardHovering] = useState(false);
+
+  const containerRef = useRef<HTMLDivElement>(null);
+  const rafRef = useRef<number | null>(null);
+  const lastUpdateTimeRef = useRef<number>(0);
+
+  // Throttle function to limit updates
+  const updateMousePosition = useCallback((clientX: number, clientY: number) => {
+    if (!containerRef.current) {
+      return;
+    }
+
+    const now = Date.now();
+    // Only update every 16ms (roughly 60fps)
+    if (now - lastUpdateTimeRef.current < 16) {
+      return;
+    }
+
+    const { left, top, width, height } = containerRef.current.getBoundingClientRect();
+    const x = (clientX - left - width / 2) / 40;
+    const y = (clientY - top - height / 2) / 25;
+
+    // Use requestAnimationFrame for smoother updates
+    if (rafRef.current) {
+      cancelAnimationFrame(rafRef.current);
+    }
+
+    rafRef.current = requestAnimationFrame(() => {
+      setMousePosition({ x, y });
+    });
+
+    lastUpdateTimeRef.current = now;
+  }, []);
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (containerRef.current && isCardHovering) {
+        updateMousePosition(e.clientX, e.clientY);
+      }
+    };
+
+    window.addEventListener('mousemove', handleMouseMove, { passive: true });
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      if (rafRef.current) {
+        cancelAnimationFrame(rafRef.current);
+      }
+    };
+  }, [isCardHovering, updateMousePosition]);
+
+  // Calculate tilt values
+  const tiltX = Math.min(8, mousePosition.y * 2 + 5);
+  const tiltY = mousePosition.x * 3;
+
+  // Create a floating shadow effect
+  const shadowDistance = 20 + Math.abs(tiltX) * 1.5 + Math.abs(tiltY) * 1.5;
+  const shadowOffsetX = -tiltY;
+  const shadowOffsetY = Math.max(0, Math.abs(tiltX));
+  const shadowBlur = Math.max(2, Math.abs(tiltX) + Math.abs(tiltY) - 2);
+  const shadowOpacity = 1 - (Math.abs(tiltX) + Math.abs(tiltY)) * 0.01;
 
   // Use a single consistent emoji for all features
   const features = featuresList.map((feature) => (
@@ -105,8 +168,40 @@ const Pricing: React.FC<Props> = ({
   }, [isHovered, actionText, hoverText]);
 
   return (
-    <Card withBorder radius="md" p="md" className={`${css.card} ${css.hvrRadialOut}`} shadow="sm">
-      <Paper p="md" className={css.paper} shadow="xl">
+    <Card
+      withBorder
+      radius="md"
+      p="md"
+      className={`${css.card} ${css.hvrRadialOut}`}
+      shadow="sm"
+      ref={containerRef}
+      onMouseEnter={() => setIsCardHovering(true)}
+      onMouseLeave={() => {
+        setIsCardHovering(false);
+        setMousePosition({ x: 0, y: 0 });
+      }}
+    >
+      <Paper
+        p="md"
+        className={css.paper}
+        shadow="xl"
+        style={{
+          transform: isCardHovering
+            ? `rotateX(${tiltX}deg) rotateY(${tiltY}deg)`
+            : 'rotateX(0deg) rotateY(0deg)',
+          boxShadow: isCardHovering
+            ? `${shadowOffsetX}px ${shadowOffsetY}px ${shadowBlur}px ${
+                colorScheme === 'dark'
+                  ? `rgba(75, 90, 140, ${shadowOpacity})`
+                  : `rgba(55, 70, 120, ${shadowOpacity * 0.6})`
+              }, 0 ${shadowDistance}px ${shadowBlur * 1.5}px ${
+                colorScheme === 'dark' ? 'rgba(65, 80, 130, 0.2)' : 'rgba(55, 70, 120, 0.12)'
+              }`
+            : colorScheme === 'dark'
+              ? '0 4px 12px rgba(70, 80, 100, 0.35)'
+              : '0 4px 12px rgba(0, 0, 0, 0.1)',
+        }}
+      >
         <Group justify="space-between">
           <Text fz={36} fw={500}>
             {title}

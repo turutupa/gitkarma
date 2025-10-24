@@ -138,7 +138,12 @@ const Pricing = () => {
       </Fade>
 
       {/* render pricing cards */}
-      <SimpleGrid cols={{ base: 1, sm: 1, md: 3 }} spacing={{ base: 'sm', lg: 'xl' }}>
+      <SimpleGrid
+        pb="xl"
+        pt="xl"
+        cols={{ base: 1, sm: 1, md: 3 }}
+        spacing={{ base: 'sm', lg: 'xl' }}
+      >
         {[team, startup, enterprise].map((plan, i) => (
           <Fade key={`pricing-card-fade-${plan.title}`} direction="right" delay={i * 200}>
             <PricingCard {...plan} />
@@ -146,29 +151,33 @@ const Pricing = () => {
         ))}
       </SimpleGrid>
 
-      {/* divider */}
-      <Divider
-        mt={50}
-        variant="solid"
-        w="70%"
-        mx="auto"
-        color={colorScheme === 'dark' ? 'dark.5' : 'gray.4'}
-      />
+      <Fade triggerOnce direction="down" delay={300} fraction={1}>
+        {/* divider */}
+        <Divider
+          mt={50}
+          variant="solid"
+          w="70%"
+          mx="auto"
+          color={colorScheme === 'dark' ? 'dark.5' : 'gray.4'}
+        />
+      </Fade>
 
       {/* footer */}
-      <Box mt="xl" py="lg">
-        <Text size="xl" fw={600} ta="center">
-          Can’t find a plan that fits?
-        </Text>
-        <Text size="lg" c="dimmed" mt="xs" ta="center">
-          Reach out to us — we’re happy to discuss a custom solution tailored to your needs.
-        </Text>
-        <Group justify="center" mt="md">
-          <Button component={Link} color="primary.7" href="/contact">
-            Contact us
-          </Button>
-        </Group>
-      </Box>
+      <Fade triggerOnce direction="up" delay={300} fraction={0.1}>
+        <Box mt="xl" py="lg">
+          <Text size="xl" fw={600} ta="center">
+            Can’t find a plan that fits?
+          </Text>
+          <Text size="lg" c={colorScheme === 'dark' ? 'dimmed' : ''} mt="xs" ta="center">
+            Reach out to us — we’re happy to discuss a custom solution tailored to your needs.
+          </Text>
+          <Group justify="center" mt="md">
+            <Button component={Link} color="primary.8" href="/contact">
+              Contact us
+            </Button>
+          </Group>
+        </Box>
+      </Fade>
     </div>
   );
 };

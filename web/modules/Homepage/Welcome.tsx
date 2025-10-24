@@ -1,46 +1,40 @@
 import { Fade } from 'react-awesome-reveal';
-import { Text, Title, useMantineColorScheme } from '@mantine/core';
+import { Button, Text, Title, useMantineColorScheme } from '@mantine/core';
 import css from './Welcome.module.css';
 
 export default function Welcome() {
   const { colorScheme } = useMantineColorScheme();
 
   return (
-    <Fade triggerOnce cascade damping={0.2} fraction={0.2}>
-      <Title className={css.title} ta="center">
-        Git<span className={css.bright}>Karma</span>
+    <Fade triggerOnce cascade delay={300} damping={0.4} fraction={0.2}>
+      <Title className={css.headline} ta="center">
+        Never ask for a pull request review again.
       </Title>
 
-      {/* blockquote */}
-      <blockquote className={css.quote}>
-        <Text className={css.quoteMarks} aria-hidden="true" mt="xs">
-          “
-        </Text>
-        <Text ta="center" size="xl" fw={700} className={css.quoteText}>
-          Can you review my PR?
-        </Text>
-        <Text
-          ta="center"
-          size="lg"
-          fs="italic"
-          className={css.quoteAttribution}
-          c={colorScheme === 'dark' ? 'dimmed' : ''}
-        >
-          – said no one ever again
-        </Text>
-      </blockquote>
-
       <Text
-        c={colorScheme === 'dark' ? 'dimmed' : ''}
+        c={colorScheme === 'dark' ? 'dimmed' : 'gray.7'}
         ta="center"
-        size="lg"
-        maw={700}
+        maw={800}
         mx="auto"
-        mt="xl"
+        className={css.subtitle}
       >
-        No more Slack chasing. Merge PRs faster with a karma-based reward system. Boost developer
-        productivity, incentivize collaboration, and improve code quality across your team.
+        A karma-based reward system that incentivizes code reviews and speeds up time to merge.
       </Text>
+
+      <Button
+        component="a"
+        href="https://github.com/apps/gitkarma-dev"
+        target="_blank"
+        radius="xl"
+        size="xl"
+        className={css.control}
+        mt="xl"
+        mx="auto"
+        display="block"
+        w="fit-content"
+      >
+        Install GitKarma
+      </Button>
     </Fade>
   );
 }

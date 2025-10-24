@@ -1,7 +1,6 @@
 import { Fade } from 'react-awesome-reveal';
 import {
   Button,
-  Center,
   Container,
   Group,
   SimpleGrid,
@@ -9,10 +8,13 @@ import {
   Textarea,
   TextInput,
   Title,
+  useMantineColorScheme,
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
 
 const Contact = () => {
+  const { colorScheme } = useMantineColorScheme();
+
   const form = useForm({
     initialValues: {
       name: '',
@@ -37,7 +39,14 @@ const Contact = () => {
       </Fade>
 
       <Fade triggerOnce delay={400} duration={1200}>
-        <Text ta="center" mb="xl" fw={500} c="dimmed" maw={400} m="auto">
+        <Text
+          ta="center"
+          mb="xl"
+          fw={500}
+          c={colorScheme === 'dark' ? 'dimmed' : ''}
+          maw={400}
+          m="auto"
+        >
           We're all ears! Whether you need help, want a quote, or just want to chat — we'd love to
           hear from you!
         </Text>
@@ -100,8 +109,18 @@ const Contact = () => {
         </Fade>
 
         <Fade triggerOnce cascade direction="up" delay={800}>
-          <Center mt="xl">Thanks for reaching out!</Center>
-          <Center mt="xs">We’ll get back to you faster than a caffeinated squirrel 🐿️.</Center>
+          <Text
+            ta="center"
+            pt="xl"
+            mt="xl"
+            mb="xl"
+            fw={500}
+            c={colorScheme === 'dark' ? 'dimmed' : ''}
+            maw={300}
+            m="auto"
+          >
+            We’ll get back to you faster than a caffeinated squirrel 🐿️.
+          </Text>
         </Fade>
       </form>
     </Container>

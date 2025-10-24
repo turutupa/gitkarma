@@ -3,6 +3,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useSession } from 'next-auth/react';
+import { Fade } from 'react-awesome-reveal';
 import { FaSun } from 'react-icons/fa';
 import { MdOutlineDarkMode } from 'react-icons/md';
 import {
@@ -128,23 +129,27 @@ const Header = () => {
 
       <Container size="xl" className={css.inner}>
         <Group gap={8} visibleFrom="xs">
-          <Box mr={6} mt={6}>
-            <Image src="/favicon.png" alt="Logo" width={38} height={38} />
-          </Box>
-          {items}
+          <Fade cascade damping={0.1} triggerOnce>
+            <Box mr={6} mt={6}>
+              <Image src="/favicon.png" alt="Logo" width={38} height={38} />
+            </Box>
+            {items}
+          </Fade>
         </Group>
 
         <Group gap={16} visibleFrom="xs">
-          <ThemeIcon
-            size={38}
-            variant="light"
-            radius="xl"
-            onClick={() => setColorScheme(colorScheme === 'light' ? 'dark' : 'light')}
-            className={css.pointer}
-          >
-            {colorScheme === 'light' ? <MdOutlineDarkMode size={18} /> : <FaSun size={18} />}
-          </ThemeIcon>
-          <AuthButton />
+          <Fade cascade damping={0.1} triggerOnce direction="right">
+            <ThemeIcon
+              size={38}
+              variant="light"
+              radius="xl"
+              onClick={() => setColorScheme(colorScheme === 'light' ? 'dark' : 'light')}
+              className={css.pointer}
+            >
+              {colorScheme === 'light' ? <MdOutlineDarkMode size={18} /> : <FaSun size={18} />}
+            </ThemeIcon>
+            <AuthButton />
+          </Fade>
         </Group>
 
         <Burger opened={opened} onClick={toggle} hiddenFrom="xs" size="sm" />
