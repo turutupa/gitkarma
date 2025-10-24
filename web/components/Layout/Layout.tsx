@@ -24,6 +24,10 @@ const Layout: React.FC<Props> = ({ children, title, description }) => {
       <Head>
         <title>{pageTitle}</title>
         <meta name="description" content={pageDescription} />
+        <meta property="og:title" content={pageTitle} />
+        <meta property="og:description" content={pageDescription} />
+        <meta property="og:image" content="https://gitkarma.dev/gitkarma.png" />
+        <meta property="og:site_name" content="gitkarma.dev" />
       </Head>
       <Header />
       <Container mt="100px" pb="150px" size="xl">
