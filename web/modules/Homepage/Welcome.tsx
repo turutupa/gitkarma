@@ -1,52 +1,55 @@
 import { Fade } from 'react-awesome-reveal';
-import { Button, Text, Title, useMantineColorScheme } from '@mantine/core';
+import { Button, Text, Title } from '@mantine/core';
 import css from './Welcome.module.css';
 
 export default function Welcome() {
-  const { colorScheme } = useMantineColorScheme();
-
   return (
-    <Fade triggerOnce cascade delay={350} damping={0.4}>
-      <Title className={css.title} ta="center" mb="lg">
-        <span className={css.git}>Git</span>
-        <span className={css.bright}>Karma</span>
-      </Title>
-      <Title
-        className={css.headline}
-        ta="center"
-        data-text="Never ask for a pull request review again."
-      >
-        Never ask for a <br />
-        PR review again.
-      </Title>
+    <div className={css.wrapper}>
+      <div className={css.container}>
+        <Fade triggerOnce cascade delay={350} damping={0.4}>
+          <Title className={css.title} ta="center" mb="lg">
+            <span className={css.git}>Git</span>
+            <span className={css.bright}>Karma</span>
+          </Title>
 
-      <Text
-        c={colorScheme === 'dark' ? 'dimmed' : 'gray.7'}
-        ta="center"
-        mx="auto"
-        className={css.subtitle}
-      >
-        A karma-based reward system that incentivizes code reviews and speeds up time to merge.
-      </Text>
+          <Title
+            className={css.headline}
+            ta="center"
+            data-text="Never ask for a pull request review again."
+          >
+            Never ask for a <br />
+            PR review again.
+          </Title>
 
-      <Button
-        component="a"
-        href="https://github.com/apps/gitkarma-dev"
-        target="_blank"
-        radius="xl"
-        size="xl"
-        className={css.installButton}
-        mt="xl"
-        mx="auto"
-        display="block"
-        w="fit-content"
-        variant="default"
-        styles={{
-          inner: { position: 'relative', zIndex: 1 },
-        }}
-      >
-        Install GitKarma
-      </Button>
-    </Fade>
+          <Text ta="center" mx="auto" className={css.subtitle}>
+            A karma-based reward system that incentivizes code reviews and speeds up time to merge.
+          </Text>
+
+          <Button
+            component="a"
+            href="https://github.com/apps/gitkarma-dev"
+            target="_blank"
+            radius="xl"
+            size="xl"
+            className={css.installButton}
+            mt="xl"
+            mx="auto"
+            display="block"
+            w="fit-content"
+            variant="default"
+            styles={{
+              inner: { position: 'relative', zIndex: 1 },
+            }}
+          >
+            Install GitKarma
+          </Button>
+        </Fade>
+      </div>
+
+      {/* video effect */}
+      <video className={css.backgroundVideo} autoPlay loop muted playsInline>
+        <source src="/prs_approved.mp4" type="video/mp4" />
+      </video>
+    </div>
   );
 }

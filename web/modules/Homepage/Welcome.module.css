@@ -7,6 +7,7 @@
   line-height: 1;
   position: relative;
   z-index: 3;
+  transition: color 0.3s ease;
 
   @media (max-width: $mantine-breakpoint-md) {
     font-size: rem(80px);
@@ -23,6 +24,8 @@
   font-size: rem(50px);
   margin-top: clamp(rem(60), 25vh, rem(300));
   margin-bottom: 40px;
+  position: relative;
+  z-index: 3;
 
   @media (max-width: $mantine-breakpoint-md) {
     font-size: rem(40px);
@@ -53,6 +56,10 @@
   font-weight: 600;
   font-size: rem(28px);
   max-width: rem(700px);
+  position: relative;
+  z-index: 3;
+  color: light-dark(var(--mantine-color-gray-7), var(--mantine-color-dark-2));
+  transition: color 0.3s ease;
 
   @media (max-width: $mantine-breakpoint-md) {
     font-size: rem(24px);
@@ -65,12 +72,54 @@
   }
 }
 
+.wrapper:has(.installButton:hover) .headline {
+  color: white !important;
+}
+
+.wrapper:has(.installButton:hover) .subtitle {
+  color: var(--mantine-color-gray-3) !important;
+}
+
+.wrapper:has(.installButton:hover) .git {
+  color: var(--mantine-color-gray-3) !important;
+}
+
 .installButton {
   transition: all 0.1s linear;
+  position: relative;
+  z-index: 3;
 }
 
 .installButton:hover {
   color: white !important;
   border-color: var(--mantine-color-primary-3) !important;
   background-color: var(--mantine-color-primary-7) !important;
+}
+
+.backgroundVideo {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  object-fit: cover;
+  z-index: 100;
+  opacity: 0;
+  filter: blur(8px);
+  transition: opacity 0.6s ease-in-out;
+  pointer-events: none;
+}
+
+.wrapper {
+  position: relative;
+}
+
+.container {
+  position: relative;
+  z-index: 101;
+  isolation: isolate;
+}
+
+.wrapper:has(.installButton:hover) .backgroundVideo {
+  opacity: 1;
 }
