@@ -8,7 +8,8 @@ export default function Welcome() {
   return (
     <Fade triggerOnce cascade delay={350} damping={0.4}>
       <Title className={css.title} ta="center" mb="lg">
-        Git<span className={css.bright}>Karma</span>
+        <span className={css.git}>Git</span>
+        <span className={css.bright}>Karma</span>
       </Title>
       <Title
         className={css.headline}

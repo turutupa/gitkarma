@@ -110,9 +110,13 @@ export default function Homepage() {
             and keeps your team moving fast.
           </Text>
 
-          <Paper shadow="xs" p="lg" mt="lg" mb="lg">
-            <Text ta="center" size="lg" maw={700}>
-              It's a <span className={css.highlightGate}>gate</span> – not a game.
+          <Paper shadow="xl" p="xl" mt="lg" mb="lg" radius="md" className={css.karmaBox}>
+            <Text fw={600} ta="center" size="xl" className={css.karmaText}>
+              Review to <span className={css.highlight}>Earn</span>
+              <Text component="span" mx="sm" className={css.separator}>
+                →
+              </Text>
+              <span className={css.highlight}>Spend</span> to Merge
             </Text>
           </Paper>
 

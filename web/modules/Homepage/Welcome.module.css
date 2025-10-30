@@ -33,14 +33,20 @@
   }
 }
 
+.git {
+  font-weight: 900;
+}
+
 .bright {
-  background: light-dark(var(--mantine-color-primary-6), var(--mantine-color-primary-7));
-  color: white;
+  background: light-dark(var(--mantine-color-primary-6), var(--mantine-color-primary-6));
+  color: light-dark(var(--mantine-color-gray-1), var(--mantine-color-gray-1));
   border-radius: var(--mantine-radius-lg);
   padding: 4px 12px;
   margin-left: 6px;
   position: relative;
   font-weight: 900;
+  -webkit-text-stroke: 1.5px light-dark(var(--mantine-color-dark-8), var(--mantine-color-gray-9));
+  border: 1.5px solid light-dark(var(--mantine-color-dark-8), var(--mantine-color-dark-5));
 }
 
 .subtitle {

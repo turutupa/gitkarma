@@ -1,8 +1,6 @@
-# GitKarma: Make Code Reviews Earn Their Keep
+# GitKarma: Never ask for a PR review again.
 
-_A playful rebellion against slow PRs — and a promise to fix them._
-
-**TL;DR:** Code reviews are the lifeblood of healthy engineering teams. But they’re slow, inconsistent, and often feel like unpaid emotional labor. GitKarma turns reviewing into a measurable, enforceable system: reviewers earn karma for quality reviews; authors spend small amounts to prioritize merges; and teams regain fast, reliable feedback loops. Visit [**gitkarma.dev**](https://gitkarma.dev) to try it.
+**TL;DR:** Code reviews are slow and require constant chasing. GitKarma fixes this: reviewers earn karma for quality reviews; authors must spend karma to get their PR merged. This creates a balanced economy where reviews actually happen, and critical work gets prioritized fairly. Visit [**gitkarma.dev**](https://gitkarma.dev) to try it.
 
 ---
 
@@ -18,65 +16,56 @@ Slow reviews are a productivity tax. We pay it with wasted cycles, frustrated de
 
 ## Meet GitKarma — make reviews fair, fast, and final
 
-GitKarma flips the script. Instead of relying on goodwill and sticky notes, it creates a transparent system for review labor inside your team. The rules are simple and human-friendly:
+GitKarma flips the script. Instead of relying on goodwill, chasing down developers, or leaving everyone to fend for themselves, it creates a transparent system for review labor inside your team.
 
-- **Earn for quality:** Reviewers earn points (karma) when they write helpful, actionable reviews. Quality, not speed, drives rewards.
-- **Pay to prioritize:** Authors can spend a little karma to nudge a PR up the queue when it’s critical. This is intentionally small — it’s about prioritization, not paying to bypass safety.
-- **Scoreboard > politics:** Karma is visible. Who consistently reviews thoroughly? Who hoards approvals? The data is there.
-- **Admin guardrails:** Team leads can set caps, emergency bypasses, and reward multipliers so GitKarma supports your workflow rather than dictating it.
+The rules are simple and human-friendly:
 
-This isn’t bribery. It’s accountability.
+- **Review to Earn:** Developers earn karma points for reviewing PRs. The more you review, the more you earn.
+- **Spend to Merge:** Authors must spend karma to pass the GitKarma check and merge their PR. No karma? No merge. If you run out, you review someone else's PR to earn more. This isn't optional — it's the gate that makes the system work.
+- **Full Visibility Dashboard:** GitKarma provides a comprehensive dashboard showing PR status, time to merge, review activity, and karma distribution across your team. No more guessing where bottlenecks are — the data is right there.
+- **Scoreboard > Politics:** Karma is visible. Who consistently reviews thoroughly? Who hoards approvals? The data is there.
+- **Admin guardrails:** When a hotfix needs to ship or production is down, admins can bypass the karma check entirely — no waiting, no blockers. GitKarma enforces process when it matters and gets out of the way when urgency demands it.
+- **Bounties!** Need a critical PR reviewed _fast_? Wrestling with a gnarly refactor that deserves extra recognition? Or just want to spice things up? Admins can add a bounty with `gk add bounty <karma points>` (e.g., `gk add bounty 50`) to offer bonus karma to reviewers. Use it to fast-track urgent work, reward heroic reviews of complex PRs, or simply add a little competitive fun to your workflow.
 
----
-
-## This is not a game. It’s a gate.
-
-This isn’t play. It’s policy.
-
-When a PR stalls, it isn’t an opportunity for a badge — it’s a risk: lost context, delayed releases, and a higher likelihood of bugs in production. GitKarma is a gatekeeper: a procedural control that enforces who reviews what, when, and how well. It turns invisible labor into auditable responsibility.
-
-GitKarma doesn’t entertain; it enforces. It makes review duties explicit, makes prioritization enforceable, and gives teams the tools to prevent critical work from getting stuck behind polite postponements. It doesn’t replace human judgment — it ensures human judgment actually happens.
-
-Use it to make review labor visible. Use it to protect the codebase. Use it to stop treating reviews as optional goodwill and start treating them as the essential process they are.
+The result: reviews happen consistently, critical work moves forward, and contribution is measured fairly.
 
 ---
 
-## Honest use-cases (real teams, real wins)
+## Real scenario: Ship faster, not harder
 
-- **Startup sprint:** A small team needs one critical feature shipped by the end of the week. Authors spend earned karma to prioritize those PRs; the team clears the path without sidelining quality.
-- **Distributed org:** With multiple timezones, reviews get staggered. GitKarma surfaces reliable reviewers and helps balance the load so no one gets buried.
-- **Platform teams:** Internal platform PRs are notorious for low visibility. Karma makes platform work respected and prioritized proportionally.
+Here's how it works in practice:
 
----
+Sarah opens a refactoring PR on Monday morning. She has 100 karma points. Her PR costs 100 karma to merge. Two teammates review it Tuesday afternoon — they each earn 50 karma. Sarah spends her 100 karma, merges the PR, and ships by Wednesday.
 
-## Rules, not chaos
+Next week, Sarah's karma is low (25 points). She needs to merge another PR (100 karma cost). She reviews two PRs from teammates — earns 100 karma — then merges her own. The cycle continues. Reviews happen. Work moves.
 
-We hear the concerns: “Won’t people game it?” “Will this hurt collaboration?” These are real questions — and preventable when the system is designed right. GitKarma is built with guardrails:
-
-- Review **quality checks** (actionable comments, suggested tests, meaningful diffs reviewed) feed scoring — not arbitrary popularity.
-- Admins set **daily caps** on spend and earn to prevent wild swings.
-- Emergency bypass exists for on-call and production hotfixes.
-- Karma is a signal for decisions, not an absolute decree — team leads still exercise judgment.
-
-The objective is to nudge behavior toward responsibility, not to replace judgment or punish people.
+No chasing. No guilt trips. Just a system that runs itself.
 
 ---
 
-## How to get started (practical, not theoretical)
+## Built for real teams
 
-1. Go to [**gitkarma.dev**](https://github.com/apps/gitkarma-dev).
-2. Click on install
-3. You're set!
+GitKarma is designed to work with how teams actually operate, not against them:
 
-GitKarma comes with **sane defaults** out of the box — you don't need to configure anything to start earning and spending karma. The system works immediately with balanced earning rates, reasonable spend costs, and sensible caps.
+- **Full configurability:** All settings — karma earned per review, karma cost to merge, and more — can be configured by admins to match your team's needs and priorities.
+- **Automate urgency incentives:** Set bonus karma for timely reviews — for example, award extra points for reviews completed within the first 24 hours of a PR being opened.
+- **Karma is a signal, not a decree:** Team leads still exercise judgment. GitKarma informs decisions; it doesn't replace human oversight.
 
-**Optional next steps:**
+---
 
-- Fine-tune karma points awarded or charged in the admin page at [**gitkarma.dev**](https://gitkarma.dev)
-- Run a pilot with one team for 2–4 sprints and watch the feedback loop
-- Adjust rules based on real usage and share results with the broader org
+## How to get started — 60 seconds, zero config
 
-Start small. Measure. Iterate. Let outcomes prove the model.
+**GitKarma is completely free.** Install it once, and it works immediately with battle-tested defaults. No credit card. No trial period. Just install and go.
+
+1. Visit [**gitkarma.dev**](https://github.com/apps/gitkarma-dev)
+2. Click "Install" and select your repositories
+3. Open a PR — GitKarma is now enforcing fair reviews
+
+**That's it.** Your team starts earning and spending karma immediately.
+
+**Want to customize?** Fine-tune settings at [**gitkarma.dev/admin**](https://gitkarma.dev/admin) (login required). Adjust karma costs, earning rates, and bonus timers to match your team's workflow.
+
+**Recommended:** Run a pilot with one team for 2–4 sprints. Watch velocity improve. Adjust rules based on real usage. Scale to other teams when you're ready.
 
 ---
 
@@ -90,12 +79,10 @@ No drama. No moralizing. Just a system that respects time and improves outcomes.
 
 ---
 
-## One last thing (because culture matters)
+## Stop waiting. Start shipping.
 
-Tools don’t fix culture — people do. GitKarma is most effective in teams that already value feedback and empathy. If you’re using it to punish, micromanage, or replace human judgment, stop. Use it to amplify the good: clearer feedback, faster merges, and a fairer distribution of effort.
+Your PRs shouldn't rot in review limbo. Your best reviewers shouldn't burn out covering for everyone else.
 
----
+**Install GitKarma in 60 seconds at [gitkarma.dev](https://gitkarma.dev)** — no configuration needed, completely free. Fix your review bottleneck today.
 
-## Ready to try it?
-
-If you’re tired of PR limbo and want a practical way to accelerate review cycles while preserving quality, check out [**gitkarma.dev**](https://gitkarma.dev). Try a pilot. Be serious about enforcement. Be fair in its use.
+Try a pilot. Enforce the rules. Watch your velocity improve.
