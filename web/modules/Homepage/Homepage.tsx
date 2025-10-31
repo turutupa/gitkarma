@@ -113,7 +113,7 @@ export default function Homepage() {
           <Paper shadow="xl" p="xl" mt="lg" mb="lg" radius="md" className={css.karmaBox}>
             <Text fw={600} ta="center" size="xl" className={css.karmaText}>
               Review to <span className={css.highlight}>Earn</span>
-              <Text component="span" mx="sm" className={css.separator}>
+              <Text component="span" mx="xs" className={css.separator}>
                 →
               </Text>
               <span className={css.highlight}>Spend</span> to Merge

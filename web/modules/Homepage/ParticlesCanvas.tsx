@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef } from 'react';
+import { useMantineTheme } from '@mantine/core';
 import styles from './ParticlesCanvas.module.css';
 
 interface Particle {
@@ -17,10 +18,16 @@ const ParticlesCanvas: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationIdRef = useRef<number | null>(null);
   const particlesRef = useRef<Particle[]>([]);
+  const theme = useMantineTheme();
 
   // Random neon colors
   const getRandomColor = () => {
-    const colors = ['#ff2a6d', '#05d9e8', '#a239ea', '#39ff14'];
+    const colors = [
+      theme.colors.pink[5],
+      theme.colors.cyan[5],
+      theme.colors.violet[5],
+      theme.colors.primary[4],
+    ];
     return colors[Math.floor(Math.random() * colors.length)];
   };
 
@@ -50,13 +57,6 @@ const ParticlesCanvas: React.FC = () => {
   // Animation loop
   const animate = (ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement) => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    // Gradient background
-    const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
-    gradient.addColorStop(0, '#070610');
-    gradient.addColorStop(1, '#0f0e17');
-    ctx.fillStyle = gradient;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     const particles = particlesRef.current;
 

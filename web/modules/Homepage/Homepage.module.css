@@ -57,8 +57,8 @@
 .separator {
   color: light-dark(var(--mantine-color-primary-5), var(--mantine-color-primary-8));
   font-weight: 900;
-  -webkit-text-stroke: 2px light-dark(var(--mantine-color-dark-8), var(--mantine-color-dark-9));
   paint-order: stroke fill;
+  -webkit-text-stroke: 2px light-dark(var(--mantine-color-dark-8), var(--mantine-color-dark-9));
 }
 
 .highlight {
