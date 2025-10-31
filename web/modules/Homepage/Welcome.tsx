@@ -1,5 +1,6 @@
 import { Fade } from 'react-awesome-reveal';
 import { Button, Text, Title } from '@mantine/core';
+import ParticlesCanvas from './ParticlesCanvas';
 import css from './Welcome.module.css';
 
 export default function Welcome() {
@@ -47,7 +48,9 @@ export default function Welcome() {
       </div>
 
       {/* background effect */}
-      <div className={css.backgroundVideo} />
+      <div className={css.backgroundVideo}>
+        <ParticlesCanvas />
+      </div>
     </div>
   );
 }

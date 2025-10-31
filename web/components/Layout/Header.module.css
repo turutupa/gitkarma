@@ -3,7 +3,7 @@
 }
 
 .header {
-  z-index: 99;
+  z-index: 150;
   top: 0;
   left: 0;
   position: fixed;
