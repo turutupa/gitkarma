@@ -72,18 +72,6 @@
   }
 }
 
-.wrapper:has(.installButton:hover) .headline {
-  color: white !important;
-}
-
-.wrapper:has(.installButton:hover) .subtitle {
-  color: var(--mantine-color-gray-3) !important;
-}
-
-.wrapper:has(.installButton:hover) .git {
-  color: var(--mantine-color-gray-3) !important;
-}
-
 .installButton {
   transition: all 0.1s linear;
   position: relative;
@@ -92,8 +80,8 @@
 
 .installButton:hover {
   color: white !important;
-  border-color: var(--mantine-color-primary-3) !important;
-  background-color: var(--mantine-color-primary-7) !important;
+  border-color: light-dark(var(--mantine-color-dark-8), var(--mantine-color-dark-5)) !important;
+  background-color: var(--mantine-color-primary-8) !important;
 }
 
 .backgroundVideo {
@@ -105,9 +93,9 @@
   object-fit: cover;
   z-index: 100;
   opacity: 0;
-  filter: blur(8px);
   transition: opacity 0.6s ease-in-out;
   pointer-events: none;
+  background-color: light-dark(var(--mantine-color-white), var(--mantine-color-dark-9));
 }
 
 .wrapper {

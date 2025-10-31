@@ -46,10 +46,8 @@ export default function Welcome() {
         </Fade>
       </div>
 
-      {/* video effect */}
-      <video className={css.backgroundVideo} autoPlay loop muted playsInline>
-        <source src="/prs_approved.mp4" type="video/mp4" />
-      </video>
+      {/* background effect */}
+      <div className={css.backgroundVideo} />
     </div>
   );
 }
